@@ -19,18 +19,29 @@ public class Player : MonoBehaviour
     public float walkSpeed = 5.0f;
     public float sneakSpeed = 2.5f;
 
+    // Health
+    public float currentHealth;
+    public float maxHealth = 100.0f;
+    public float healthRegRate = 2.0f;
+
     // Jump
     public float jumpHeight = 1.5f;
 
     // Stamina
-    public float maxStamina = 100.0f;
     public float currentStamina;
+    public float maxStamina = 100.0f;
+    public float staminaRegRate = 5.0f;
+
+    public float runConsRate = 10.0f;
+    public float jumpConsRate = 15.0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         cameraTransform = GameObject.Find("Main Camera").GetComponent<Transform>();
         characterController = GetComponent<CharacterController>();
+
+        currentHealth = maxHealth;
         currentStamina = maxStamina;
     }
 
@@ -49,6 +60,9 @@ public class Player : MonoBehaviour
         }
 
         characterController.Move(motion * Time.deltaTime);
+
+        RegenerateHealth();
+        RegenrerationStamina();
     }
 
     public bool isGrounded()
@@ -92,6 +106,28 @@ public class Player : MonoBehaviour
 
         motion.x = movement.x * speed;
         motion.z = movement.z * speed;
+    }
+
+    void RegenerateHealth()
+    {
+        float health = currentHealth + healthRegRate * Time.deltaTime;
+        currentHealth = Mathf.Clamp(health, 0.0f, maxHealth);
+    }
+
+    void RegenrerationStamina()
+    {
+        float rate = staminaRegRate;
+
+        if (motion.x >= -0.1f && motion.x <= 0.1f &&
+            motion.y >= -0.1f && motion.y <= 0.1f &&
+            motion.z >= -0.1f && motion.z <= 0.1f)
+        {
+            // Increase regeneration rate when idle
+            rate *= 1.5f;
+        }
+
+        float stamina = currentStamina + rate * Time.deltaTime;
+        currentStamina = Mathf.Clamp(stamina, 0.0f, maxStamina);
     }
 
     public void Run(bool value)
