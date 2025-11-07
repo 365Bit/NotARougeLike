@@ -10,6 +10,7 @@ public class UserInput : MonoBehaviour
 
     private bool jump;
     private bool run;
+    private bool slide;
     private bool sneak;
 
     public float mouseSensitivity = 0.1f;
@@ -32,6 +33,7 @@ public class UserInput : MonoBehaviour
 
         jump = false;
         run = false;
+        slide = false;
         sneak = false;
 
         // Get inputs
@@ -41,6 +43,7 @@ public class UserInput : MonoBehaviour
 
         // Apply inputs
         player.Run(run);
+        player.Slide(slide);
         player.Sneak(sneak);
 
         player.Rotate(rotation);
@@ -109,6 +112,7 @@ public class UserInput : MonoBehaviour
 
         jump |= keyboard.spaceKey.isPressed;
         run |= keyboard.leftShiftKey.isPressed;
+        slide |= keyboard.leftAltKey.isPressed;
         sneak |= keyboard.leftCtrlKey.isPressed;
     }
 

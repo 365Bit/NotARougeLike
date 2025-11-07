@@ -3,6 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class Player : MonoBehaviour
 {
+    // Components
     private Transform cameraTransform;
     private CharacterController characterController;
 
@@ -10,29 +11,41 @@ public class Player : MonoBehaviour
 
     private bool grounded;
     private bool run;
+    private bool slide;
     private bool sneak;
 
     private Vector3 motion;
+    private Vector3 scale;
 
-    // Movement
+    private float currentHealth;
+    private float currentStamina;
+
+    private float defaultYScale;
+
+    private float slideCooldown;
+    private float slideTime;
+
+    [Header("Movement")]
     public float runSpeed = 10.0f;
     public float walkSpeed = 5.0f;
     public float sneakSpeed = 2.5f;
 
-    // Health
-    public float currentHealth;
+    [Header("Sliding")]
+    public float maxSlideTime = 3.0f;
+    public float slideSpeed = 12.0f;
+
+    [Header("Health")]
     public float maxHealth = 100.0f;
     public float healthRegRate = 2.0f;
 
-    // Jump
+    [Header("Jump")]
     public float jumpHeight = 1.5f;
 
-    // Stamina
-    public float currentStamina;
+    [Header("Stamina")]
     public float maxStamina = 100.0f;
     public float staminaRegRate = 5.0f;
-
     public float runConsRate = 10.0f;
+    public float slideConsRate = 20.0f;
     public float jumpConsRate = 15.0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -43,12 +56,18 @@ public class Player : MonoBehaviour
 
         currentHealth = maxHealth;
         currentStamina = maxStamina;
+
+        defaultYScale = transform.localScale.y;
     }
 
     // Update is called once per frame
     void Update()
     {
         grounded = characterController.isGrounded;
+        scale = transform.localScale;
+
+        scale.y = slide ? defaultYScale * 0.5f : sneak ? defaultYScale * 0.75f : defaultYScale;
+        transform.localScale = scale;
 
         if (!grounded)
         {
@@ -57,6 +76,28 @@ public class Player : MonoBehaviour
         else
         {
             motion.y = 0.0f;
+        }
+
+        if (slide)
+        {
+            slideTime -= Time.deltaTime;
+
+            if (slideTime <= 0.0f)
+            {
+                // End slide
+                slide = false;
+                slideCooldown = 1.0f;
+                slideTime = 0.0f;
+            }
+        }
+        else if (slideCooldown > 0.0f)
+        {
+            slideCooldown -= Time.deltaTime;
+
+            if (slideCooldown < 0.0f)
+            {
+                slideCooldown = 0.0f;
+            }
         }
 
         characterController.Move(motion * Time.deltaTime);
@@ -75,6 +116,11 @@ public class Player : MonoBehaviour
         return run;
     }
 
+    public bool isSliding()
+    {
+        return slide;
+    }
+
     public bool isSneaking()
     {
         return sneak;
@@ -82,8 +128,9 @@ public class Player : MonoBehaviour
 
     public void Jump()
     {
-        if (grounded && currentStamina > 0)
+        if (grounded && currentStamina >= jumpConsRate)
         {
+            currentStamina -= jumpConsRate;
             motion.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
     }
@@ -95,13 +142,19 @@ public class Player : MonoBehaviour
 
         float speed = walkSpeed;
 
-        if (run && currentStamina > 0)
+        if (run && currentStamina >= runConsRate)
         {
+            currentStamina -= runConsRate * Time.deltaTime;
             speed = runSpeed;
         }
         else if (sneak)
         {
             speed = sneakSpeed;
+        }
+
+        if (slide)
+        {
+            speed += slideSpeed * (slideTime / maxSlideTime);
         }
 
         motion.x = movement.x * speed;
@@ -149,6 +202,22 @@ public class Player : MonoBehaviour
         // Camera
         float angle = Mathf.Clamp(rotation.y * 2, -90, 90.0f);
         cameraTransform.localRotation = Quaternion.AngleAxis(angle, Vector3.left);
+    }
+
+    public void Slide(bool value)
+    {
+        if (value && currentStamina >= slideConsRate &&
+            grounded && !slide && slideCooldown == 0.0f)
+        {
+            currentStamina -= slideConsRate;
+
+            slide = true;
+            slideTime = maxSlideTime;
+        }
+        else if (!value && slide)
+        {
+            slide = false;
+        }
     }
 
     public void Sneak(bool value)
