@@ -7,8 +7,17 @@ public class Player : MonoBehaviour
     private Transform cameraTransform;
     private CharacterController characterController;
 
+    public enum AttackType
+    {
+        Hit,
+        Shoot
+    }
+
+    private AttackType attackType;
+
     private float gravity = -9.81f;
 
+    private bool aim;
     private bool grounded;
     private bool run;
     private bool slide;
@@ -53,6 +62,8 @@ public class Player : MonoBehaviour
     {
         cameraTransform = GameObject.Find("Main Camera").GetComponent<Transform>();
         characterController = GetComponent<CharacterController>();
+
+        attackType = AttackType.Shoot;
 
         currentHealth = maxHealth;
         currentStamina = maxStamina;
@@ -104,6 +115,66 @@ public class Player : MonoBehaviour
 
         RegenerateHealth();
         RegenrerationStamina();
+    }
+
+    public void Aim(bool value)
+    {
+        // TODO
+        if (value)
+        {
+            Debug.Log("Aime");
+        }
+
+        aim = value;
+    }
+
+    public void Attack(AttackType? type = null)
+    {
+        // Use current attack type if no type is specified
+        attackType = type ?? attackType;
+
+        switch (attackType)
+        {
+            case AttackType.Hit:
+                Hit();
+                break;
+            case AttackType.Shoot:
+                Shoot();
+                break;
+            default:
+                Debug.LogError("Unknown Attack Type: " + attackType);
+                break;
+        }
+    }
+
+    public void ChangeAttack()
+    {
+        if (attackType == AttackType.Hit)
+        {
+            attackType = AttackType.Shoot;
+        }
+        else
+        {
+            attackType = AttackType.Hit;
+        }
+    }
+
+    private void Die()
+    {
+        // TODO
+        Debug.Log("Die");
+    }
+
+    void Hit()
+    {
+        // TODO
+        Debug.Log("Hit");
+    }
+
+    public void Interact()
+    {
+        // TODO
+        Debug.Log("Interact");
     }
 
     public bool isGrounded()
@@ -204,6 +275,12 @@ public class Player : MonoBehaviour
         cameraTransform.localRotation = Quaternion.AngleAxis(angle, Vector3.left);
     }
 
+    void Shoot()
+    {
+        // TODO
+        Debug.Log("Shoot");
+    }
+
     public void Slide(bool value)
     {
         if (value && currentStamina >= slideConsRate &&
@@ -229,5 +306,22 @@ public class Player : MonoBehaviour
         }
 
         sneak = value;
+    }
+
+    public void UseItem(int itemID)
+    {
+        // TODO
+        Debug.Log("Use Item: " + itemID);
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+
+        if (currentHealth <= 0.0f)
+        {
+            currentHealth = 0.0f;
+            Die();
+        }
     }
 }
