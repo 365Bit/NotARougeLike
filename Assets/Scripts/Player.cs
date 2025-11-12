@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
 
     private float currentFOV;
     private float currentHealth;
+    private float currentMana;
     private float currentStamina;
 
     private float defaultYScale;
@@ -47,6 +48,10 @@ public class Player : MonoBehaviour
     public GameObject weapon;
     public float fireRate = 3.0f;
     public float hitRange = 2.0f;
+
+    [Header("Mana")]
+    public float maxMana = 100.0f;
+    public float manaRegRate = 3.0f;
 
     [Header("Movement")]
     public float runSpeed = 10.0f;
@@ -84,6 +89,7 @@ public class Player : MonoBehaviour
         attackType = AttackType.Shoot;
 
         currentHealth = maxHealth;
+        currentMana = maxMana;
         currentStamina = maxStamina;
 
         defaultYScale = transform.localScale.y;
@@ -143,7 +149,8 @@ public class Player : MonoBehaviour
         characterController.Move(motion * Time.deltaTime);
 
         RegenerateHealth();
-        RegenrerationStamina();
+        RegenerateMana();
+        RegenrerateStamina();
     }
 
     public void Aim(bool value)
@@ -272,7 +279,13 @@ public class Player : MonoBehaviour
         currentHealth = Mathf.Clamp(health, 0.0f, maxHealth);
     }
 
-    void RegenrerationStamina()
+    void RegenerateMana()
+    {
+        float mana = currentStamina + manaRegRate * Time.deltaTime;
+        currentStamina = Mathf.Clamp(mana, 0.0f, maxStamina);
+    }
+
+    void RegenrerateStamina()
     {
         float rate = staminaRegRate;
 
