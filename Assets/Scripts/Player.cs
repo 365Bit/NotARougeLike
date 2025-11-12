@@ -9,6 +9,9 @@ public class Player : MonoBehaviour
     private InteractionArea interactArea;
     private Camera playerCamera;
 
+    private Transform leftShoulderTransform;
+    private Transform rightShoulderTransform;
+
     public enum AttackType
     {
         Hit,
@@ -85,6 +88,9 @@ public class Player : MonoBehaviour
         cameraTransform = mainCamera.GetComponent<Transform>();
         characterController = GetComponent<CharacterController>();
         interactArea = GameObject.Find("Interaction Area").GetComponent<InteractionArea>();
+
+        leftShoulderTransform = GameObject.Find("Left Shoulder").GetComponent<Transform>();
+        rightShoulderTransform = GameObject.Find("Right Shoulder").GetComponent<Transform>();
 
         attackType = AttackType.Shoot;
 
@@ -271,6 +277,28 @@ public class Player : MonoBehaviour
 
         motion.x = movement.x * speed;
         motion.z = movement.z * speed;
+
+        float ratio = Time.deltaTime * 5.0f;
+
+        if (attackType != AttackType.Hit && (direction.x != 0.0f || direction.y != 0.0f) && !slide)
+        {
+            float amplitude = 2.0f * speed;
+            float frequency = 5.0f;
+
+            float wave = Mathf.Sin(Time.time * frequency) * amplitude;
+
+            leftShoulderTransform.localRotation = Quaternion.Slerp(leftShoulderTransform.localRotation,
+                Quaternion.Euler(wave, 0.0f, 0.0f), ratio);
+            rightShoulderTransform.localRotation = Quaternion.Slerp(rightShoulderTransform.localRotation,
+                Quaternion.Euler(-wave, 0.0f, 0.0f), ratio);
+        }
+        else
+        {
+            leftShoulderTransform.localRotation = Quaternion.Slerp(leftShoulderTransform.localRotation,
+                Quaternion.Euler(0.0f, 0.0f, 0.0f), ratio);
+            rightShoulderTransform.localRotation = Quaternion.Slerp(rightShoulderTransform.localRotation,
+                Quaternion.Euler(0.0f, 0.0f, 0.0f), ratio);
+        }
     }
 
     void RegenerateHealth()
