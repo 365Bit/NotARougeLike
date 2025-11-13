@@ -417,30 +417,39 @@ public class Player : MonoBehaviour
 
     void RegenerateHealth()
     {
-        float health = currentHealth + healthRegRate * Time.deltaTime;
-        currentHealth = Mathf.Clamp(health, 0.0f, maxHealth);
+        if (currentHealth < maxHealth)
+        {
+            float health = currentHealth + healthRegRate * Time.deltaTime;
+            currentHealth = Mathf.Min(health, maxHealth);
+        }
     }
 
     void RegenerateMana()
     {
-        float mana = currentStamina + manaRegRate * Time.deltaTime;
-        currentStamina = Mathf.Clamp(mana, 0.0f, maxStamina);
+        if (currentMana < maxMana)
+        {
+            float mana = currentMana + manaRegRate * Time.deltaTime;
+            currentMana = Mathf.Min(mana, maxMana);
+        }
     }
 
     void RegenrerateStamina()
     {
-        float rate = staminaRegRate;
-
-        if (motion.x >= -0.1f && motion.x <= 0.1f &&
-            motion.y >= -0.1f && motion.y <= 0.1f &&
-            motion.z >= -0.1f && motion.z <= 0.1f)
+        if (currentStamina < maxStamina)
         {
-            // Increase regeneration rate when idle
-            rate *= 1.5f;
-        }
+            float rate = staminaRegRate;
 
-        float stamina = currentStamina + rate * Time.deltaTime;
-        currentStamina = Mathf.Clamp(stamina, 0.0f, maxStamina);
+            if (motion.x >= -0.1f && motion.x <= 0.1f &&
+                motion.y >= -0.1f && motion.y <= 0.1f &&
+                motion.z >= -0.1f && motion.z <= 0.1f)
+            {
+                // Increase regeneration rate when idle
+                rate *= 1.5f;
+            }
+
+            float stamina = currentStamina + rate * Time.deltaTime;
+            currentStamina = Mathf.Min(stamina, maxStamina);
+        }
     }
 
     public void Run(bool value)
