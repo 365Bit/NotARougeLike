@@ -32,11 +32,13 @@ public class InteractionArea : MonoBehaviour
             return;
         }
 
-        triggerObject = other.gameObject;
-
-        if (triggerObject != null)
+        if (name == "neck" || name == "body")
         {
-            Debug.Log("Enter Trigger: " + name);
+            triggerObject = other.transform.parent.gameObject;
+        }
+        else
+        {
+            triggerObject = other.gameObject;
         }
     }
 

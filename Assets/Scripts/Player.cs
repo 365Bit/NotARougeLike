@@ -45,6 +45,10 @@ public class Player : MonoBehaviour
     private float currentMana;
     private float currentStamina;
 
+    private int healthFruits = 0;
+    private int manaFruits = 0;
+    private int staminaFruits = 0;
+
     private float defaultYScale;
     private float fireCooldown;
 
@@ -312,9 +316,25 @@ public class Player : MonoBehaviour
     {
         if (interactArea.triggerObject != null)
         {
-            // TODO
             string name = interactArea.triggerObject.name;
-            Debug.Log("Interact with: " + name);
+
+            switch (name)
+            {
+                case "health_fruit":
+                    healthFruits += 1;
+                    Destroy(interactArea.triggerObject);
+                    break;
+                    case "mana_fruit":
+                    manaFruits += 1;
+                    Destroy(interactArea.triggerObject);
+                    break;
+                    case "stamina_fruit":
+                    staminaFruits += 1;
+                    Destroy(interactArea.triggerObject);
+                    break;
+                    default:
+                    break;
+            }
         }
     }
 
@@ -487,8 +507,35 @@ public class Player : MonoBehaviour
 
     public void UseItem(int itemID)
     {
-        // TODO
-        Debug.Log("Use Item: " + itemID);
+        switch (itemID)
+        {
+            case 0: // Health Fruit
+                if (healthFruits > 0)
+                {
+                    healthFruits -= 1;
+                    currentHealth += 30.0f;
+                    currentHealth = Mathf.Clamp(currentHealth, 0.0f, maxHealth);
+                }
+                break;
+            case 1: // Mana Fruit
+                if (manaFruits > 0)
+                {
+                    manaFruits -= 1;
+                    currentMana += 10.0f;
+                    currentMana = Mathf.Clamp(currentMana, 0.0f, maxMana);
+                }
+                break;
+            case 2: // Stamina Fruit
+                if (staminaFruits > 0)
+                {
+                    staminaFruits -= 1;
+                    currentStamina += 20.0f;
+                    currentStamina = Mathf.Clamp(currentStamina, 0.0f, maxStamina);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     public void TakeDamage(float damage)
