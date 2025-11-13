@@ -61,6 +61,13 @@ public class Projectile : MonoBehaviour
             }
         }
 
+        if (name.Contains("Opponent"))
+        {
+            Opponent opponent = collision.gameObject.GetComponent<Opponent>();
+            Debug.Log("Projectile dealing " + damage + " damage to " + name);
+            opponent.TakeDamage(damage);
+        }
+
         // Destroy the projectile on impact
         Destroy(this.gameObject);
     }

@@ -72,7 +72,7 @@ public class Player : MonoBehaviour
 
     [Header("Combat")]
     public Projectile[] projectiles;
-    public GameObject weapon;
+    public Weapon weapon;
     public float fireRate = 3.0f;
     public float hitRate = 2.0f;
     public float swingDuration = 0.4f;
@@ -135,7 +135,7 @@ public class Player : MonoBehaviour
 
         defaultYScale = transform.localScale.y;
 
-        weapon.SetActive(false);
+        weapon.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -207,7 +207,7 @@ public class Player : MonoBehaviour
                         hitState = HitState.Idle;
                         hitCooldown = 1.0f / hitRate;
 
-                        weapon.SetActive(false);
+                        weapon.gameObject.SetActive(false);
                         break;
                     default:
                         Debug.LogError("Unknown Hit State: " + hitState);
@@ -303,7 +303,8 @@ public class Player : MonoBehaviour
             return;
         }
 
-        weapon.SetActive(true);
+        weapon.gameObject.SetActive(true);
+        weapon.SetDamage(20.0f);
 
         hitState = HitState.Swing;
         hitTime = 0.0f;
