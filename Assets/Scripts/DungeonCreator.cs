@@ -16,7 +16,7 @@ public class DungeonCreator : MonoBehaviour
     public int roomWidthMin, roomLengthMin;
     public int maxIterations;
     public int corridorWidth;
-    public float lootProb;
+    public float lootProb, shopProb;
     public Material material;
     [Range(0.0f, 0.3f)]
     public float roomBottomCornerModifier;
@@ -24,7 +24,7 @@ public class DungeonCreator : MonoBehaviour
     public float roomTopCornerMidifier;
     [Range(0, 2)]
     public int roomOffset;
-    public GameObject wallPrefab, playerPrefab, chestPrefab, enemyPrefab;
+    public GameObject wallPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab;
     List<Vector3Int> possibleDoorVerticalPosition;
     List<Vector3Int> possibleDoorHorizontalPosition;
     List<Vector3Int> possibleWallHorizontalPosition;
@@ -64,6 +64,7 @@ public class DungeonCreator : MonoBehaviour
         CreateWalls(wallParent);
         CreateLoot(listOfRooms);
         CreateEnemy(listOfRooms);
+        CreateShop(listOfRooms);
     }
 
     private void CreatePlayer(List<Node> listOfRooms)
@@ -99,6 +100,29 @@ public class DungeonCreator : MonoBehaviour
                 if(UnityEngine.Random.Range(0f,1f) > 0.3)
                 {
                     Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
+                }   
+            }
+        }
+    }
+
+
+    private void CreateShop(List<Node> listOfRooms)
+    {
+        foreach( var room in listOfRooms)
+        {
+            if (room.Type == "room")
+            {
+                int shopX = (room.BottomLeftAreaCorner.x + 1 + room.BottomRightAreaCorner.x) / 2;
+                int shopY = (room.BottomLeftAreaCorner.y + 1 + room.TopLeftAreaCorner.y) / 2;
+                Vector3 shopPos = new Vector3(
+                    shopX,
+                    0.35f,
+                    shopY);
+                if(UnityEngine.Random.Range(0f,1f) < shopProb)
+                {
+                    var shop = Instantiate(shopPrefab, shopPos, Quaternion.identity);
+
+                    shop.GetComponent<ShopRenderer>().AddRandomItems();
                 }   
             }
         }
