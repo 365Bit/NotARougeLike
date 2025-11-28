@@ -7,7 +7,10 @@ using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using UnityEditor.Rendering;
 using UnityEngine;
+<<<<<<< HEAD
 using UnityEngine.InputSystem;
+=======
+>>>>>>> 5cc06eb (cleaner Wall creation)
 using Random = System.Random;
 
 [RequireComponent(typeof(NavMeshSurface))]
@@ -29,13 +32,14 @@ public class DungeonCreator : MonoBehaviour
     [Range(0, 2)]
     public int roomOffset;
     public GameObject wallPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab;
-    
+
     List<Vector3Int> possibleVerticalDoorPosition;
     List<Vector3Int> possibleHorizontalDoorPosition;
     List<Vector3Int> possibleHorizontalWallPosition;
     List<Vector3Int> possibleVerticalWallPosition;
-    ItemDefinitions itemDefinitions;
 
+    ItemDefinitions itemDefinitions;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -206,6 +210,11 @@ public class DungeonCreator : MonoBehaviour
         // To Cap the possibleWalls Lists
         possibleHorizontalWallPosition.Add(possibleHorizontalWallPosition[0]);
         possibleVerticalWallPosition.Add(possibleVerticalWallPosition[0]);
+<<<<<<< HEAD
+=======
+        Random rng = new Random();
+        int start = possibleHorizontalWallPosition[0].x;
+>>>>>>> 5cc06eb (cleaner Wall creation)
         int wallLength;
         float wallDetail;
         float wallPosX = 0;
@@ -214,7 +223,11 @@ public class DungeonCreator : MonoBehaviour
         int startX = -1;
         int startZ = -1;
         int temp = 0;
+<<<<<<< HEAD
         int wallScaler = 4;
+=======
+        float wallScaler = 4f;
+>>>>>>> 5cc06eb (cleaner Wall creation)
         foreach (var wallPosition in possibleHorizontalWallPosition)
         {
             // Define starting point
@@ -236,6 +249,7 @@ public class DungeonCreator : MonoBehaviour
                 {
                     wallPosX = startX;
                     wallLength = temp - startX;
+<<<<<<< HEAD
                     int segmentCount = (wallLength < 6) ? 1 : wallLength / wallScaler;
                     float xScale;
                     if(segmentCount == 1)
@@ -267,6 +281,40 @@ public class DungeonCreator : MonoBehaviour
                             CreateWall(wallParent, wallPos, wallPrefab, Quaternion.identity);
                             wallPosX += xScale * wallScaler / 2;
                         }
+=======
+                    int segmentCount = (wallLength < 10) ? 2 : wallLength / 10 * 2 ;
+                    int cutCount = segmentCount - 1;
+
+                    List<float> cuts = new List<float>();
+                    for (int c = 0; c < cutCount; c++)
+                    {
+                        cuts.Add((float)(rng.NextDouble() * wallLength));
+                    }
+                    cuts.Sort();
+
+                    float[] segments = new float[segmentCount];
+
+                    if (segmentCount > 0)
+                        segments[0] = cuts[0];
+
+                    for (int c = 1; c < cutCount; c++)
+                        segments[c] = cuts[c] - cuts[c - 1];
+
+                    segments[segmentCount - 1] = wallLength - cuts[cutCount - 1];
+
+                    foreach (float xScale in segments)
+                    {
+                        wallPrefab.transform.localScale = new Vector3(xScale/wallScaler, 1, 1);
+                        wallPosX += xScale / 2;
+                        wallDetail = UnityEngine.Random.Range(-0.1f, 0.1f);
+                        Vector3 wallPos  = new Vector3(
+                            wallPosX,
+                            wallPosY,
+                            wallPosZ + wallDetail
+                        );  
+                        CreateWall(wallParent, wallPos, wallPrefab, Quaternion.identity);
+                        wallPosX += xScale / 2;
+>>>>>>> 5cc06eb (cleaner Wall creation)
                     }
                     startX = wallPosition.x;
                     wallPosZ = wallPosition.z;
@@ -295,6 +343,7 @@ public class DungeonCreator : MonoBehaviour
                 {
                     wallPosZ = startZ;
                     wallLength = temp - startZ;
+<<<<<<< HEAD
                     int segmentCount = (wallLength < 6) ? 1 : wallLength / wallScaler;
                     float zScale;
                     if(segmentCount == 1)
@@ -325,6 +374,40 @@ public class DungeonCreator : MonoBehaviour
                             CreateWall(wallParent, wallPos, wallPrefab, Quaternion.Euler(0, 90, 0));
                             wallPosZ += zScale * wallScaler / 2;
                         }
+=======
+                    int segmentCount = (wallLength < 10) ? 2 : wallLength / 10 * 2 ;
+                    int cutCount = segmentCount - 1;
+
+                    List<float> cuts = new List<float>();
+                    for (int c = 0; c < cutCount; c++)
+                    {
+                        cuts.Add((float)(rng.NextDouble() * wallLength));
+                    }
+                    cuts.Sort();
+
+                    float[] segments = new float[segmentCount];
+
+                    if (segmentCount > 0)
+                        segments[0] = cuts[0];
+
+                    for (int c = 1; c < cutCount; c++)
+                        segments[c] = cuts[c] - cuts[c - 1];
+
+                    segments[segmentCount - 1] = wallLength - cuts[cutCount - 1];
+
+                    foreach (float zScale in segments)
+                    {
+                        wallPrefab.transform.localScale = new Vector3(zScale/wallScaler, 1, 1);
+                        wallPosZ += zScale / 2;
+                        wallDetail = UnityEngine.Random.Range(-0.1f, 0.1f);
+                        Vector3 wallPos  = new Vector3(
+                            wallPosX + wallDetail,
+                            wallPosY,
+                            wallPosZ
+                        );  
+                        CreateWall(wallParent, wallPos, wallPrefab, Quaternion.Euler(0, 90, 0));
+                        wallPosZ += zScale / 2;
+>>>>>>> 5cc06eb (cleaner Wall creation)
                     }
                     startZ = wallPosition.z;
                     wallPosX = wallPosition.x;
