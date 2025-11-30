@@ -176,15 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DestroyableObject
   maxHealth: 50
-  items:
-  - {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
-  - {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
-  - {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
-  dropChances:
-  - 0.3
-  - 0.2
-  - 0.3
-  numberOfItems: 3
+  droppedItemPrefab: {fileID: 6834112976765427387, guid: 5c8515f40aecf6259b9c3cdb74d0a499, type: 3}
 --- !u!1 &3442830045073502725
 GameObject:
   m_ObjectHideFlags: 0
