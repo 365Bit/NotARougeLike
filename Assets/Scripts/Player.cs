@@ -45,10 +45,6 @@ public class Player : MonoBehaviour
     private float currentMana;
     private float currentStamina;
 
-    private int healthFruits = 0;
-    private int manaFruits = 0;
-    private int staminaFruits = 0;
-
     private float defaultYScale;
     private float fireCooldown;
 
@@ -106,6 +102,11 @@ public class Player : MonoBehaviour
     public float slideConsRate = 20.0f;
     public float jumpConsRate = 15.0f;
 
+
+    private Inventory inventory;
+    [SerializeField]
+    private ItemDefinitions itemDefinitions;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -136,6 +137,8 @@ public class Player : MonoBehaviour
         defaultYScale = transform.localScale.y;
 
         weapon.gameObject.SetActive(false);
+
+        inventory = GetComponent<Inventory>();
     }
 
     // Update is called once per frame
@@ -336,53 +339,32 @@ public class Player : MonoBehaviour
         return Physics.Raycast(position, cameraTransform.forward, out hit, interactionDistance, ~LayerMask.GetMask("Player"));
     }
 
+    // returns true on successfull interaction
+    public bool InteractWith(Transform transform) {
+        if (transform.gameObject.TryGetComponent<ShopItemSlot>(out ShopItemSlot slot)) {
+            GetComponent<Inventory>().container.AddItem(slot.item, slot.count);
+            slot.Disable();
+            return true;
+        } else if (transform.gameObject.TryGetComponent<DroppedItem>(out DroppedItem item)) {
+            GetComponent<Inventory>().container.AddItem(item.item, item.count);
+            item.Disable();
+            return true;
+        }
+        return false;
+    }
+
     public void Interact()
     {
-        string name = null;
+        bool done = false;
 
         // first check interaction area
         if (interactArea.triggerObject != null)
         {
-            name = interactArea.triggerObject.name;
-            switch (name) {
-                case "health_fruit":
-                    healthFruits += 1;
-                    Destroy(interactArea.triggerObject);
-                    return;
-                case "mana_fruit":
-                    manaFruits += 1;
-                    Destroy(interactArea.triggerObject);
-                    return;
-                case "stamina_fruit":
-                    staminaFruits += 1;
-                    Destroy(interactArea.triggerObject);
-                    return;
-                default:
-                    break;
-            }
+            done = InteractWith(interactArea.triggerObject.transform);
         }
 
-        if (RaycastInteractible(out RaycastHit hit)) {
-            if (hit.transform.gameObject.TryGetComponent<ShopItemSlot>(out ShopItemSlot slot)) {
-                name = slot.ItemName;
-                var cost = slot.Cost;
-                Debug.Log("Buying " + name);
-                switch (name) {
-                    case "health_fruit":
-                        healthFruits += 1;
-                        break;
-                    case "mana_fruit":
-                        manaFruits += 1;
-                        break;
-                    case "stamina_fruit":
-                        staminaFruits += 1;
-                        break;
-                    default:
-                        break;
-                }
-
-                slot.Disable();
-            }
+        if (!done && RaycastInteractible(out RaycastHit hit)) {
+            done = InteractWith(hit.transform);
         }
     }
 
@@ -567,35 +549,32 @@ public class Player : MonoBehaviour
 
     public void UseItem(int itemID)
     {
-        switch (itemID)
+        var inv = GetComponent<Inventory>().container;
+        var slot = inv[itemID];
+        var item = slot.storedItem;
+        var count = slot.count;
+
+        if (item == null) return;
+
+        switch (item.name)
         {
-            case 0: // Health Fruit
-                if (healthFruits > 0)
-                {
-                    healthFruits -= 1;
-                    currentHealth += 30.0f;
-                    currentHealth = Mathf.Clamp(currentHealth, 0.0f, maxHealth);
-                }
+            case "health_fruit": // Health Fruit
+                currentHealth += 30.0f;
+                currentHealth = Mathf.Clamp(currentHealth, 0.0f, maxHealth);
                 break;
-            case 1: // Mana Fruit
-                if (manaFruits > 0)
-                {
-                    manaFruits -= 1;
-                    currentMana += 10.0f;
-                    currentMana = Mathf.Clamp(currentMana, 0.0f, maxMana);
-                }
+            case "mana_fruit": // Mana Fruit
+                currentMana += 10.0f;
+                currentMana = Mathf.Clamp(currentMana, 0.0f, maxMana);
                 break;
-            case 2: // Stamina Fruit
-                if (staminaFruits > 0)
-                {
-                    staminaFruits -= 1;
-                    currentStamina += 20.0f;
-                    currentStamina = Mathf.Clamp(currentStamina, 0.0f, maxStamina);
-                }
+            case "stamina_fruit": // Stamina Fruit
+                currentStamina += 20.0f;
+                currentStamina = Mathf.Clamp(currentStamina, 0.0f, maxStamina);
                 break;
             default:
                 break;
         }
+
+        inv.ConsumeItem(itemID);
     }
 
     public void TakeDamage(float damage)

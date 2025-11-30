@@ -68,6 +68,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d655d0ffa8433af9598c87d211cebf06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  modelPosition: {x: 0, y: 0, z: 0}
+  modelScale: {x: 0.1, y: 0.1, z: 0.1}
   costText: {fileID: 4050262901591825956}
 --- !u!1 &2250339879979335594
 GameObject:
