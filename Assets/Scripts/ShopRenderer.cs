@@ -49,6 +49,7 @@ public class ShopRenderer : MonoBehaviour
         }
     }
 
+    // TODO: extract to dungeon creator
     public void AddRandomItems() {
         foreach (var slot in items.slots) {
             slot.storedItem = null;
@@ -58,6 +59,7 @@ public class ShopRenderer : MonoBehaviour
             foreach (ItemDefinition def in itemDefinitions.definitions) {
                 if (random <= def.shopProbability) {
                     slot.storedItem = def;
+                    slot.count = 1;
                     break;
                 }
                 random -= def.shopProbability;

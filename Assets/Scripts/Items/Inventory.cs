@@ -5,18 +5,11 @@ using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
-    [System.Serializable]
-    public class PlayerItemSlot {
-        public ItemDefinition storedItem;
-        public int count;
-    }
-
     public int numItemSlots;
     public ItemContainer container { get; private set;}
 
     // amount of currencies
     private Dictionary<Currency, int> currency;
-
 
     public void Start() {
         container = new(numItemSlots);
@@ -28,8 +21,8 @@ public class Inventory : MonoBehaviour
 
 [System.Serializable]
 public class ItemSlot {
-    public ItemDefinition storedItem;
-    public int count;
+    public ItemDefinition storedItem = null;
+    public int count = 0;
 }
 
 
