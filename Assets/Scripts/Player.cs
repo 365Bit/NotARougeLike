@@ -103,7 +103,10 @@ public class Player : MonoBehaviour
     public float jumpConsRate = 15.0f;
 
 
-    private Inventory inventory;
+    [Header("Inventory")]
+    public Inventory inventory {get; private set;}
+    public int currentSlot = 0;
+
     [SerializeField]
     private ItemDefinitions itemDefinitions;
 
@@ -342,11 +345,11 @@ public class Player : MonoBehaviour
     // returns true on successfull interaction
     public bool InteractWith(Transform transform) {
         if (transform.gameObject.TryGetComponent<ShopItemSlot>(out ShopItemSlot slot)) {
-            GetComponent<Inventory>().container.AddItem(slot.item, slot.count);
+            inventory.container.AddItem(slot.item, slot.count);
             slot.Disable();
             return true;
         } else if (transform.gameObject.TryGetComponent<DroppedItem>(out DroppedItem item)) {
-            GetComponent<Inventory>().container.AddItem(item.item, item.count);
+            inventory.container.AddItem(item.item, item.count);
             item.Disable();
             return true;
         }
@@ -363,6 +366,7 @@ public class Player : MonoBehaviour
             done = InteractWith(interactArea.triggerObject.transform);
         }
 
+        // then try raycasting
         if (!done && RaycastInteractible(out RaycastHit hit)) {
             done = InteractWith(hit.transform);
         }
