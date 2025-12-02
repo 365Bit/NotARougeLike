@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5066985577544289893
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3264794840061447751}
+  - component: {fileID: 5196027272824433926}
+  m_Layer: 0
+  m_Name: Definitions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &3264794840061447751
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5196027272824433926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fea940d012f9f88b9794c1dc44c09fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinitions
+  definitions:
+  - name: health_fruit
+    itemModel: {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
+    itemModelUI: {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
+    dropProbability: 0.092
+    shopProbability: 0.098
+    cost: 2
+    maxPerShopSlot: 1
+    weight: 0
+    maxPerInventorySlot: 1
+  - name: stamina_fruit
+    itemModel: {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
+    itemModelUI: {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
+    dropProbability: 0.301
+    shopProbability: 0.147
+    cost: 1
+    maxPerShopSlot: 2
+    weight: 0
+    maxPerInventorySlot: 4
+  - name: mana_fruit
+    itemModel: {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
+    itemModelUI: {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
+    dropProbability: 0.331
+    shopProbability: 0.202
+    cost: 2
+    maxPerShopSlot: 4
+    weight: 0
+    maxPerInventorySlot: 10
