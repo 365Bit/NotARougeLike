@@ -105,7 +105,6 @@ public class Player : MonoBehaviour
 
     [Header("Inventory")]
     public Inventory inventory {get; private set;}
-    public int currentSlot = 0;
 
     [SerializeField]
     private ItemDefinitions itemDefinitions;
