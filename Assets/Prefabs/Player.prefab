@@ -362,6 +362,7 @@ MonoBehaviour:
   runConsRate: 10
   slideConsRate: 20
   jumpConsRate: 15
+  currentSlot: 0
   itemDefinitions: {fileID: 0}
 --- !u!114 &8439484915624340096
 MonoBehaviour:
@@ -375,7 +376,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7b0b0bd39727be73b5d90365994a0b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
-  numItemSlots: 0
+  numItemSlots: 4
 --- !u!1 &934793935829304382
 GameObject:
   m_ObjectHideFlags: 0
