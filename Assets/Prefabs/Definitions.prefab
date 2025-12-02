@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinitions
   definitions:
   - name: health_fruit
+    displayName: Health Fruit
     itemModel: {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
     itemModelUI: {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
     dropProbability: 0.092
@@ -55,6 +56,7 @@ MonoBehaviour:
     weight: 0
     maxPerInventorySlot: 1
   - name: stamina_fruit
+    displayName: Stamina Fruit
     itemModel: {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
     itemModelUI: {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
     dropProbability: 0.301
@@ -64,6 +66,7 @@ MonoBehaviour:
     weight: 0
     maxPerInventorySlot: 4
   - name: mana_fruit
+    displayName: Mana Fruit
     itemModel: {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
     itemModelUI: {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
     dropProbability: 0.331
