@@ -1,15 +1,21 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using TMPro;
+
 public class ItemHotbarSlot : MonoBehaviour
 {
     public Color backgroundColor;
     public Color backgroundColorSelected;
 
     private GameObject itemModel = null;
+    private GameObject itemText = null;
 
     public void SetItem(ItemDefinition item, int count) {
         if (itemModel != null) Destroy(itemModel);
+        if (itemText == null) {
+            itemText = transform.GetChild(0).gameObject;
+        }
 
         if (count > 0 && item != null) {
             itemModel = Instantiate(item.itemModelUI, transform);
