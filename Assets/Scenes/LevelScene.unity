@@ -678,9 +678,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DungeonCreator
   dungeonWidth: 80
   dungeonLength: 80
-  roomWidthMin: 24
-  roomLengthMin: 24
-  maxIterations: 12
+  roomWidthMin: 18
+  roomLengthMin: 18
+  maxIterations: 7
   corridorWidth: 5
   lootProb: 0.5
   shopProb: 0.1

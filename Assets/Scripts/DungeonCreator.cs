@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
 using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Random = System.Random;
 
 [RequireComponent(typeof(NavMeshSurface))]
@@ -18,6 +19,7 @@ public class DungeonCreator : MonoBehaviour
     public int roomWidthMin, roomLengthMin;
     public int maxIterations;
     public int corridorWidth;
+    public int enemyAmount;
     public float lootProb, shopProb;
     public Material material;
     [Range(0.0f, 0.3f)]
@@ -67,7 +69,7 @@ public class DungeonCreator : MonoBehaviour
         CreateWalls(wallParent);
         CreateLoot(listOfRooms);
         CreateEnemy(listOfRooms);
-        CreateShop(listOfRooms);
+        CreateShop(listOfRooms);    
     }
 
     private void CreatePlayer(List<Node> listOfRooms)
@@ -84,22 +86,34 @@ public class DungeonCreator : MonoBehaviour
 
     private void CreateEnemy(List<Node> listOfRooms)
     {
-        foreach( var room in listOfRooms)
+        bool isEnoughEnemies = false;
+        int counter = 0;
+        while (!isEnoughEnemies)
         {
-            if (room.Type == "room")
+            foreach( var room in listOfRooms)
             {
-                int enemyPosX = UnityEngine.Random.Range(room.BottomLeftAreaCorner.x + 2, room.BottomRightAreaCorner.x - 1);
-                int enemyPosY = UnityEngine.Random.Range(room.BottomLeftAreaCorner.y + 2, room.TopLeftAreaCorner.y - 1);
-                Vector3 enemyPos = new Vector3(
-                    enemyPosX,
-                    1,
-                    enemyPosY);
-                if(UnityEngine.Random.Range(0f,1f) > 0.3)
+                if (room.Type == "room")
                 {
-                    Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
-                }   
+                    if(UnityEngine.Random.Range(0f,1f) > 0.5)
+                    {
+                        int enemyPosX = UnityEngine.Random.Range(room.BottomLeftAreaCorner.x + 2, room.BottomRightAreaCorner.x - 1);
+                        int enemyPosY = UnityEngine.Random.Range(room.BottomLeftAreaCorner.y + 2, room.TopLeftAreaCorner.y - 1);
+                        Vector3 enemyPos = new Vector3(
+                            enemyPosX,
+                            1,
+                            enemyPosY);
+                        Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
+                        counter++;
+                    }  
+                    if (counter == enemyAmount)
+                    {
+                        break;
+                    } 
+                }
             }
+            isEnoughEnemies = counter >= enemyAmount;
         }
+        
     }
 
 
