@@ -737,7 +737,7 @@ GameObject:
   - component: {fileID: 6760816808951863384}
   - component: {fileID: 8923003907773176712}
   m_Layer: 5
-  m_Name: Inventory
+  m_Name: Hotbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
