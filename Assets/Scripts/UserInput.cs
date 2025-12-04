@@ -103,8 +103,8 @@ public class UserInput : MonoBehaviour
             player.Attack(Player.AttackType.Hit);
         }
 
-        interact |= gamepad.bButton.isPressed;
-        jump |= gamepad.aButton.isPressed;
+        interact |= gamepad.bButton.wasPressedThisFrame;
+        jump |= gamepad.aButton.wasPressedThisFrame;
         run |= gamepad.leftStickButton.isPressed;
         slide |= gamepad.rightShoulder.isPressed;
         sneak |= gamepad.leftShoulder.isPressed;
@@ -112,19 +112,19 @@ public class UserInput : MonoBehaviour
         bool yButton = gamepad.yButton.isPressed;
 
         // Item selection
-        if (gamepad.dpad.left.isPressed)
+        if (gamepad.dpad.left.wasPressedThisFrame)
         {
             itemID = 0;
         }
-        if (gamepad.dpad.up.isPressed)
+        if (gamepad.dpad.up.wasPressedThisFrame)
         {
             itemID = 1;
         }
-        if (gamepad.dpad.right.isPressed)
+        if (gamepad.dpad.right.wasPressedThisFrame)
         {
             itemID = 2;
         }
-        if (gamepad.dpad.down.isPressed)
+        if (gamepad.dpad.down.wasPressedThisFrame)
         {
             itemID = 3;
         }
@@ -159,26 +159,26 @@ public class UserInput : MonoBehaviour
             direction.y += 1;
         }
 
-        interact |= keyboard.fKey.isPressed;
-        jump |= keyboard.spaceKey.isPressed;
+        interact |= keyboard.fKey.wasPressedThisFrame;
+        jump |= keyboard.spaceKey.wasPressedThisFrame;
         run |= keyboard.leftShiftKey.isPressed;
         slide |= keyboard.leftAltKey.isPressed;
         sneak |= keyboard.leftCtrlKey.isPressed;
 
         // Item selection
-        if (keyboard.digit1Key.isPressed)
+        if (keyboard.digit1Key.wasPressedThisFrame)
         {
             itemID = 0;
         }
-        if (keyboard.digit2Key.isPressed)
+        if (keyboard.digit2Key.wasPressedThisFrame)
         {
             itemID = 1;
         }
-        if (keyboard.digit3Key.isPressed)
+        if (keyboard.digit3Key.wasPressedThisFrame)
         {
             itemID = 2;
         }
-        if (keyboard.digit4Key.isPressed)
+        if (keyboard.digit4Key.wasPressedThisFrame)
         {
             itemID = 3;
         }
