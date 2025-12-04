@@ -29,6 +29,8 @@ public class DungeonCreator : MonoBehaviour
     List<Vector3Int> possibleDoorHorizontalPosition;
     List<Vector3Int> possibleWallHorizontalPosition;
     List<Vector3Int> possibleWallVerticalPosition;
+
+    public GameObject UI;
     // Start is called before the first frame update
     void Start()
     {
@@ -82,7 +84,11 @@ public class DungeonCreator : MonoBehaviour
                 playerPosX,
                 2,
                 playerPosY);
-        playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        //playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        GameObject player = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        player.name = "Player";
+
+        UI.SetActive(true);
     }
 
     private void CreateEnemy(List<Node> listOfRooms)
