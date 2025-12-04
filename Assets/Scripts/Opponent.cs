@@ -15,6 +15,7 @@ public class Opponent : MonoBehaviour
 
     [Header("Combat")]
     public Opp_Weapon weapon;
+    public HitZone hitZone;
     public float hitRate = 2.0f;
     private float hitTime;
     private float hitCooldown;
@@ -65,6 +66,7 @@ public class Opponent : MonoBehaviour
         hitCooldown = 0.0f;
         hitTime = 0.0f;
         weapon.gameObject.SetActive(false);
+        hitZone.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -128,6 +130,7 @@ public class Opponent : MonoBehaviour
                         endRotation = Quaternion.Euler(strikeRotation);
                         break;
                     case HitState.Strike:
+                        hitZone.gameObject.SetActive(true);
                         hitState = HitState.Return;
                         hitTime = 0.0f;
 
@@ -135,6 +138,7 @@ public class Opponent : MonoBehaviour
                         endRotation = Quaternion.Euler(restRotation);
                         break;
                     case HitState.Return:
+                        hitZone.gameObject.SetActive(false);
                         hitState = HitState.Idle;
                         hitCooldown = 1.0f / hitRate;
                         playerGotHit = false;
@@ -153,14 +157,14 @@ public class Opponent : MonoBehaviour
         // TODO
         navMeshAgent.isStopped = true;
 
-        //transform.LookAt(playerTransform);
+        transform.LookAt(playerTransform);
 
         if (hitCooldown > 0.0f || hitState != HitState.Idle)
         {
             return;
         }
         weapon.gameObject.SetActive(true);
-        weapon.SetDamage(20.0f);
+        hitZone.SetDamage(20.0f);
         hitState = HitState.Swing;
         hitTime = 0.0f;
 
@@ -200,11 +204,13 @@ public class Opponent : MonoBehaviour
 
         if (wanderTime >= wanderInterval)
         {
-            Vector3 randomDirection = Random.insideUnitSphere * wanderRadius;
-            randomDirection += spawnPosition;
+            //Vector3 randomDirection = Random.insideUnitSphere * wanderRadius;
+            Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f),Random.Range(-1f, 1f)).normalized;
+            Vector3 targetPos = spawnPosition + new Vector3(randomDirection.x, randomDirection.y, 0) * wanderRadius;
+            //randomDirection += spawnPosition;
 
             NavMeshHit navHit;
-            NavMesh.SamplePosition(randomDirection, out navHit, wanderRadius, NavMesh.AllAreas);
+            NavMesh.SamplePosition(targetPos, out navHit, wanderRadius, NavMesh.AllAreas);
 
             navMeshAgent.SetDestination(navHit.position);
 
