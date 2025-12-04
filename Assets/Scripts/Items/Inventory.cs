@@ -9,13 +9,13 @@ public class Inventory : MonoBehaviour
     public ItemContainer container { get; private set;}
 
     // amount of currencies
-    private Dictionary<Currency, int> currency;
+    public Dictionary<Currency, int> currency {get; private set;}
 
     public void Start() {
         container = new(numItemSlots);
         currency = new();
         foreach(Currency val in Enum.GetValues(typeof(Currency)))
-            currency.Add(val, 0);
+            currency.Add(val, 4);
     }
 }
 
