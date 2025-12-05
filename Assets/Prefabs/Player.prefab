@@ -154,6 +154,8 @@ GameObject:
   - component: {fileID: 62203805369549304}
   - component: {fileID: 3948242591594315538}
   - component: {fileID: 8439484915624340096}
+  - component: {fileID: 1939592861400707939}
+  - component: {fileID: 1195309795827131598}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -170,7 +172,7 @@ Transform:
   m_GameObject: {fileID: 309834695554700441}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 36, y: 2, z: 27}
+  m_LocalPosition: {x: 92, y: 2, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -342,28 +344,6 @@ MonoBehaviour:
   projectiles:
   - {fileID: 7974811766441290857, guid: 60e49ade76f5c004293e0e18fd49dbb0, type: 3}
   weapon: {fileID: 5109643459192554882}
-  fireRate: 3
-  hitRate: 2
-  swingDuration: 0.4
-  strikeDuration: 0.2
-  returnDuration: 0.1
-  maxMana: 100
-  manaRegRate: 3
-  runSpeed: 15
-  walkSpeed: 5
-  sneakSpeed: 1
-  maxSlideTime: 3
-  slideSpeed: 12
-  maxHealth: 100
-  healthRegRate: 2
-  jumpHeight: 1.5
-  maxStamina: 100
-  staminaRegRate: 5
-  runConsRate: 10
-  slideConsRate: 20
-  jumpConsRate: 15
-  currentSlot: 0
-  itemDefinitions: {fileID: 0}
 --- !u!114 &8439484915624340096
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,6 +357,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
   numItemSlots: 4
+--- !u!114 &1939592861400707939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 309834695554700441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 859ecc0f927b18dadb24872a7e65c545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  levels: 
+--- !u!114 &1195309795827131598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 309834695554700441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99ff3bef177338594b0de52d0add7e5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
 --- !u!1 &934793935829304382
 GameObject:
   m_ObjectHideFlags: 0
