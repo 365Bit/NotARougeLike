@@ -1100,11 +1100,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 7299883490974400925}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_SizeDelta: {x: 400, y: 100}
+  m_Pivot: {x: 1, y: 1}
 --- !u!114 &1174493148950342287
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1137,6 +1137,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 690e7e0dcb4f3fa1c8c897243b3b2092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CurrencyDisplay
+  player: {fileID: 0}
+  slotPrefab: {fileID: 7343116501942089031, guid: b61cc76a33700c7aeb941c07e39a9425, type: 3}
+  slotPositionLeft: {x: -50, y: -150}
+  slotPositionRight: {x: -400, y: -150}
 --- !u!1 &7117123524355538582
 GameObject:
   m_ObjectHideFlags: 0

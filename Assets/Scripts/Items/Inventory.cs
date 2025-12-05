@@ -9,6 +9,7 @@ public class Inventory : MonoBehaviour
     public ItemContainer container { get; private set;}
 
     // amount of currencies
+    public int numCurrencySlots = Enum.GetValues(typeof(Currency)).Length;
     public Dictionary<Currency, int> currency {get; private set;}
 
     public void Start() {
