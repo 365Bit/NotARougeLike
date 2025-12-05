@@ -1139,8 +1139,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CurrencyDisplay
   player: {fileID: 0}
   slotPrefab: {fileID: 7343116501942089031, guid: b61cc76a33700c7aeb941c07e39a9425, type: 3}
-  slotPositionLeft: {x: -50, y: -150}
-  slotPositionRight: {x: -400, y: -150}
+  slotPositionLeft: {x: -75, y: -150}
+  slotPositionRight: {x: -425, y: -150}
 --- !u!1 &7117123524355538582
 GameObject:
   m_ObjectHideFlags: 0
