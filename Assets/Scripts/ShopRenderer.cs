@@ -27,8 +27,7 @@ public class ShopRenderer : MonoBehaviour
 
 
     public void Awake() {
-        if (itemDefinitions == null)
-            itemDefinitions = ItemDefinitions.main;
+        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
 
         items = new(numItemSlots);
     }
