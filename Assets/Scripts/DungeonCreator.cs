@@ -207,14 +207,8 @@ public class DungeonCreator : MonoBehaviour
         // To Cap the possibleWalls Lists
         possibleHorizontalWallPosition.Add(possibleHorizontalWallPosition[0]);
         possibleVerticalWallPosition.Add(possibleVerticalWallPosition[0]);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         Random rng = new Random();
         int start = possibleHorizontalWallPosition[0].x;
->>>>>>> 5cc06eb (cleaner Wall creation)
-=======
->>>>>>> 16ec212 (Wall Creation improvements)
         int wallLength;
         float wallDetail;
         float wallPosX = 0;
@@ -223,40 +217,30 @@ public class DungeonCreator : MonoBehaviour
         int startX = -1;
         int startZ = -1;
         int temp = 0;
-<<<<<<< HEAD
-<<<<<<< HEAD
         int wallScaler = 4;
-=======
-        float wallScaler = 4f;
->>>>>>> 5cc06eb (cleaner Wall creation)
-=======
-        int wallScaler = 4;
->>>>>>> 16ec212 (Wall Creation improvements)
-        foreach (var wallPosition in possibleHorizontalWallPosition)
+        foreach (var hWallPosition in possibleHorizontalWallPosition)
         {
             // Define starting point
             if (startX == -1)
             {
-                startX = wallPosition.x;
-                wallPosZ = wallPosition.z;
-                temp = wallPosition.x;
+                startX = hWallPosition.x;
+                wallPosZ = hWallPosition.z;
+                temp = hWallPosition.x;
             }
             else
             {
                 // check if coherent Wall, save end point as temp
-                if(wallPosition.x == temp + 1)
+                if(hWallPosition.x == temp + 1)
                 {
-                    temp = wallPosition.x;
+                    temp = hWallPosition.x;
                 }
                 // (temp - start) = total length of wall
                 else
                 {
                     wallPosX = startX;
                     wallLength = temp - startX;
-<<<<<<< HEAD
-<<<<<<< HEAD
                     int segmentCount = (wallLength < 6) ? 1 : wallLength / wallScaler;
-                    float xScale;
+                    float xScale = 0;
                     if(segmentCount == 1)
                     {
                         xScale = (float)wallLength / wallScaler;
@@ -286,80 +270,34 @@ public class DungeonCreator : MonoBehaviour
                             CreateWall(wallParent, wallPos, wallPrefab, Quaternion.identity);
                             wallPosX += xScale * wallScaler / 2;
                         }
-=======
-                    int segmentCount = (wallLength < 10) ? 2 : wallLength / 10 * 2 ;
-                    int cutCount = segmentCount - 1;
-
-                    List<float> cuts = new List<float>();
-                    for (int c = 0; c < cutCount; c++)
-=======
-                    int segmentCount = (wallLength < 6) ? 1 : wallLength / wallScaler;
-                    float xScale;
-                    if(segmentCount == 1)
->>>>>>> 16ec212 (Wall Creation improvements)
-                    {
-                        xScale = (float)wallLength / wallScaler;
-                        wallPosX += xScale * wallScaler / 2;
-                        wallPrefab.transform.localScale = new Vector3(xScale, 1, 1);
-                        Vector3 wallPos  = new Vector3(
-                            wallPosX + xScale / 2,
-                            wallPosY,
-                            wallPosZ
-                        ); 
-                        CreateWall(wallParent, wallPos, wallPrefab, Quaternion.identity);
-<<<<<<< HEAD
-                        wallPosX += xScale / 2;
->>>>>>> 5cc06eb (cleaner Wall creation)
-=======
-                        wallPosX += wallLength / 2;
                     }
-                    else
-                    {
-                        xScale = wallLength / segmentCount / wallScaler;
-                        for (int i = 0; i < segmentCount; i++)
-                        {
-                            wallPrefab.transform.localScale = new Vector3(xScale, 1, 1);
-                            wallPosX += xScale * wallScaler / 2;
-                            wallDetail = UnityEngine.Random.Range(-0.1f, 0.2f);
-                            Vector3 wallPos  = new Vector3(
-                                wallPosX + 2,
-                                wallPosY,
-                                wallPosZ + wallDetail
-                            );  
-                            CreateWall(wallParent, wallPos, wallPrefab, Quaternion.identity);
-                            wallPosX += xScale * wallScaler / 2;
-                        }
->>>>>>> 16ec212 (Wall Creation improvements)
-                    }
-                    startX = wallPosition.x;
-                    wallPosZ = wallPosition.z;
-                    temp = wallPosition.x;
+                    startX = hWallPosition.x;
+                    wallPosZ = hWallPosition.z;
+                    temp = hWallPosition.x;
                 }
             }
         }
-        foreach (var wallPosition in possibleVerticalWallPosition)
+        foreach (var vWallPosition in possibleVerticalWallPosition)
         {
             // Define starting point
             if (startZ == -1)
             {
-                startZ = wallPosition.z;
-                wallPosX = wallPosition.x;
-                temp = wallPosition.z;
+                startZ = vWallPosition.z;
+                wallPosX = vWallPosition.x;
+                temp = vWallPosition.z;
             }
             else
             {
                 // check if coherent Wall, save end point as temp
-                if(wallPosition.z == temp + 1)
+                if(vWallPosition.z == temp + 1)
                 {
-                    temp = wallPosition.z;
+                    temp = vWallPosition.z;
                 }
                 // (temp - start) = total length of wall
                 else
                 {
                     wallPosZ = startZ;
                     wallLength = temp - startZ;
-<<<<<<< HEAD
-<<<<<<< HEAD
                     int segmentCount = (wallLength < 6) ? 1 : wallLength / wallScaler;
                     float zScale;
                     if(segmentCount == 1)
@@ -390,53 +328,10 @@ public class DungeonCreator : MonoBehaviour
                             CreateWall(wallParent, wallPos, wallPrefab, Quaternion.Euler(0, 90, 0));
                             wallPosZ += zScale * wallScaler / 2;
                         }
-=======
-                    int segmentCount = (wallLength < 10) ? 2 : wallLength / 10 * 2 ;
-                    int cutCount = segmentCount - 1;
-
-                    List<float> cuts = new List<float>();
-                    for (int c = 0; c < cutCount; c++)
-=======
-                    int segmentCount = (wallLength < 6) ? 1 : wallLength / wallScaler;
-                    float zScale;
-                    if(segmentCount == 1)
->>>>>>> 16ec212 (Wall Creation improvements)
-                    {
-                        wallPosZ += wallLength / 2;
-                        zScale = (float)wallLength / wallScaler;
-                        wallPrefab.transform.localScale = new Vector3(zScale, 1, 1);
-                        Vector3 wallPos  = new Vector3(
-                            wallPosX,
-                            wallPosY,
-                            wallPosZ + zScale / 2
-                        ); 
-                        CreateWall(wallParent, wallPos, wallPrefab, Quaternion.Euler(0, 90, 0));
-<<<<<<< HEAD
-                        wallPosZ += zScale / 2;
->>>>>>> 5cc06eb (cleaner Wall creation)
-=======
                     }
-                    else
-                    {
-                        zScale = wallLength / segmentCount / wallScaler;
-                        for (int i = 0; i < segmentCount; i++)
-                        {
-                            wallPrefab.transform.localScale = new Vector3(zScale, 1, 1);
-                            wallPosZ += zScale * wallScaler / 2;
-                            wallDetail = UnityEngine.Random.Range(-0.1f, 0.2f);
-                            Vector3 wallPos  = new Vector3(
-                                wallPosX + wallDetail,
-                                wallPosY,
-                                wallPosZ + 2
-                            );  
-                            CreateWall(wallParent, wallPos, wallPrefab, Quaternion.Euler(0, 90, 0));
-                            wallPosZ += zScale * wallScaler / 2;
-                        }
->>>>>>> 16ec212 (Wall Creation improvements)
-                    }
-                    startZ = wallPosition.z;
-                    wallPosX = wallPosition.x;
-                    temp = wallPosition.z;
+                    startZ = vWallPosition.z;
+                    wallPosX = vWallPosition.x;
+                    temp = vWallPosition.z;
                 }
             }
         }
