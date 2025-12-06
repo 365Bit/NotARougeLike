@@ -41,13 +41,6 @@ public class ItemDefinition {
 
 public class ItemDefinitions : MonoBehaviour
 {
-    // can be accessed as a singleton
-    public static ItemDefinitions main = null;
-
-    public ItemDefinitions() {
-        main = this;
-    }
-
     public ItemDefinition this[int i] {
         get => definitions[i];
     }
