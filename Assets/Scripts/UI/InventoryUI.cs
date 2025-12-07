@@ -85,8 +85,9 @@ public class InventoryUI : MonoBehaviour
         if (slots == null || numSlots != slots.Length)
             InitializeSlots();
 
+        // todo: extract to UserInput script
         Keyboard keyboard = Keyboard.current;
-        if (keyboard.jKey.wasPressedThisFrame)
+        if (keyboard.spaceKey.wasPressedThisFrame)
             grabbed = !grabbed;
 
         UpdateSlots();
