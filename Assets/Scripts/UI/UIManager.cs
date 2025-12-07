@@ -8,9 +8,12 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
 
     // ui elements
-    private GameObject playerStats;
-    private GameObject hotbar;
-    private GameObject deathScreen;
+    public GameObject playerStats { get; private set; }
+    public GameObject hotbar { get; private set; }
+    public GameObject inventoryUI { get; private set; }
+    public GameObject deathScreen { get; private set; }
+
+    public bool inventoryOpen { get => inventoryUI.active; }
 
     // set of possible ui states
     public enum UIState {
@@ -26,6 +29,10 @@ public class UIManager : MonoBehaviour
         playerStats.SetActive(true);
         hotbar.SetActive(true);
 
+        inventoryUI.SetActive(false);
+
+        deathScreen.SetActive(false);
+
         currentState = UIState.Gameplay;
     }
 
@@ -33,7 +40,7 @@ public class UIManager : MonoBehaviour
         playerStats.SetActive(false);
         hotbar.SetActive(false);
 
-        // TODO
+        inventoryUI.SetActive(true);
 
         currentState = UIState.Inventory;
     }
@@ -41,6 +48,8 @@ public class UIManager : MonoBehaviour
     public void SwitchToDeathScreen() {
         playerStats.SetActive(false);
         hotbar.SetActive(false);
+
+        inventoryUI.SetActive(false);
 
         deathScreen.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
@@ -53,8 +62,10 @@ public class UIManager : MonoBehaviour
         Instance = this;
         playerStats = GameObject.Find("Player Stats");
         hotbar = GameObject.Find("Hotbar");
+
+        inventoryUI = GameObject.Find("Inventory");
+
         deathScreen = GameObject.Find("Death Screen");
-        deathScreen.SetActive(false);
 
         SwitchToGameplay();
     }

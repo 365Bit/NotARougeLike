@@ -38,10 +38,6 @@ public class ItemHotbar : MonoBehaviour
         }
     }
 
-    void Start() {
-        player = GameObject.Find("Player").GetComponent<Player>();
-    }
-
     // Update is called once per frame
     void Update()
     {

@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class UserInput : MonoBehaviour
 {
     private Player player;
-    private UIController uiController;
+    private UIManager uiController;
 
     private Vector2 direction;
     private Vector2 uiDirection;
@@ -30,7 +30,7 @@ public class UserInput : MonoBehaviour
     void Awake()
     {
         player = GameObject.Find("Player").GetComponent<Player>();
-        uiController = GameObject.Find("Canvas").GetComponent<UIController>();
+        uiController = GetComponent<UIManager>();
 
         rotation = Vector2.zero;
 
@@ -54,6 +54,9 @@ public class UserInput : MonoBehaviour
 
         itemID = -1;
 
+        KeyboardInput();
+        GamepadInput();
+        MouseInput();
 
         // Apply inputs
         if (controlPlayer) {
@@ -88,9 +91,9 @@ public class UserInput : MonoBehaviour
 
         // toggle inventory
         if (inventory && !uiController.inventoryOpen)
-            uiController.OpenInventory();
+            uiController.SwitchToInventory();
         else if ((inventory || escape) && uiController.inventoryOpen)
-            uiController.CloseInventory();
+            uiController.SwitchToGameplay();
     }
 
     void GamepadInput()

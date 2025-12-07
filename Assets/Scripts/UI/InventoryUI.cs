@@ -15,17 +15,20 @@ public class InventoryUI : MonoBehaviour
     public Vector2 slotPositionRight;
     public Vector2 slotPositionBottom;
     
-    public int numHotbarSlots, numColumns;
+    public int  numColumns;
+    private int numHotbarSlots;
+    private int numSlots;
 
     // selection state
     public int currentSlot;
     public bool grabbed;
 
     // instantiated slots
-    private GameObject[] slots;
+    private GameObject[] slots = null;
 
     void InitializeSlots() {
-        var numSlots = inventory.numItemSlots;
+        numSlots = inventory.numItemSlots;
+        numHotbarSlots = inventory.numHotbarSlots;
         slots = new GameObject[numSlots];
 
         for (int i = 0; i < numSlots; i++) {
@@ -41,11 +44,10 @@ public class InventoryUI : MonoBehaviour
     }
 
     void UpdateSlots() {
-        var inv = inventory;
         for (int i = 0; i < slots.Length; i++) {
-            var slot = slots[i];
+            GameObject slot = slots[i];
             var s = slot.GetComponent<ItemHotbarSlot>();
-            s.SetItem(inv.container[i].storedItem, inv.container[i].count);
+            s.SetItem(inventory.container[i].storedItem, inventory.container[i].count);
             s.SetSelected(i == currentSlot);
             slot.GetComponent<Button>().onClick.AddListener(delegate { OnClick(i); });
         }
@@ -55,14 +57,7 @@ public class InventoryUI : MonoBehaviour
         Debug.Log("slot " + slot + " has been clicked");
     }
 
-    void Start() {
-        player = GameObject.Find("Player").GetComponent<Player>();
-        inventory = GameObject.Find("Player").GetComponent<Inventory>();
-        slots = null;
-    }
-
     private void SwitchSlot(bool right) {
-        var numSlots = inventory.numItemSlots;
         int newSlot = right ? ((currentSlot + 1 + numSlots) % numSlots) : (currentSlot - 1 + numSlots) % numSlots;
         if (grabbed)
             inventory.container.SwapItems(currentSlot, newSlot);
@@ -70,7 +65,6 @@ public class InventoryUI : MonoBehaviour
     }
 
     public void MoveSelection(Vector2 delta) {
-        var numSlots = inventory.numItemSlots;
         int newSlot = (currentSlot + (int)Math.Round(delta.x) + numSlots) % numSlots;
         newSlot = (newSlot + (int)Math.Round(delta.y) * numColumns + numSlots) % numSlots;
         if (grabbed)
@@ -78,11 +72,16 @@ public class InventoryUI : MonoBehaviour
         currentSlot = newSlot;
     }
 
+    void Start() {
+        player = GameObject.Find("Player").GetComponent<Player>();
+        inventory = GameObject.Find("Player").GetComponent<Inventory>();
+    }
+
     // Update is called once per frame
     void Update()
     {
         // check if slot count has changed
-        var numSlots = inventory.numItemSlots;
+        numSlots = inventory.numItemSlots;
         if (slots == null || numSlots != slots.Length)
             InitializeSlots();
 
