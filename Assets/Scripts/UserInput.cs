@@ -4,16 +4,24 @@ using UnityEngine.InputSystem;
 public class UserInput : MonoBehaviour
 {
     private Player player;
+    private UIController uiController;
 
     private Vector2 direction;
+    private Vector2 uiDirection;
     private Vector2 rotation;
+
+    private bool controlPlayer {
+        get => !uiController.inventoryOpen && !player.isDead;
+    }
 
     private bool aim;
     private bool interact;
+    private bool inventory;
     private bool jump;
     private bool run;
     private bool slide;
     private bool sneak;
+    private bool escape;
 
     private int itemID;
 
@@ -22,6 +30,8 @@ public class UserInput : MonoBehaviour
     void Awake()
     {
         player = GameObject.Find("Player").GetComponent<Player>();
+        uiController = GameObject.Find("Canvas").GetComponent<UIController>();
+
         rotation = Vector2.zero;
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -40,18 +50,13 @@ public class UserInput : MonoBehaviour
         run = false;
         slide = false;
         sneak = false;
+        inventory = false;
 
         itemID = -1;
 
 
-        if (!player.isDead)
-        {
-            // Get inputs
-            GamepadInput();
-            KeyboardInput();
-            MouseInput();
-
-            // Apply inputs
+        // Apply inputs
+        if (controlPlayer) {
             player.Run(run);
             player.Slide(slide);
             player.Sneak(sneak);
@@ -75,6 +80,17 @@ public class UserInput : MonoBehaviour
                 player.Jump();
             }
         }
+
+        // move cursor
+        if (uiController.inventoryOpen) {
+            uiController.inventoryUI.GetComponent<InventoryUI>().MoveSelection(uiDirection);
+        }
+
+        // toggle inventory
+        if (inventory && !uiController.inventoryOpen)
+            uiController.OpenInventory();
+        else if ((inventory || escape) && uiController.inventoryOpen)
+            uiController.CloseInventory();
     }
 
     void GamepadInput()
@@ -142,7 +158,7 @@ public class UserInput : MonoBehaviour
             return;
         }
 
-        bool escape = keyboard.escapeKey.isPressed;
+        escape = keyboard.escapeKey.isPressed;
 
         // Movement
         if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
@@ -184,6 +200,31 @@ public class UserInput : MonoBehaviour
         if (keyboard.digit4Key.wasPressedThisFrame)
         {
             itemID = 3;
+        }
+
+
+        // ui
+        uiDirection = Vector2.zero;
+        if (keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame)
+        {
+            uiDirection.y -= 1;
+        }
+        if (keyboard.aKey.wasPressedThisFrame || keyboard.leftArrowKey.wasPressedThisFrame)
+        {
+            uiDirection.x -= 1;
+        }
+        if (keyboard.dKey.wasPressedThisFrame || keyboard.rightArrowKey.wasPressedThisFrame)
+        {
+            uiDirection.x += 1;
+        }
+        if (keyboard.wKey.wasPressedThisFrame || keyboard.upArrowKey.wasPressedThisFrame)
+        {
+            uiDirection.y += 1;
+        }
+
+
+        if (keyboard.eKey.wasPressedThisFrame) {
+            inventory = true;
         }
     }
 
