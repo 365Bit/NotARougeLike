@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3264794840061447751}
   - component: {fileID: 5196027272824433926}
+  - component: {fileID: 8408705079164422734}
   m_Layer: 0
   m_Name: Definitions
   m_TagString: Untagged
@@ -141,72 +142,72 @@ MonoBehaviour:
       baseValue: 3
       operation: 1
       scalingInBaseStat: []
-  - key: 6
-    def:
-      baseValue: 10
-      operation: 1
-      scalingInBaseStat: []
   - key: 7
     def:
-      baseValue: 5
+      baseValue: 10
       operation: 1
       scalingInBaseStat: []
   - key: 8
     def:
-      baseValue: 2.5
+      baseValue: 5
       operation: 1
       scalingInBaseStat: []
   - key: 9
     def:
-      baseValue: 3
+      baseValue: 5
       operation: 1
       scalingInBaseStat: []
   - key: 10
     def:
-      baseValue: 12
+      baseValue: 2.5
       operation: 1
       scalingInBaseStat: []
   - key: 11
     def:
-      baseValue: 100
+      baseValue: 12
       operation: 1
       scalingInBaseStat: []
   - key: 12
     def:
-      baseValue: 2
+      baseValue: 100
       operation: 1
       scalingInBaseStat: []
   - key: 13
     def:
-      baseValue: 1.5
+      baseValue: 2
       operation: 1
       scalingInBaseStat: []
   - key: 14
     def:
-      baseValue: 100
+      baseValue: 1.5
       operation: 1
       scalingInBaseStat: []
   - key: 15
     def:
-      baseValue: 5
+      baseValue: 100
       operation: 1
       scalingInBaseStat: []
   - key: 16
     def:
-      baseValue: 10
+      baseValue: 5
       operation: 1
       scalingInBaseStat: []
   - key: 17
     def:
-      baseValue: 20
+      baseValue: 10
       operation: 1
       scalingInBaseStat: []
   - key: 18
     def:
-      baseValue: 15
+      baseValue: 20
       operation: 1
       scalingInBaseStat: []
   - key: 19
+    def:
+      baseValue: 15
+      operation: 1
+      scalingInBaseStat: []
+  - key: 20
     def:
       baseValue: 15
       operation: 1
