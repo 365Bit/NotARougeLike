@@ -17,7 +17,7 @@ public class ShopItemSlot : MonoBehaviour
         this.count = count;
         this.item = item;
 
-        var instance = Instantiate(item.itemModel, transform).transform;
+        Transform instance = Instantiate(item.itemModel, transform).transform;
         instance.localPosition = modelPosition;
         instance.localScale = modelScale;
 

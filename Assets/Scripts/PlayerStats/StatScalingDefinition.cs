@@ -57,11 +57,11 @@ public class ScalingFormula {
         float result = baseValue;
         if (scalingInBaseStat != null) {
             if (operation == Operation.Multiplication) {
-                foreach (var s in scalingInBaseStat) {
+                foreach (Operand s in scalingInBaseStat) {
                     result *= s.value[upgradeLevels[s.stat]];
                 }
             } else {
-                foreach (var s in scalingInBaseStat) {
+                foreach (Operand s in scalingInBaseStat) {
                     result += s.value[upgradeLevels[s.stat]];
                 }
             }

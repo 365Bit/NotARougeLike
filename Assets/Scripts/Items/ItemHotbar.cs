@@ -19,7 +19,7 @@ public class ItemHotbar : MonoBehaviour
 
     void InitializeSlots() {
         
-        var numSlots = player.GetComponent<Inventory>().numItemSlots;
+        int numSlots = player.GetComponent<Inventory>().numItemSlots;
         slots = new GameObject[numSlots];
 
         for (int i = 0; i < numSlots; i++) {
@@ -31,7 +31,7 @@ public class ItemHotbar : MonoBehaviour
     void UpdateSlots() {
         var inv = player.GetComponent<Inventory>();
         for (int i = 0; i < slots.Length; i++) {
-            var slot = slots[i];
+            GameObject slot = slots[i];
             var s = slot.GetComponent<ItemHotbarSlot>();
             s.SetItem(inv.container[i].storedItem, inv.container[i].count);
             s.SetSelected(false);
