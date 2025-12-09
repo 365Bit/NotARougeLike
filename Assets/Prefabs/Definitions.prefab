@@ -207,8 +207,3 @@ MonoBehaviour:
       baseValue: 15
       operation: 1
       scalingInBaseStat: []
-  - key: 20
-    def:
-      baseValue: 15
-      operation: 1
-      scalingInBaseStat: []
