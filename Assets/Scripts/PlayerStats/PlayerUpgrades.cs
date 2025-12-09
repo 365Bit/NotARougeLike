@@ -3,6 +3,11 @@ using System;
 
 public class PlayerUpgrades : MonoBehaviour
 {
+    public PlayerUpgrades()
+    {
+        GameSaver.subscribe(this);
+    }
+
     [SerializeField]
     private int[] levels;
 
@@ -11,6 +16,7 @@ public class PlayerUpgrades : MonoBehaviour
         foreach (BaseStatKey key in Enum.GetValues(typeof(BaseStatKey))) {
             levels[(int)key] = 0;
         }
+        GameSaver.save();
     }
 
     public int this[BaseStatKey stat] {
