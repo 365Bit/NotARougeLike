@@ -35,8 +35,7 @@ public class DungeonCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (itemDefinitions == null)
-            itemDefinitions = ItemDefinitions.main;
+        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
 
         navMeshSurface = GetComponent<NavMeshSurface>();
 
