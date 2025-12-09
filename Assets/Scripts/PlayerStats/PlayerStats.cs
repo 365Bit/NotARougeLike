@@ -2,7 +2,7 @@ using UnityEngine;
 
 
 
-/// stores player stats depending on player upgrades and items
+/// stores player stats depending on player upgrades and items.
 [RequireComponent(typeof(Inventory)), RequireComponent(typeof(PlayerUpgrades)), DisallowMultipleComponent]
 public class PlayerStats : MonoBehaviour
 {
@@ -28,7 +28,7 @@ public class PlayerStats : MonoBehaviour
         return def[stat].ComputeFrom(upgrades);
     }
 
-    // 
+    // should be called whenever player upgrades or inventory (or anything influencing stats) is modified
     public void Recompute() {
         fireRate = Compute(StatKey.FireRate); 
         hitRate = Compute(StatKey.HitRate); 
@@ -58,38 +58,38 @@ public class PlayerStats : MonoBehaviour
         jumpConsRate = Compute(StatKey.JumpConsRate); 
     }
 
-    // 
+    // conventient accessors for stats
     [Header("Combat")]
-    public float fireRate;
-    public float hitRate;
-    public float swingDuration;
-    public float strikeDuration;
-    public float returnDuration;
+    public float fireRate { get; private set; }
+    public float hitRate { get; private set; }
+    public float swingDuration { get; private set; }
+    public float strikeDuration { get; private set; }
+    public float returnDuration { get; private set; }
 
     [Header("Mana")]
-    public float maxMana;
-    public float manaRegRate;
+    public float maxMana { get; private set; }
+    public float manaRegRate { get; private set; }
 
     [Header("Movement")]
-    public float runSpeed;
-    public float walkSpeed;
-    public float sneakSpeed;
+    public float runSpeed { get; private set; }
+    public float walkSpeed { get; private set; }
+    public float sneakSpeed { get; private set; }
 
     [Header("Sliding")]
-    public float maxSlideTime;
-    public float slideSpeed;
+    public float maxSlideTime { get; private set; }
+    public float slideSpeed { get; private set; }
 
     [Header("Health")]
-    public float maxHealth;
-    public float healthRegRate;
+    public float maxHealth { get; private set; }
+    public float healthRegRate { get; private set; }
 
     [Header("Jump")]
-    public float jumpHeight;
+    public float jumpHeight { get; private set; }
 
     [Header("Stamina")]
-    public float maxStamina;
-    public float staminaRegRate;
-    public float runConsRate;
-    public float slideConsRate;
-    public float jumpConsRate;
+    public float maxStamina { get; private set; }
+    public float staminaRegRate { get; private set; }
+    public float runConsRate { get; private set; }
+    public float slideConsRate { get; private set; }
+    public float jumpConsRate { get; private set; }
 }

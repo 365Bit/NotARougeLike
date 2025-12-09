@@ -1,6 +1,8 @@
 using UnityEngine;
 using System;
 
+/// provides definitions on how to compute gameplay-stats from base-stats
+[DisallowMultipleComponent]
 public class StatScalingDefinitions : MonoBehaviour
 {
     [System.Serializable]
@@ -49,8 +51,13 @@ public class ScalingFormula {
     public enum Operation {
         Addition, Multiplication
     };
+
+    // initial value
     public float baseValue;
+
+    // how to combine operands
     public Operation operation;
+    // operand constists of a value per upgrade level of a base stat
     public Operand[] scalingInBaseStat;
 
     public float ComputeFrom(PlayerUpgrades upgradeLevels) {
