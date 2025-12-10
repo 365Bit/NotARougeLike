@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class CurrencyDisplay : MonoBehaviour
 {
-    public Player player;
+    private GameObject player;
+    private Inventory playerInventory;
 
     [Header("Rendering")]
     public GameObject slotPrefab;
@@ -13,8 +14,13 @@ public class CurrencyDisplay : MonoBehaviour
     // 
     private GameObject[] slots;
 
+    void Awake() {
+        player = GameObject.Find("Player");
+        playerInventory = player.GetComponent<Inventory>();
+    }
+
     void InitializeSlots() {
-        var numSlots = player.inventory.numCurrencySlots;
+        var numSlots = playerInventory.numCurrencySlots;
         slots = new GameObject[numSlots];
 
         for (int i = 0; i < numSlots; i++) {
@@ -24,11 +30,10 @@ public class CurrencyDisplay : MonoBehaviour
     }
 
     void UpdateSlots() {
-        var inv = player.inventory;
         for (int i = 0; i < slots.Length; i++) {
             var slot = slots[i];
             var s = slot.GetComponent<ItemHotbarSlot>();
-            s.SetCurrency((Currency)i, inv.currency[(Currency)i]);
+            s.SetCurrency((Currency)i, playerInventory.currency[(Currency)i]);
             s.SetSelected(false);
         }
     }
@@ -37,7 +42,7 @@ public class CurrencyDisplay : MonoBehaviour
     void Update()
     {
         // check if slot count has changed
-        if (slots == null || player.inventory.numCurrencySlots != slots.Length)
+        if (slots == null || playerInventory.numCurrencySlots != slots.Length)
             InitializeSlots();
 
         UpdateSlots();
