@@ -6,78 +6,62 @@ using TMPro;
 public class ShopRenderer : MonoBehaviour
 {
     [System.Serializable]
-    public struct Item {
-        [Range(0.0f, 1f)]
-        public float probability;
-        public string name;
-        public Vector3 scale;
-        public GameObject prefab;
-        public int cost;
-    };
-
-    [System.Serializable]
-    public struct ItemSlot {
+    public struct ItemSlotConfig {
         public Vector3 position;
     }
 
-
-    [Header("Definitions")]
-    public Item[] items;
-
+    [Header("General")]
+    public ItemDefinitions itemDefinitions;
 
     [Header("Item Slots")]
-    public ItemSlot[] itemSlots;
+    public int numItemSlots;
+    private ItemContainer items;
+
 
     [Header("Rendering")]
+    public ItemSlotConfig[] slotProperties;
     public GameObject itemSlotPrefab;
     // where to instantiate item slots
     public Transform slotDisplayParent;
     public Vector3 itemScale;
 
-    //
-    private int[] availableItems;
-    private float probabilitySum;
 
     public void Awake() {
-        // has to be done on Instantiation (before Start())
-        probabilitySum = 0.0f;
-        foreach(var item in items)
-            probabilitySum += item.probability;
+        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
 
-        availableItems = new int[itemSlots.Length];
+        items = new(numItemSlots);
     }
-
 
     public void ShowItems() {
         foreach(Transform child in slotDisplayParent) {
             Destroy(child);
         }
 
-        int index = 0;
-        foreach(var (item,slot) in availableItems.Zip(itemSlots, (a,b) => (a,b))) {
-            if (index == -1) {
+        foreach(var (slot, slotDisplay) in items.slots.Zip(slotProperties, (a,b)=>(a,b))) {
+            if (slot.storedItem == null) {
                 // no item
             } else {
-                var slotInstance = Instantiate(itemSlotPrefab, slotDisplayParent).transform;
-                slotInstance.localPosition = slot.position;
-                slotInstance.GetComponent<ShopItemSlot>().SetItem(index, items[item]);
+                Transform slotInstance = Instantiate(itemSlotPrefab, slotDisplayParent).transform;
+                slotInstance.localPosition = slotDisplay.position;
+                slotInstance.GetComponent<ShopItemSlot>().SetItem(slot.storedItem, slot.count);
             }
-            index++;
         }
     }
 
+    // TODO: extract to dungeon creator
     public void AddRandomItems() {
-        for (int slot = 0; slot < itemSlots.Length; slot++) {
-            availableItems[slot] = -1;
+        foreach (ItemSlot slot in items.slots) {
+            slot.storedItem = null;
 
-            var random = UnityEngine.Random.Range(0f,probabilitySum);
-            for (int item = 0; item < items.Length; item++) {
-                Debug.Log("Comparing " + random + " with " + items[item].probability);
-                if (random <= items[item].probability) {
-                    availableItems[slot] = item;
+            // select random definition
+            float random = UnityEngine.Random.Range(0f,1f);
+            foreach (ItemDefinition def in itemDefinitions.definitions) {
+                if (random <= def.shopProbability) {
+                    slot.storedItem = def;
+                    slot.count = 1;
                     break;
                 }
-                random -= items[item].probability;
+                random -= def.shopProbability;
             }
         }
 

@@ -174,29 +174,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c1de7629195a51a6acf84ecf7aea865, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  items:
-  - probability: 0.4
-    name: health_fruit
-    scale: {x: 0.2, y: 0.2, z: 0.2}
-    prefab: {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
-    cost: 5
-  - probability: 0.3
-    name: stamina_fruit
-    scale: {x: 0.2, y: 0.2, z: 0.2}
-    prefab: {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
-    cost: 5
-  - probability: 0.3
-    name: mana_fruit
-    scale: {x: 0.2, y: 0.2, z: 0.2}
-    prefab: {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
-    cost: 5
-  itemSlots:
-  - position: {x: -0.3, y: 0, z: 0}
-  - position: {x: 0, y: 0, z: 0}
-  - position: {x: 0.3, y: 0, z: 0}
+  itemDefinitions: {fileID: 0}
+  numItemSlots: 3
+  slotProperties:
+  - position: {x: -0.5, y: 0.5, z: 0}
+  - position: {x: 0, y: 0.5, z: 0}
+  - position: {x: 0.5, y: 0.5, z: 0}
   itemSlotPrefab: {fileID: 2039209275694103591, guid: 4374d672cac9fbb99938d0d63978e082, type: 3}
   slotDisplayParent: {fileID: 3334482627787709302}
-  itemScale: {x: 1, y: 1, z: 1}
+  itemScale: {x: 0.1, y: 0.1, z: 0.1}
 --- !u!1 &8705672360542760137
 GameObject:
   m_ObjectHideFlags: 0

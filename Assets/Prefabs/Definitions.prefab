@@ -1,0 +1,209 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5066985577544289893
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3264794840061447751}
+  - component: {fileID: 5196027272824433926}
+  - component: {fileID: 8408705079164422734}
+  m_Layer: 0
+  m_Name: Definitions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1
+--- !u!4 &3264794840061447751
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5196027272824433926
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fea940d012f9f88b9794c1dc44c09fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinitions
+  definitions:
+  - name: health_fruit
+    displayName: Health Fruit
+    itemModel: {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
+    itemModelUI: {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
+    dropProbability: 0.092
+    shopProbability: 0.098
+    cost: 2
+    maxPerShopSlot: 1
+    weight: 0
+    maxPerInventorySlot: 1
+  - name: stamina_fruit
+    displayName: Stamina Fruit
+    itemModel: {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
+    itemModelUI: {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
+    dropProbability: 0.301
+    shopProbability: 0.147
+    cost: 1
+    maxPerShopSlot: 2
+    weight: 0
+    maxPerInventorySlot: 4
+  - name: mana_fruit
+    displayName: Mana Fruit
+    itemModel: {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
+    itemModelUI: {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
+    dropProbability: 0.331
+    shopProbability: 0.202
+    cost: 2
+    maxPerShopSlot: 4
+    weight: 0
+    maxPerInventorySlot: 10
+--- !u!114 &8408705079164422734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ed6bc1b65f8b649f9e94a95e3dae9ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  definitions:
+  - key: 0
+    def:
+      baseValue: 3
+      operation: 1
+      scalingInBaseStat:
+      - stat: 5
+        value:
+        - 1
+        - 2
+        - 3
+        - 4
+  - key: 1
+    def:
+      baseValue: 2
+      operation: 1
+      scalingInBaseStat:
+      - stat: 5
+        value:
+        - 1
+        - 2
+        - 3
+        - 5
+      - stat: 3
+        value:
+        - 1
+        - 1.2
+        - 1.3
+        - 1.5
+  - key: 2
+    def:
+      baseValue: 0.4
+      operation: 1
+      scalingInBaseStat: []
+  - key: 3
+    def:
+      baseValue: 0.2
+      operation: 1
+      scalingInBaseStat: []
+  - key: 4
+    def:
+      baseValue: 0.1
+      operation: 1
+      scalingInBaseStat: []
+  - key: 5
+    def:
+      baseValue: 100
+      operation: 1
+      scalingInBaseStat: []
+  - key: 6
+    def:
+      baseValue: 3
+      operation: 1
+      scalingInBaseStat: []
+  - key: 7
+    def:
+      baseValue: 10
+      operation: 1
+      scalingInBaseStat: []
+  - key: 8
+    def:
+      baseValue: 5
+      operation: 1
+      scalingInBaseStat: []
+  - key: 9
+    def:
+      baseValue: 5
+      operation: 1
+      scalingInBaseStat: []
+  - key: 10
+    def:
+      baseValue: 2.5
+      operation: 1
+      scalingInBaseStat: []
+  - key: 11
+    def:
+      baseValue: 12
+      operation: 1
+      scalingInBaseStat: []
+  - key: 12
+    def:
+      baseValue: 100
+      operation: 1
+      scalingInBaseStat: []
+  - key: 13
+    def:
+      baseValue: 2
+      operation: 1
+      scalingInBaseStat: []
+  - key: 14
+    def:
+      baseValue: 1.5
+      operation: 1
+      scalingInBaseStat: []
+  - key: 15
+    def:
+      baseValue: 100
+      operation: 1
+      scalingInBaseStat: []
+  - key: 16
+    def:
+      baseValue: 5
+      operation: 1
+      scalingInBaseStat: []
+  - key: 17
+    def:
+      baseValue: 10
+      operation: 1
+      scalingInBaseStat: []
+  - key: 18
+    def:
+      baseValue: 20
+      operation: 1
+      scalingInBaseStat: []
+  - key: 19
+    def:
+      baseValue: 15
+      operation: 1
+      scalingInBaseStat: []

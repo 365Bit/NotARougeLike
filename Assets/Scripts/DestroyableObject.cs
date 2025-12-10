@@ -7,12 +7,8 @@ public class DestroyableObject : MonoBehaviour
     [Header("Health")]
     public float maxHealth = 50.0f;
 
-    [Header("Items")]
-    public GameObject[] items;
-    public float[] dropChances;
-    public float numberOfItems;
-
-    // Array of pairs
+    [Header("Dropped Item")]
+    public GameObject droppedItemPrefab;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -20,32 +16,25 @@ public class DestroyableObject : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    // item to drop
+    private ItemDefinition item;
+    private int count;
+
+    public void SetItem(ItemDefinition item, int count) {
+        this.item = item;
+        this.count = count;
     }
 
     public void SelfDestruct()
     {
         Destroy(this.gameObject);
+        
+        Vector3 position = transform.position + new Vector3(Random.Range(-0.5f, 0.5f), 0.0f, Random.Range(-0.5f, 0.5f));
+        Quaternion rotation = Quaternion.Euler(0.0f, Random.Range(0.0f, 360.0f), 0.0f);
 
-        for (int i = 0; i < numberOfItems; i++)
-        {
-            float random = Random.Range(0.0f, 1.0f);
-            for (int j = 0; j < items.Length; j++)
-            {
-                if (random <= dropChances[j])
-                {
-                    Vector3 position = transform.position + new Vector3(Random.Range(-0.5f, 0.5f), 0.0f, Random.Range(-0.5f, 0.5f));
-                    Quaternion rotation = Quaternion.Euler(0.0f, Random.Range(0.0f, 360.0f), 0.0f);
-
-                    GameObject instance = Instantiate(items[j], position, rotation);
-                    instance.name = items[j].name;
-                    break;
-                }
-            }
-        }
+        GameObject instance = Instantiate(droppedItemPrefab, position, rotation);
+        instance.GetComponent<DroppedItem>().SetItem(item, count);
+        instance.name = item.name;
     }
 
     public void TakeDamage(float damage)

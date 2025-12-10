@@ -30,10 +30,17 @@ public class DungeonCreator : MonoBehaviour
     List<Vector3Int> possibleWallHorizontalPosition;
     List<Vector3Int> possibleWallVerticalPosition;
 
-    public GameObject UI;
+    ItemDefinitions itemDefinitions;
+
+    [Header("User Interfaces")]
+    public GameObject inventory;
+    public GameObject playerStats;
+
     // Start is called before the first frame update
     void Start()
     {
+        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
+
         navMeshSurface = GetComponent<NavMeshSurface>();
 
         CreateDungeon();
@@ -88,7 +95,8 @@ public class DungeonCreator : MonoBehaviour
         GameObject player = Instantiate(playerPrefab, playerPos, Quaternion.identity);
         player.name = "Player";
 
-        UI.SetActive(true);
+        inventory.SetActive(true);
+        playerStats.SetActive(true);
     }
 
     private void CreateEnemy(List<Node> listOfRooms)
@@ -112,12 +120,45 @@ public class DungeonCreator : MonoBehaviour
     }
 
 
+    private void SetRandomShopItems(ItemSlot[] slots) {
+        foreach (var slot in slots) {
+            slot.storedItem = null;
+
+            // select random definition
+            var random = UnityEngine.Random.Range(0f,1f);
+            foreach (ItemDefinition def in itemDefinitions.definitions) {
+                if (random <= def.shopProbability) {
+                    slot.storedItem = def;
+                    slot.count = 1;
+                    break;
+                }
+                random -= def.shopProbability;
+            }
+        }
+    }
+
+    private void SetRandomDroppedItem(ItemSlot slot) {
+        slot.storedItem = null;
+
+        // select random definition
+        var random = UnityEngine.Random.Range(0f,1f);
+        foreach (ItemDefinition def in itemDefinitions.definitions) {
+            if (random <= def.shopProbability) {
+                slot.storedItem = def;
+                slot.count = 1;
+                break;
+            }
+            random -= def.shopProbability;
+        }
+    }
+
     private void CreateShop(List<Node> listOfRooms)
     {
         foreach( var room in listOfRooms)
         {
             if (room.Type == "room")
             {
+                // use center of room
                 int shopX = (room.BottomLeftAreaCorner.x + 1 + room.BottomRightAreaCorner.x) / 2;
                 int shopY = (room.BottomLeftAreaCorner.y + 1 + room.TopLeftAreaCorner.y) / 2;
                 Vector3 shopPos = new Vector3(
@@ -127,7 +168,7 @@ public class DungeonCreator : MonoBehaviour
                 if(UnityEngine.Random.Range(0f,1f) < shopProb)
                 {
                     var shop = Instantiate(shopPrefab, shopPos, Quaternion.identity);
-
+                    // TODO
                     shop.GetComponent<ShopRenderer>().AddRandomItems();
                 }   
             }
@@ -148,7 +189,11 @@ public class DungeonCreator : MonoBehaviour
                     chestY);
                 if(UnityEngine.Random.Range(0f,1f) > lootProb)
                 {
-                    Instantiate(chestPrefab, chestPos, Quaternion.identity);
+                    var chest = Instantiate(chestPrefab, chestPos, Quaternion.identity);
+
+                    ItemSlot tmpSlot = new();
+                    SetRandomDroppedItem(tmpSlot);
+                    chest.GetComponent<DestroyableObject>().SetItem(tmpSlot.storedItem, tmpSlot.count);
                 }   
             }
         }
