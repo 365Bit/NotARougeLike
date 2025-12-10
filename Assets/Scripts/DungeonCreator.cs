@@ -24,7 +24,7 @@ public class DungeonCreator : MonoBehaviour
     public float roomTopCornerMidifier;
     [Range(0, 2)]
     public int roomOffset;
-    public GameObject wallPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab;
+    public GameObject wallPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab, navPointPrefab;
     List<Vector3Int> possibleDoorVerticalPosition;
     List<Vector3Int> possibleDoorHorizontalPosition;
     List<Vector3Int> possibleWallHorizontalPosition;
@@ -43,8 +43,6 @@ public class DungeonCreator : MonoBehaviour
         navMeshSurface = GetComponent<NavMeshSurface>();
 
         CreateDungeon();
-
-        navMeshSurface.BuildNavMesh();
     }
 
     public void CreateDungeon()
@@ -72,7 +70,10 @@ public class DungeonCreator : MonoBehaviour
         CreateWalls(wallParent);
         CreateLoot(listOfRooms);
         CreateEnemy(listOfRooms);
+        CreateNavPoint(listOfRooms);
         CreateShop(listOfRooms);
+
+        navMeshSurface.BuildNavMesh();
     }
 
     private void CreatePlayer(List<Node> listOfRooms)
@@ -91,8 +92,11 @@ public class DungeonCreator : MonoBehaviour
                 2,
                 playerPosY);
         //playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
-        GameObject player = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        //GameObject player = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        Player player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        player.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
         player.name = "Player";
+        player.StartGame();
 
         canvas.SetActive(true);
     }
@@ -111,8 +115,55 @@ public class DungeonCreator : MonoBehaviour
                     enemyPosY);
                 if(UnityEngine.Random.Range(0f,1f) > 0.3)
                 {
-                    Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
+                    GameObject foe = Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
+                    Opponent opponent = foe.GetComponent<Opponent>();
+                    opponent.spawnRoom = room;
                 }   
+            }
+        }
+    }
+
+    private void CreateNavPoint(List<Node> listOfRooms)
+    {
+        foreach( var room in listOfRooms)
+        {
+            if (room.Type == "room")
+            {
+                int navPointX = room.BottomLeftAreaCorner.x + 5;
+                int navPointY = room.BottomLeftAreaCorner.y + 5;
+                Vector3 navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+
+                navPointX = room.TopLeftAreaCorner.x + 5;
+                navPointY = room.TopLeftAreaCorner.y - 5;
+                navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+
+                navPointX = room.TopRightAreaCorner.x - 5;
+                navPointY = room.TopRightAreaCorner.y - 5;
+                navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+
+                navPointX = room.BottomRightAreaCorner.x - 5;
+                navPointY = room.BottomRightAreaCorner.y + 5;
+                navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
             }
         }
     }
