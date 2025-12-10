@@ -68,7 +68,6 @@ class GameSaver
                 continue;
             }
             file.WriteLine(JsonUtility.ToJson(saveable.Item2.Target));
-            JsonConvert.SerializeObject()
         }
         file.Close();
         Debug.Log("finish saving");
