@@ -15,13 +15,14 @@ public abstract class Node
     public String Type { get; set; }
 
     public Node Parent { get; set; }
-
-
     public int TreeLayerIndex { get; set; }
+
+    public List<NavPoint> navPointList { get; set; }
 
     public Node(Node parentNode)
     {
         childrenNodeList = new List<Node>();
+        navPointList = new List<NavPoint>();
         this.Parent = parentNode;
         if (parentNode != null)
         {

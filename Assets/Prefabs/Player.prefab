@@ -344,6 +344,7 @@ MonoBehaviour:
   projectiles:
   - {fileID: 7974811766441290857, guid: 60e49ade76f5c004293e0e18fd49dbb0, type: 3}
   weapon: {fileID: 5109643459192554882}
+  deathScreen: {fileID: 7038015854114532385, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
 --- !u!114 &8439484915624340096
 MonoBehaviour:
   m_ObjectHideFlags: 0
