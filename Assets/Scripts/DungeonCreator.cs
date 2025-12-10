@@ -32,6 +32,10 @@ public class DungeonCreator : MonoBehaviour
 
     ItemDefinitions itemDefinitions;
 
+    [Header("User Interfaces")]
+    public GameObject inventory;
+    public GameObject playerStats;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -87,7 +91,12 @@ public class DungeonCreator : MonoBehaviour
                 playerPosX,
                 2,
                 playerPosY);
-        playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        //playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        GameObject player = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        player.name = "Player";
+
+        inventory.SetActive(true);
+        playerStats.SetActive(true);
     }
 
     private void CreateEnemy(List<Node> listOfRooms)
