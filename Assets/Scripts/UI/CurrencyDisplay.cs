@@ -14,11 +14,6 @@ public class CurrencyDisplay : MonoBehaviour
     // 
     private GameObject[] slots;
 
-    void Awake() {
-        player = GameObject.Find("Player");
-        playerInventory = player.GetComponent<Inventory>();
-    }
-
     void InitializeSlots() {
         var numSlots = playerInventory.numCurrencySlots;
         slots = new GameObject[numSlots];
@@ -36,6 +31,11 @@ public class CurrencyDisplay : MonoBehaviour
             s.SetCurrency((Currency)i, playerInventory.currency[(Currency)i]);
             s.SetSelected(false);
         }
+    }
+
+    void Awake() {
+        player = GameObject.Find("Player");
+        playerInventory = player.GetComponent<Inventory>();
     }
 
     // Update is called once per frame

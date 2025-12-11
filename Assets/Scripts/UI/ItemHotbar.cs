@@ -3,6 +3,7 @@ using UnityEngine;
 public class ItemHotbar : MonoBehaviour
 {
     private GameObject player;
+    private Inventory playerInventory;
 
     [Header("Rendering")]
     public GameObject slotPrefab;
@@ -15,11 +16,11 @@ public class ItemHotbar : MonoBehaviour
 
     public void Awake() {
         player = GameObject.Find("Player");
+        playerInventory = player.GetComponent<Inventory>();
     }
 
     void InitializeSlots() {
-        
-        int numSlots = player.GetComponent<Inventory>().numItemSlots;
+        int numSlots = playerInventory.numHotbarSlots;
         slots = new GameObject[numSlots];
 
         for (int i = 0; i < numSlots; i++) {
@@ -29,11 +30,10 @@ public class ItemHotbar : MonoBehaviour
     }
 
     void UpdateSlots() {
-        var inv = player.GetComponent<Inventory>();
         for (int i = 0; i < slots.Length; i++) {
             GameObject slot = slots[i];
             var s = slot.GetComponent<ItemHotbarSlot>();
-            s.SetItem(inv.container[i].storedItem, inv.container[i].count);
+            s.SetItem(playerInventory.container[i].storedItem, playerInventory.container[i].count);
             s.SetSelected(false);
         }
     }
@@ -42,7 +42,7 @@ public class ItemHotbar : MonoBehaviour
     void Update()
     {
         // check if slot count has changed
-        var numSlots = player.GetComponent<Inventory>().numItemSlots;
+        var numSlots = playerInventory.numHotbarSlots;
         if (slots == null || numSlots != slots.Length)
             InitializeSlots();
 

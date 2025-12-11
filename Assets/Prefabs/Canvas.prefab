@@ -810,7 +810,7 @@ RectTransform:
   m_Father: {fileID: 9093391096345492041}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -885,7 +885,7 @@ RectTransform:
   m_Father: {fileID: 7541815379611112471}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -977,6 +977,7 @@ GameObject:
   - component: {fileID: 415620087222215944}
   - component: {fileID: 7128067112286998707}
   - component: {fileID: 4840845350211867440}
+  - component: {fileID: 1174493148950342287}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1069,6 +1070,31 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &4840845350211867440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7038015854114532385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c14fd3552390f8459b3ab55ffa9158f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UserInput
+  mouseSensitivity: 0.1
+--- !u!114 &1174493148950342287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7038015854114532385}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9238566f73bd5d5df8f0abf244b9260d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager
 --- !u!1 &7052077407146181751
 GameObject:
   m_ObjectHideFlags: 0
@@ -1078,7 +1104,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8922166085170856251}
-  - component: {fileID: 1174493148950342287}
+  - component: {fileID: 3083442733792379412}
   m_Layer: 5
   m_Name: Currencies
   m_TagString: Untagged
@@ -1102,45 +1128,24 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -10}
   m_SizeDelta: {x: 400, y: 100}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &1174493148950342287
+--- !u!114 &3083442733792379412
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7038015854114532385}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9238566f73bd5d5df8f0abf244b9260d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIManager
-  inventoryOpen: 0
---- !u!114 &4840845350211867440
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7038015854114532385}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c14fd3552390f8459b3ab55ffa9158f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UserInput
-  mouseSensitivity: 0.1
   m_GameObject: {fileID: 7052077407146181751}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 690e7e0dcb4f3fa1c8c897243b3b2092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CurrencyDisplay
-  player: {fileID: 0}
   slotPrefab: {fileID: 7343116501942089031, guid: b61cc76a33700c7aeb941c07e39a9425, type: 3}
-  slotPositionLeft: {x: -75, y: -150}
-  slotPositionRight: {x: -425, y: -150}
+  slotPositionLeft: {x: -50, y: -100}
+  slotPositionRight: {x: -350, y: -100}
 --- !u!1 &7117123524355538582
 GameObject:
   m_ObjectHideFlags: 0
@@ -1473,7 +1478,7 @@ RectTransform:
   m_Father: {fileID: 4933455140302044119}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
