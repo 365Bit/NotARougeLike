@@ -52,7 +52,7 @@ public class UIManager : MonoBehaviour
     void Awake() {
         Instance = this;
         playerStats = GameObject.Find("Player Stats");
-        hotbar = GameObject.Find("Inventory");
+        hotbar = GameObject.Find("Hotbar");
         deathScreen = GameObject.Find("Death Screen");
         deathScreen.SetActive(false);
 
