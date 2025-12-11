@@ -63,7 +63,11 @@ public class ItemContainer {
 
     public void ConsumeItem(int slot) {
         if (slots[slot].count > 0)
+        {
             slots[slot].count -= 1;
+            if(slots[slot].count == 0)
+                slots[slot].storedItem = null;
+        }
         PrintState();
     }
 

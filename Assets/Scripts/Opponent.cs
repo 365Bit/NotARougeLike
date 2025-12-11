@@ -16,14 +16,14 @@ public class Opponent : MonoBehaviour
     private Vector3 spawnPosition;
 
     [Header("Combat")]
-    public Opp_Weapon weapon;
+    private Animator animator;
     public HitZone hitZone;
-    public float hitRate = 2.0f;
+    public float hitRate = 1.0f;
     private float hitTime;
-    private float hitCooldown;
-    private Transform rightShoulderTransform;
-    public float swingDuration = 0.4f;
-    public float strikeDuration = 0.2f;
+    public float hitCooldown = 0.5f;
+    //private Transform rightShoulderTransform;
+    public float swingDuration = 0.1f;
+    public float strikeDuration = 0.1f;
     public float returnDuration = 0.1f;
     public float attackRange = 3.0f;
     public float detectionRange = 15.0f;
@@ -62,7 +62,7 @@ public class Opponent : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         playerTransform = GameObject.Find("Player").transform;
-        rightShoulderTransform = transform.Find("Opp Right Shoulder");
+        //rightShoulderTransform = transform.Find("Opp Right Shoulder");
 
         currentHealth = maxHealth;
         spawnPosition = transform.position;
@@ -71,15 +71,27 @@ public class Opponent : MonoBehaviour
         hitState = HitState.Idle;
         hitCooldown = 0.0f;
         hitTime = 0.0f;
-        weapon.gameObject.SetActive(false);
         hitZone.gameObject.SetActive(false);
 
         player = playerTransform.GetComponent<Player>();
+
+        animator = GetComponentInChildren<Animator>();
+        animator.SetFloat("attackSpeed", hitRate);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(navMeshAgent.speed > 0.1f)
+        {
+            animator.SetBool("isMoving", true);
+        }
+        else
+        {
+            animator.SetBool("isMoving", false);
+        }
+
+
         if (playerTransform == null)
         {
             return;
@@ -105,7 +117,6 @@ public class Opponent : MonoBehaviour
             }
             else
             {
-                navMeshAgent.isStopped = false;
                 navMeshAgent.SetDestination(playerTransform.position);
             }
         }
@@ -124,13 +135,14 @@ public class Opponent : MonoBehaviour
 
             float ratio = Mathf.Clamp(hitTime / duration, 0.0f, 1.0f);
 
-            rightShoulderTransform.localRotation = Quaternion.Slerp(startRotation, endRotation, ratio);
+            //rightShoulderTransform.localRotation = Quaternion.Slerp(startRotation, endRotation, ratio);
 
             if (ratio >= 1.0f)
             {
                 switch (hitState)
                 {
                     case HitState.Swing:
+                        animator.SetTrigger("swing");
                         hitState = HitState.Strike;
                         hitTime = 0.0f;
 
@@ -148,10 +160,10 @@ public class Opponent : MonoBehaviour
                     case HitState.Return:
                         hitZone.gameObject.SetActive(false);
                         hitState = HitState.Idle;
-                        hitCooldown = 1.0f / hitRate;
+                        hitCooldown = 0.5f;
                         playerGotHit = false;
+                        navMeshAgent.isStopped = false;
 
-                        weapon.gameObject.SetActive(false);
                         break;
                     default:
                         Debug.LogError("Unknown Hit State: " + hitState);
@@ -165,29 +177,30 @@ public class Opponent : MonoBehaviour
         // TODO
         navMeshAgent.isStopped = true;
 
-        transform.LookAt(playerTransform);
+        //transform.LookAt(playerTransform);
 
         if (hitCooldown > 0.0f || hitState != HitState.Idle)
         {
             return;
         }
-        weapon.gameObject.SetActive(true);
         hitZone.SetDamage(20.0f);
         hitState = HitState.Swing;
         hitTime = 0.0f;
 
-        startRotation = rightShoulderTransform.localRotation;
+        //startRotation = rightShoulderTransform.localRotation;
         endRotation = Quaternion.Euler(swingRotation);
     }
 
     void Die()
     {
         navMeshAgent.isStopped = true;
+        animator.SetTrigger("death");
         Destroy(gameObject, 2.0f);
     }
 
     public void TakeDamage(float damage)
     {
+        animator.SetTrigger("gotHit");
         currentHealth -= damage;
 
         if (currentHealth <= 0.0f)

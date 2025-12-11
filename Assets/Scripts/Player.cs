@@ -113,6 +113,8 @@ public class Player : MonoBehaviour
         defaultYScale = transform.localScale.y;
 
         weapon.gameObject.SetActive(false);
+
+        inventory.container.AddItem(itemDefinitions[3], 10);
     }
 
     // Update is called once per frame
@@ -491,10 +493,16 @@ public class Player : MonoBehaviour
 
     void Shoot()
     {
-        if (fireCooldown > 0.0f || projectiles.Length == 0)
+        int bowAmmoSlot = inventory.container.GetSlotContaining(itemDefinitions[3]);
+
+        Debug.Log("Bow Ammo Slot: " + bowAmmoSlot);
+
+        if (fireCooldown > 0.0f || projectiles.Length == 0 || bowAmmoSlot == -1)
         {
             return;
         }
+
+        inventory.container.ConsumeItem(bowAmmoSlot);
 
         Vector3 position = cameraTransform.position + transform.forward * 1.0f;
         Quaternion rotation = cameraTransform.rotation;
