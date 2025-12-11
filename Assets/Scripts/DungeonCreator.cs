@@ -23,10 +23,10 @@ public class DungeonCreator : MonoBehaviour
     public int roomOffset;
 
     public GameObject wallPrefab, pillarPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab, navPointPrefab;
-    List<Vector3Int> possibleDoorVerticalPosition;
-    List<Vector3Int> possibleDoorHorizontalPosition;
-    List<Vector3Int> possibleWallHorizontalPosition;
-    List<Vector3Int> possibleWallVerticalPosition;
+    List<Vector3Int> possibleVerticalDoorPosition;
+    List<Vector3Int> possibleHorizontalDoorPosition;
+    List<Vector3Int> possibleHorizontalWallPosition;
+    List<Vector3Int> possibleVerticalWallPosition;
 
     ItemDefinitions itemDefinitions;
 
