@@ -43,33 +43,37 @@ public class UserInput : MonoBehaviour
 
         itemID = -1;
 
-        // Get inputs
-        GamepadInput();
-        KeyboardInput();
-        MouseInput();
 
-        // Apply inputs
-        player.Run(run);
-        player.Slide(slide);
-        player.Sneak(sneak);
-
-        player.Aim(aim);
-        player.Rotate(rotation);
-        player.Move(direction);
-
-        if (itemID > -1)
+        if (!player.isDead)
         {
-            player.UseItem(itemID);
-        }
+            // Get inputs
+            GamepadInput();
+            KeyboardInput();
+            MouseInput();
 
-        if (interact)
-        {
-            player.Interact();
-        }
+            // Apply inputs
+            player.Run(run);
+            player.Slide(slide);
+            player.Sneak(sneak);
 
-        if (jump)
-        {
-            player.Jump();
+            player.Aim(aim);
+            player.Rotate(rotation);
+            player.Move(direction);
+
+            if (itemID > -1)
+            {
+                player.UseItem(itemID);
+            }
+
+            if (interact)
+            {
+                player.Interact();
+            }
+
+            if (jump)
+            {
+                player.Jump();
+            }
         }
     }
 

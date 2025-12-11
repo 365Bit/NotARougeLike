@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class Opponent : MonoBehaviour
@@ -7,6 +8,7 @@ public class Opponent : MonoBehaviour
     // Components
     private NavMeshAgent navMeshAgent;
     private Transform playerTransform;
+    private Player player;
 
     private float currentHealth;
     private float wanderTime;
@@ -51,6 +53,10 @@ public class Opponent : MonoBehaviour
     public float wanderInterval = 3.0f;
     public float wanderRadius = 5.0f;
 
+    public Node spawnRoom;
+    private int nextNavPointID = 0;
+    bool wandering = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -67,6 +73,8 @@ public class Opponent : MonoBehaviour
         hitTime = 0.0f;
         weapon.gameObject.SetActive(false);
         hitZone.gameObject.SetActive(false);
+
+        player = playerTransform.GetComponent<Player>();
     }
 
     // Update is called once per frame
@@ -88,7 +96,7 @@ public class Opponent : MonoBehaviour
             }
         }
 
-        if (distance <= detectionRange)
+        if (distance <= detectionRange && !player.isDead)
         {
             if (distance <= attackRange)
             {
@@ -201,13 +209,23 @@ public class Opponent : MonoBehaviour
     void Wander()
     {
         wanderTime += Time.deltaTime;
+        navMeshAgent.isStopped = false;
 
-        if (wanderTime >= wanderInterval)
+        if (navMeshAgent.remainingDistance < 1)
+        {
+            wandering = false;
+        }
+
+        if (!wandering)
         {
             //Vector3 randomDirection = Random.insideUnitSphere * wanderRadius;
-            Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f),Random.Range(-1f, 1f)).normalized;
-            Vector3 targetPos = spawnPosition + new Vector3(randomDirection.x, randomDirection.y, 0) * wanderRadius;
+            //Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f),Random.Range(-1f, 1f)).normalized;
+            //Vector3 targetPos = spawnPosition + new Vector3(randomDirection.x, randomDirection.y, 0) * wanderRadius;
             //randomDirection += spawnPosition;
+
+            List<NavPoint> targetList = spawnRoom.navPointList;
+
+            Vector3 targetPos = targetList[nextNavPointID].transform.position;
 
             NavMeshHit navHit;
             NavMesh.SamplePosition(targetPos, out navHit, wanderRadius, NavMesh.AllAreas);
@@ -215,6 +233,9 @@ public class Opponent : MonoBehaviour
             navMeshAgent.SetDestination(navHit.position);
 
             wanderTime = 0.0f;
+            wandering = true;
+            nextNavPointID++;
+            nextNavPointID %= targetList.Count;
         }
     }
 

@@ -74,6 +74,8 @@ public class Player : MonoBehaviour
     private ItemDefinitions itemDefinitions;
     private PlayerStats stats;
 
+    public bool isDead = false;
+
     void Awake()
     {
         stats = GetComponent<PlayerStats>();
@@ -268,7 +270,18 @@ public class Player : MonoBehaviour
     private void Die()
     {
         // TODO
-        Debug.Log("Die");
+        isDead = true;
+        characterController.enabled = false;
+        UIManager.Instance.SwitchToDeathScreen();
+    }
+
+    public void StartGame()
+    {
+        isDead = false;
+        characterController.enabled = true;
+        currentHealth = stats.maxHealth;
+        currentMana = stats.maxMana;
+        currentStamina = stats.maxStamina;
     }
 
     public float GetHealth()

@@ -5,9 +5,12 @@ using UnityEngine.InputSystem;
 // can switch between gameplay/inventory/death-screen (/pause-screen)
 public class UIManager : MonoBehaviour
 {
+    public static UIManager Instance;
+
     // ui elements
     private GameObject playerStats;
     private GameObject hotbar;
+    private GameObject deathScreen;
 
     // set of possible ui states
     public enum UIState {
@@ -39,14 +42,19 @@ public class UIManager : MonoBehaviour
         playerStats.SetActive(false);
         hotbar.SetActive(false);
 
-        // TODO
+        deathScreen.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         currentState = UIState.Death;
     }
 
     void Awake() {
+        Instance = this;
         playerStats = GameObject.Find("Player Stats");
         hotbar = GameObject.Find("Hotbar");
+        deathScreen = GameObject.Find("Death Screen");
+        deathScreen.SetActive(false);
 
         SwitchToGameplay();
     }
