@@ -11,13 +11,13 @@ public class Inventory : MonoBehaviour
 
     // amount of currencies
     public int numCurrencySlots = Enum.GetValues(typeof(Currency)).Length;
-    public Dictionary<Currency, int> currency {get; private set;}
+    public CurrencyContainer currency { get; private set; }
 
     public void Start() {
         container = new(numItemSlots);
         currency = new();
-        foreach(Currency val in Enum.GetValues(typeof(Currency)))
-            currency.Add(val, 4);
+
+        currency[Currency.Gold] = 4;
     }
 }
 
@@ -29,8 +29,25 @@ public class ItemSlot {
 
 
 [System.Serializable]
+public class CurrencyContainer {
+    public int[] balances {get; private set;}
+
+    public CurrencyContainer() {
+        balances = new int[Enum.GetValues(typeof(Currency)).Length];
+        for (int i = 0; i < balances.Length; i++) 
+        {
+            balances[i] = 0;
+        }
+    }
+
+    public ref int this[Currency c] {
+        get => ref balances[(int)c];
+    }
+}
+
+[System.Serializable]
 public class ItemContainer {
-    public ItemSlot[] slots;
+    public ItemSlot[] slots {get; private set;}
 
     public ItemContainer(int count) {
         slots = new ItemSlot[count];

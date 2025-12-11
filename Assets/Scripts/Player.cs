@@ -329,6 +329,8 @@ public class Player : MonoBehaviour
     // returns true on successfull interaction
     public bool InteractWith(Transform transform) {
         if (transform.gameObject.TryGetComponent<ShopItemSlot>(out ShopItemSlot slot)) {
+            if (inventory.currency[Currency.Gold] < slot.item.cost) return false;
+            inventory.currency[Currency.Gold] -= slot.item.cost;
             inventory.container.AddItem(slot.item, slot.count);
             slot.Disable();
             return true;
