@@ -76,6 +76,16 @@ MonoBehaviour:
     maxPerShopSlot: 4
     weight: 0
     maxPerInventorySlot: 10
+  - name: BowAmmo
+    displayName: Bow Ammo
+    itemModel: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
+    itemModelUI: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
+    dropProbability: 0
+    shopProbability: 0
+    cost: 2
+    maxPerShopSlot: 4
+    weight: 0
+    maxPerInventorySlot: 10
 --- !u!114 &8408705079164422734
 MonoBehaviour:
   m_ObjectHideFlags: 0
