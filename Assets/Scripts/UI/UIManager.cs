@@ -10,20 +10,20 @@ public class UIManager : MonoBehaviour
     private GameObject hotbar;
 
     // set of possible ui states
-    public enum UiState {
+    public enum UIState {
         Gameplay,
         Inventory,
         Death,
         Pause
     };
-    public UiState currentState { get; private set; }
+    public UIState currentState { get; private set; }
 
 
     public void SwitchToGameplay() {
         playerStats.SetActive(true);
         hotbar.SetActive(true);
 
-        currentState = UiState.Gameplay;
+        currentState = UIState.Gameplay;
     }
 
     public void SwitchToInventory() {
@@ -32,7 +32,7 @@ public class UIManager : MonoBehaviour
 
         // TODO
 
-        currentState = UiState.Inventory;
+        currentState = UIState.Inventory;
     }
 
     public void SwitchToDeathScreen() {
@@ -41,7 +41,7 @@ public class UIManager : MonoBehaviour
 
         // TODO
 
-        currentState = UiState.Death;
+        currentState = UIState.Death;
     }
 
     void Awake() {
