@@ -272,7 +272,7 @@ public class Player : MonoBehaviour
         // TODO
         isDead = true;
         characterController.enabled = false;
-        UIManager.Instance.ShowDeathScreen();
+        UIManager.Instance.SwitchToDeathScreen();
     }
 
     public void StartGame()
