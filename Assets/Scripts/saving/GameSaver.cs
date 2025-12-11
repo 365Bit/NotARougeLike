@@ -80,6 +80,10 @@ class GameSaver
                 {
                     continue;
                 }
+                if(member.MemberType == MemberTypes.Field)
+                {
+                    
+                }
                 Debug.Log($"saving {member.Name}");
             }
             file.WriteLine(JsonUtility.ToJson(saveable.Item2.Target));
