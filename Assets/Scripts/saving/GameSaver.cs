@@ -46,14 +46,19 @@ class GameSaver
         {
             name=typeof(T).Name;
         }
+        saveables.RemoveAll(s=>{return s.Item2.IsAlive;});
         if(saveables.Any(s=>{return s.Item1 == name; }))
         {
+            return;
             throw new DuplicateNameException($"{name} already subscribed for gamesaves");
         }
         var reference = new WeakReference(self);
         saveables.Add((name,reference));
     }
 
+    /// <summary>
+    /// Stores all subscribed objects onto disk
+    /// </summary>
     public static void save()
     {
         Debug.Log("start saving");
@@ -73,4 +78,9 @@ class GameSaver
         Debug.Log("finish saving");
     }
 
+}
+
+
+internal class SaveAttribute : Attribute
+{
 }
