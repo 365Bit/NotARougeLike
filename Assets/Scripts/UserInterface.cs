@@ -12,7 +12,7 @@ public class UserInterface : MonoBehaviour
     private PlayerStats playerStats;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         player = GameObject.Find("Player").GetComponent<Player>();
         playerStats = GameObject.Find("Player").GetComponent<PlayerStats>();
