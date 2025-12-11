@@ -5,13 +5,13 @@ public class PlayerUpgrades : MonoBehaviour
 {
     public PlayerUpgrades()
     {
-        GameSaver.subscribe(this);
     }
 
-    [SerializeField]
+    [SerializeField,Save]
     private int[] levels;
 
     public void Awake() {
+        GameSaver.subscribe(this);
         levels = new int[Enum.GetValues(typeof(BaseStatKey)).Length];
         foreach (BaseStatKey key in Enum.GetValues(typeof(BaseStatKey))) {
             levels[(int)key] = 0;
