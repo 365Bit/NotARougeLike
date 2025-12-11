@@ -7,30 +7,31 @@ using System.Runtime.InteropServices;
 using Unity.VisualScripting;
 using System.Data;
 using Newtonsoft.Json;
+using System.Reflection;
 
 class GameSaver
 {
     private static List<(string,WeakReference)> saveables = new List<(string, WeakReference)>();
-    private static string savePath;
+    private static string saveDirectory;
+
 
     static GameSaver()
     {
         var home=Environment.GetFolderPath(Environment.SpecialFolder.Personal);
         if (Application.isEditor)
         {
-            savePath=Path.Combine("game_saves","not_a_rogue_like");
+            saveDirectory=Path.Combine("game_saves","not_a_rogue_like");
         }else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            savePath=Path.Combine(new string[]{home,"Saved Games","NotARogueLike"});
+            saveDirectory=Path.Combine(new string[]{home,"Saved Games","NotARogueLike"});
         }else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            savePath=Path.Combine(new string[]{home,".local","share","not_a_rogue_like"});
+            saveDirectory=Path.Combine(new string[]{home,".local","share","not_a_rogue_like"});
         }
         else
         {
             throw new NotImplementedException("There is no savegame location implemented for the current operating system.\nSupported are: Linux and MS Windows");
         }
-        
     } 
 
     /// <summary>
@@ -46,7 +47,7 @@ class GameSaver
         {
             name=typeof(T).Name;
         }
-        saveables.RemoveAll(s=>{return s.Item2.IsAlive;});
+        saveables.RemoveAll(s=>{return ! s.Item2.IsAlive;});
         if(saveables.Any(s=>{return s.Item1 == name; }))
         {
             return;
@@ -62,7 +63,8 @@ class GameSaver
     public static void save()
     {
         Debug.Log("start saving");
-        StreamWriter file = new StreamWriter(Path.Combine(savePath,"save.json"));
+        Directory.CreateDirectory(saveDirectory);
+        StreamWriter file = new StreamWriter(Path.Combine(saveDirectory,"save.json"));
         for (int i = 0; i < saveables.Count; i++)
         {
             var saveable = saveables[i];
@@ -71,6 +73,14 @@ class GameSaver
             {
                 saveables.RemoveAt(i--);
                 continue;
+            }
+            foreach(var member in saveable.Item2.Target.GetType().GetMembers(BindingFlags.NonPublic|BindingFlags.Public|BindingFlags.Instance))
+            {
+                if(!member.GetCustomAttributes(typeof(SaveAble)).Any())
+                {
+                    continue;
+                }
+                Debug.Log($"saving {member.Name}");
             }
             file.WriteLine(JsonUtility.ToJson(saveable.Item2.Target));
         }
@@ -81,6 +91,7 @@ class GameSaver
 }
 
 
-internal class SaveAttribute : Attribute
+
+internal class SaveAble : Attribute
 {
 }

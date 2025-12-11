@@ -7,7 +7,7 @@ public class PlayerUpgrades : MonoBehaviour
     {
     }
 
-    [SerializeField,Save]
+    [SerializeField,SaveAble]
     private int[] levels;
 
     public void Awake() {
