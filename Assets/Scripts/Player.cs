@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CharacterController)), RequireComponent(typeof(PlayerStats)), DisallowMultipleComponent]
 public class Player : MonoBehaviour
 {
     // Components
@@ -69,49 +69,19 @@ public class Player : MonoBehaviour
     [Header("Combat")]
     public Projectile[] projectiles;
     public Weapon weapon;
-    public float fireRate = 3.0f;
-    public float hitRate = 2.0f;
-    public float swingDuration = 0.4f;
-    public float strikeDuration = 0.2f;
-    public float returnDuration = 0.1f;
 
-    [Header("Mana")]
-    public float maxMana = 100.0f;
-    public float manaRegRate = 3.0f;
-
-    [Header("Movement")]
-    public float runSpeed = 10.0f;
-    public float walkSpeed = 5.0f;
-    public float sneakSpeed = 2.5f;
-
-    [Header("Sliding")]
-    public float maxSlideTime = 3.0f;
-    public float slideSpeed = 12.0f;
-
-    [Header("Health")]
-    public float maxHealth = 100.0f;
-    public float healthRegRate = 2.0f;
-
-    [Header("Jump")]
-    public float jumpHeight = 1.5f;
-
-    [Header("Stamina")]
-    public float maxStamina = 100.0f;
-    public float staminaRegRate = 5.0f;
-    public float runConsRate = 10.0f;
-    public float slideConsRate = 20.0f;
-    public float jumpConsRate = 15.0f;
-
-
-    [Header("Inventory")]
-    public Inventory inventory {get; private set;}
-
-    [SerializeField]
+    private Inventory inventory;
     private ItemDefinitions itemDefinitions;
+    private PlayerStats stats;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public bool isDead = false;
+
+    void Awake()
     {
+        stats = GetComponent<PlayerStats>();
+        inventory = GetComponent<Inventory>();
+        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
+
         GameObject mainCamera = GameObject.Find("Main Camera");
 
         playerCamera = mainCamera.GetComponent<Camera>();
@@ -121,13 +91,17 @@ public class Player : MonoBehaviour
 
         leftShoulderTransform = GameObject.Find("Left Shoulder").GetComponent<Transform>();
         rightShoulderTransform = GameObject.Find("Right Shoulder").GetComponent<Transform>();
+    }
 
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
         attackType = AttackType.Shoot;
         hitState = HitState.Idle;
 
-        currentHealth = maxHealth;
-        currentMana = maxMana;
-        currentStamina = maxStamina;
+        currentHealth = stats.maxHealth;
+        currentMana = stats.maxMana;
+        currentStamina = stats.maxStamina;
 
         fireCooldown = 0.0f;
         hitCooldown = 0.0f;
@@ -140,7 +114,7 @@ public class Player : MonoBehaviour
 
         weapon.gameObject.SetActive(false);
 
-        inventory = GetComponent<Inventory>();
+        inventory.container.AddItem(itemDefinitions[3], 10);
     }
 
     // Update is called once per frame
@@ -183,8 +157,8 @@ public class Player : MonoBehaviour
         {
             hitTime += Time.deltaTime;
 
-            float duration = hitState == HitState.Swing ? swingDuration :
-                             hitState == HitState.Strike ? strikeDuration : returnDuration;
+            float duration = hitState == HitState.Swing ? stats.swingDuration :
+                             hitState == HitState.Strike ? stats.strikeDuration : stats.returnDuration;
 
             float ratio = Mathf.Clamp(hitTime / duration, 0.0f, 1.0f);
 
@@ -210,7 +184,7 @@ public class Player : MonoBehaviour
                         break;
                     case HitState.Return:
                         hitState = HitState.Idle;
-                        hitCooldown = 1.0f / hitRate;
+                        hitCooldown = 1.0f / stats.hitRate;
 
                         weapon.gameObject.SetActive(false);
                         break;
@@ -298,7 +272,18 @@ public class Player : MonoBehaviour
     private void Die()
     {
         // TODO
-        Debug.Log("Die");
+        isDead = true;
+        characterController.enabled = false;
+        UIManager.Instance.SwitchToDeathScreen();
+    }
+
+    public void StartGame()
+    {
+        isDead = false;
+        characterController.enabled = true;
+        currentHealth = stats.maxHealth;
+        currentMana = stats.maxMana;
+        currentStamina = stats.maxStamina;
     }
 
     public float GetHealth()
@@ -344,6 +329,8 @@ public class Player : MonoBehaviour
     // returns true on successfull interaction
     public bool InteractWith(Transform transform) {
         if (transform.gameObject.TryGetComponent<ShopItemSlot>(out ShopItemSlot slot)) {
+            if (inventory.currency[Currency.Gold] < slot.item.cost) return false;
+            inventory.currency[Currency.Gold] -= slot.item.cost;
             inventory.container.AddItem(slot.item, slot.count);
             slot.Disable();
             return true;
@@ -393,10 +380,10 @@ public class Player : MonoBehaviour
 
     public void Jump()
     {
-        if (grounded && currentStamina >= jumpConsRate)
+        if (grounded && currentStamina >= stats.jumpConsRate)
         {
-            currentStamina -= jumpConsRate;
-            motion.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            currentStamina -= stats.jumpConsRate;
+            motion.y = Mathf.Sqrt(stats.jumpHeight * -2f * gravity);
         }
     }
 
@@ -405,21 +392,21 @@ public class Player : MonoBehaviour
         Vector3 movement = transform.right * direction.x + transform.forward * direction.y;
         movement.Normalize();
 
-        float speed = walkSpeed;
+        float speed = stats.walkSpeed;
 
-        if (run && currentStamina >= runConsRate)
+        if (run && currentStamina >= stats.runConsRate)
         {
-            currentStamina -= runConsRate * Time.deltaTime;
-            speed = runSpeed;
+            currentStamina -= stats.runConsRate * Time.deltaTime;
+            speed = stats.runSpeed;
         }
         else if (sneak)
         {
-            speed = sneakSpeed;
+            speed = stats.sneakSpeed;
         }
 
         if (slide)
         {
-            speed += slideSpeed * (slideTime / maxSlideTime);
+            speed += stats.slideSpeed * (slideTime / stats.maxSlideTime);
         }
 
         motion.x = movement.x * speed;
@@ -450,27 +437,27 @@ public class Player : MonoBehaviour
 
     void RegenerateHealth()
     {
-        if (currentHealth < maxHealth)
+        if (currentHealth < stats.maxHealth)
         {
-            float health = currentHealth + healthRegRate * Time.deltaTime;
-            currentHealth = Mathf.Min(health, maxHealth);
+            float health = currentHealth + stats.healthRegRate * Time.deltaTime;
+            currentHealth = Mathf.Min(health, stats.maxHealth);
         }
     }
 
     void RegenerateMana()
     {
-        if (currentMana < maxMana)
+        if (currentMana < stats.maxMana)
         {
-            float mana = currentMana + manaRegRate * Time.deltaTime;
-            currentMana = Mathf.Min(mana, maxMana);
+            float mana = currentMana + stats.manaRegRate * Time.deltaTime;
+            currentMana = Mathf.Min(mana, stats.maxMana);
         }
     }
 
     void RegenrerateStamina()
     {
-        if (currentStamina < maxStamina)
+        if (currentStamina < stats.maxStamina)
         {
-            float rate = staminaRegRate;
+            float rate = stats.staminaRegRate;
 
             if (motion.x >= -0.1f && motion.x <= 0.1f &&
                 motion.y >= -0.1f && motion.y <= 0.1f &&
@@ -481,7 +468,7 @@ public class Player : MonoBehaviour
             }
 
             float stamina = currentStamina + rate * Time.deltaTime;
-            currentStamina = Mathf.Min(stamina, maxStamina);
+            currentStamina = Mathf.Min(stamina, stats.maxStamina);
         }
     }
 
@@ -508,10 +495,16 @@ public class Player : MonoBehaviour
 
     void Shoot()
     {
-        if (fireCooldown > 0.0f || projectiles.Length == 0)
+        int bowAmmoSlot = inventory.container.GetSlotContaining(itemDefinitions[3]);
+
+        Debug.Log("Bow Ammo Slot: " + bowAmmoSlot);
+
+        if (fireCooldown > 0.0f || projectiles.Length == 0 || bowAmmoSlot == -1)
         {
             return;
         }
+
+        inventory.container.ConsumeItem(bowAmmoSlot);
 
         Vector3 position = cameraTransform.position + transform.forward * 1.0f;
         Quaternion rotation = cameraTransform.rotation;
@@ -520,18 +513,18 @@ public class Player : MonoBehaviour
         instance.name = projectiles[0].name;
         instance.SetDamage(10.0f);
 
-        fireCooldown = 1.0f / fireRate;
+        fireCooldown = 1.0f / stats.fireRate;
     }
 
     public void Slide(bool value)
     {
-        if (value && currentStamina >= slideConsRate &&
+        if (value && currentStamina >= stats.slideConsRate &&
             grounded && !slide && slideCooldown == 0.0f)
         {
-            currentStamina -= slideConsRate;
+            currentStamina -= stats.slideConsRate;
 
             slide = true;
-            slideTime = maxSlideTime;
+            slideTime = stats.maxSlideTime;
         }
         else if (!value && slide)
         {
@@ -563,15 +556,15 @@ public class Player : MonoBehaviour
         {
             case "health_fruit": // Health Fruit
                 currentHealth += 30.0f;
-                currentHealth = Mathf.Clamp(currentHealth, 0.0f, maxHealth);
+                currentHealth = Mathf.Clamp(currentHealth, 0.0f, stats.maxHealth);
                 break;
             case "mana_fruit": // Mana Fruit
                 currentMana += 10.0f;
-                currentMana = Mathf.Clamp(currentMana, 0.0f, maxMana);
+                currentMana = Mathf.Clamp(currentMana, 0.0f, stats.maxMana);
                 break;
             case "stamina_fruit": // Stamina Fruit
                 currentStamina += 20.0f;
-                currentStamina = Mathf.Clamp(currentStamina, 0.0f, maxStamina);
+                currentStamina = Mathf.Clamp(currentStamina, 0.0f, stats.maxStamina);
                 break;
             default:
                 break;

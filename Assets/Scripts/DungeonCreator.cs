@@ -21,26 +21,26 @@ public class DungeonCreator : MonoBehaviour
     public float roomTopCornerMidifier;
     [Range(0, 2)]
     public int roomOffset;
-    public GameObject wallPrefab, pillarPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab;
 
-    List<Vector3Int> possibleVerticalDoorPosition;
-    List<Vector3Int> possibleHorizontalDoorPosition;
-    List<Vector3Int> possibleHorizontalWallPosition;
-    List<Vector3Int> possibleVerticalWallPosition;
+    public GameObject wallPrefab, pillarPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab, navPointPrefab;
+    List<Vector3Int> possibleDoorVerticalPosition;
+    List<Vector3Int> possibleDoorHorizontalPosition;
+    List<Vector3Int> possibleWallHorizontalPosition;
+    List<Vector3Int> possibleWallVerticalPosition;
 
     ItemDefinitions itemDefinitions;
-    
+
+    [Header("User Interfaces")]
+    public GameObject canvas;
+
     // Start is called before the first frame update
     void Start()
     {
-        if (itemDefinitions == null)
-            itemDefinitions = ItemDefinitions.main;
+        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
 
         navMeshSurface = GetComponent<NavMeshSurface>();
 
         CreateDungeon();
-
-        navMeshSurface.BuildNavMesh();
     }
 
     public void CreateDungeon()
@@ -69,7 +69,10 @@ public class DungeonCreator : MonoBehaviour
         CreatePillars(listOfRooms);
         CreateLoot(listOfRooms);
         CreateEnemy(listOfRooms);
-        CreateShop(listOfRooms);    
+        CreateNavPoint(listOfRooms);
+        CreateShop(listOfRooms);
+
+        navMeshSurface.BuildNavMesh();
     }
 
     private void CreatePlayer(List<Node> listOfRooms)
@@ -81,7 +84,14 @@ public class DungeonCreator : MonoBehaviour
                 playerPosX,
                 2,
                 playerPosY);
-        playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        //playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        //GameObject player = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        Player player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        player.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        player.name = "Player";
+        player.StartGame();
+
+        canvas.SetActive(true);
     }
 
     private void CreateEnemy(List<Node> listOfRooms)
@@ -102,18 +112,66 @@ public class DungeonCreator : MonoBehaviour
                             enemyPosX,
                             1,
                             enemyPosY);
-                        Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
+
+                        GameObject foe = Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
+                        Opponent opponent = foe.GetComponent<Opponent>();
+                        opponent.spawnRoom = room;
+
                         counter++;
-                    }  
+                    }
                     if (counter == enemyAmount)
                     {
                         break;
-                    } 
+                    }
                 }
             }
             isEnoughEnemies = counter >= enemyAmount;
         }
-        
+    }
+
+    private void CreateNavPoint(List<Node> listOfRooms)
+    {
+        foreach( var room in listOfRooms)
+        {
+            if (room.Type == "room")
+            {
+                int navPointX = room.BottomLeftAreaCorner.x + 5;
+                int navPointY = room.BottomLeftAreaCorner.y + 5;
+                Vector3 navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+
+                navPointX = room.TopLeftAreaCorner.x + 5;
+                navPointY = room.TopLeftAreaCorner.y - 5;
+                navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+
+                navPointX = room.TopRightAreaCorner.x - 5;
+                navPointY = room.TopRightAreaCorner.y - 5;
+                navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+
+                navPointX = room.BottomRightAreaCorner.x - 5;
+                navPointY = room.BottomRightAreaCorner.y + 5;
+                navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+            }
+        }
     }
 
 
@@ -167,7 +225,7 @@ public class DungeonCreator : MonoBehaviour
                     var shop = Instantiate(shopPrefab, shopPos, Quaternion.identity);
                     // TODO
                     shop.GetComponent<ShopRenderer>().AddRandomItems();
-                }   
+                }
             }
         }
     }
@@ -191,7 +249,7 @@ public class DungeonCreator : MonoBehaviour
                     ItemSlot tmpSlot = new();
                     SetRandomDroppedItem(tmpSlot);
                     chest.GetComponent<DestroyableObject>().SetItem(tmpSlot.storedItem, tmpSlot.count);
-                }   
+                }
             }
         }
     }
@@ -206,7 +264,7 @@ public class DungeonCreator : MonoBehaviour
             CreatePillar(bottomRightAreaCorner);
             Vector3 topLeftCorner = new Vector3(room.TopLeftAreaCorner.x, 0, room.TopLeftAreaCorner.y);
             CreatePillar(topLeftCorner);
-            Vector3 topRightCorner = new Vector3(room.TopRightAreaCorner.x, 0, room.TopRightAreaCorner.y); 
+            Vector3 topRightCorner = new Vector3(room.TopRightAreaCorner.x, 0, room.TopRightAreaCorner.y);
             CreatePillar(topRightCorner);
         }
     }
@@ -271,7 +329,7 @@ public class DungeonCreator : MonoBehaviour
                             wallPosX,
                             wallPosY,
                             wallPosZ
-                        ); 
+                        );
                         GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, wallParent.transform);
                         wall.transform.localScale = new Vector3(xScale, 1, 1);
                         wallPosX += wallLength / 2;
@@ -288,7 +346,7 @@ public class DungeonCreator : MonoBehaviour
                                 wallPosX,
                                 wallPosY,
                                 wallPosZ + wallDetail
-                            );  
+                            );
                             GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, wallParent.transform);
                             wall.transform.localScale = new Vector3(xScale, 1, 1);
                             wallPosX += xScale * wallScaler / 2;
@@ -322,7 +380,7 @@ public class DungeonCreator : MonoBehaviour
                     wallLength = temp - startZ;
                     int segmentCount = (wallLength < wallScaler) ? 1 : wallLength / wallScaler;
                     float zScale;
-                    
+
                     if(segmentCount == 1)
                     {
                         if(wallLength < 4)
@@ -339,7 +397,7 @@ public class DungeonCreator : MonoBehaviour
                             wallPosX,
                             wallPosY,
                             wallPosZ
-                        ); 
+                        );
                         GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.Euler(0, 90, 0), wallParent.transform);
                         wall.transform.localScale = new Vector3(1, 1, zScale);
                         wallPosX += wallLength / 2;
@@ -357,7 +415,7 @@ public class DungeonCreator : MonoBehaviour
                                 wallPosX + wallDetail,
                                 wallPosY,
                                 wallPosZ + 2
-                            );  
+                            );
                             GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.Euler(0, 90, 0), wallParent.transform);
                             wall.transform.localScale = new Vector3(1, 1, zScale);
                             wallPosZ += zScale * wallScaler / 2;
@@ -370,12 +428,12 @@ public class DungeonCreator : MonoBehaviour
             }
         }
     }
-   
+
     private GameObject CreateWall(GameObject wallParent, Vector3 wallPosition, GameObject wallPrefab, Quaternion rotation)
     {
         return Instantiate(wallPrefab, wallPosition, rotation, wallParent.transform);
     }
-    
+
 
     private void CreateMesh(Vector2 bottomLeftCorner, Vector2 topRightCorner, String roomType)
     {
@@ -424,24 +482,22 @@ public class DungeonCreator : MonoBehaviour
         for (int row = (int)Math.Ceiling(bottomLeftV.x); row < (int)Math.Ceiling(bottomRightV.x); row++)
         {
             var wallPosition = new Vector3(row, 0, bottomLeftV.z);
-            AddWallPositionToList(wallPosition, possibleHorizontalWallPosition, possibleHorizontalDoorPosition);                
-            
+            AddWallPositionToList(wallPosition, possibleHorizontalWallPosition, possibleHorizontalDoorPosition);
         }
         for (int row = (int)Math.Ceiling(topLeftV.x); row < (int)Math.Ceiling(topRightCorner.x); row++)
         {
             var wallPosition = new Vector3(row, 0, topRightV.z);
-            AddWallPositionToList(wallPosition, possibleHorizontalWallPosition, possibleHorizontalDoorPosition);                
-            
+            AddWallPositionToList(wallPosition, possibleHorizontalWallPosition, possibleHorizontalDoorPosition);
         }
         for (int col = (int)Math.Ceiling(bottomLeftV.z); col < (int)Math.Ceiling(topLeftV.z); col++)
         {
             var wallPosition = new Vector3(bottomLeftV.x, 0, col);
-            AddWallPositionToList(wallPosition, possibleVerticalWallPosition, possibleVerticalDoorPosition);                
+            AddWallPositionToList(wallPosition, possibleVerticalWallPosition, possibleVerticalDoorPosition);
         }
         for (int col = (int)Math.Ceiling(bottomRightV.z); col < (int)Math.Ceiling(topRightV.z); col++)
         {
             var wallPosition = new Vector3(bottomRightV.x, 0, col);
-            AddWallPositionToList(wallPosition, possibleVerticalWallPosition, possibleVerticalDoorPosition);                
+            AddWallPositionToList(wallPosition, possibleVerticalWallPosition, possibleVerticalDoorPosition);
         }
     }
 

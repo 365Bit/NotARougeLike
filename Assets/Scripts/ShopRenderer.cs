@@ -6,7 +6,7 @@ using TMPro;
 public class ShopRenderer : MonoBehaviour
 {
     [System.Serializable]
-    public struct ItemSlot {
+    public struct ItemSlotConfig {
         public Vector3 position;
     }
 
@@ -19,7 +19,7 @@ public class ShopRenderer : MonoBehaviour
 
 
     [Header("Rendering")]
-    public ItemSlot[] slotProperties;
+    public ItemSlotConfig[] slotProperties;
     public GameObject itemSlotPrefab;
     // where to instantiate item slots
     public Transform slotDisplayParent;
@@ -27,8 +27,7 @@ public class ShopRenderer : MonoBehaviour
 
 
     public void Awake() {
-        if (itemDefinitions == null)
-            itemDefinitions = ItemDefinitions.main;
+        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
 
         items = new(numItemSlots);
     }
@@ -42,7 +41,7 @@ public class ShopRenderer : MonoBehaviour
             if (slot.storedItem == null) {
                 // no item
             } else {
-                var slotInstance = Instantiate(itemSlotPrefab, slotDisplayParent).transform;
+                Transform slotInstance = Instantiate(itemSlotPrefab, slotDisplayParent).transform;
                 slotInstance.localPosition = slotDisplay.position;
                 slotInstance.GetComponent<ShopItemSlot>().SetItem(slot.storedItem, slot.count);
             }
@@ -51,11 +50,11 @@ public class ShopRenderer : MonoBehaviour
 
     // TODO: extract to dungeon creator
     public void AddRandomItems() {
-        foreach (var slot in items.slots) {
+        foreach (ItemSlot slot in items.slots) {
             slot.storedItem = null;
 
             // select random definition
-            var random = UnityEngine.Random.Range(0f,1f);
+            float random = UnityEngine.Random.Range(0f,1f);
             foreach (ItemDefinition def in itemDefinitions.definitions) {
                 if (random <= def.shopProbability) {
                     slot.storedItem = def;

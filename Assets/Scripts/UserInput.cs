@@ -4,25 +4,34 @@ using UnityEngine.InputSystem;
 public class UserInput : MonoBehaviour
 {
     private Player player;
+    private UIManager uiController;
 
     private Vector2 direction;
+    private Vector2 uiDirection;
     private Vector2 rotation;
+
+    private bool controlPlayer {
+        get => !uiController.inventoryOpen && !player.isDead;
+    }
 
     private bool aim;
     private bool interact;
+    private bool inventory;
     private bool jump;
     private bool run;
     private bool slide;
     private bool sneak;
+    private bool escape;
 
     private int itemID;
 
     public float mouseSensitivity = 0.1f;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         player = GameObject.Find("Player").GetComponent<Player>();
+        uiController = GetComponent<UIManager>();
+
         rotation = Vector2.zero;
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -41,37 +50,50 @@ public class UserInput : MonoBehaviour
         run = false;
         slide = false;
         sneak = false;
+        inventory = false;
 
         itemID = -1;
 
-        // Get inputs
-        GamepadInput();
         KeyboardInput();
+        GamepadInput();
         MouseInput();
 
         // Apply inputs
-        player.Run(run);
-        player.Slide(slide);
-        player.Sneak(sneak);
+        if (controlPlayer) {
+            player.Run(run);
+            player.Slide(slide);
+            player.Sneak(sneak);
 
-        player.Aim(aim);
-        player.Rotate(rotation);
-        player.Move(direction);
+            player.Aim(aim);
+            player.Rotate(rotation);
+            player.Move(direction);
 
-        if (itemID > -1)
-        {
-            player.UseItem(itemID);
+            if (itemID > -1)
+            {
+                player.UseItem(itemID);
+            }
+
+            if (interact)
+            {
+                player.Interact();
+            }
+
+            if (jump)
+            {
+                player.Jump();
+            }
         }
 
-        if (interact)
-        {
-            player.Interact();
+        // move cursor
+        if (uiController.inventoryOpen) {
+            uiController.inventoryUI.GetComponent<InventoryUI>().MoveSelection(uiDirection);
         }
 
-        if (jump)
-        {
-            player.Jump();
-        }
+        // toggle inventory
+        if (inventory && !uiController.inventoryOpen)
+            uiController.SwitchToInventory();
+        else if ((inventory || escape) && uiController.inventoryOpen)
+            uiController.SwitchToGameplay();
     }
 
     void GamepadInput()
@@ -139,7 +161,7 @@ public class UserInput : MonoBehaviour
             return;
         }
 
-        bool escape = keyboard.escapeKey.isPressed;
+        escape = keyboard.escapeKey.isPressed;
 
         // Movement
         if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
@@ -181,6 +203,31 @@ public class UserInput : MonoBehaviour
         if (keyboard.digit4Key.wasPressedThisFrame)
         {
             itemID = 3;
+        }
+
+
+        // ui
+        uiDirection = Vector2.zero;
+        if (keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame)
+        {
+            uiDirection.y -= 1;
+        }
+        if (keyboard.aKey.wasPressedThisFrame || keyboard.leftArrowKey.wasPressedThisFrame)
+        {
+            uiDirection.x -= 1;
+        }
+        if (keyboard.dKey.wasPressedThisFrame || keyboard.rightArrowKey.wasPressedThisFrame)
+        {
+            uiDirection.x += 1;
+        }
+        if (keyboard.wKey.wasPressedThisFrame || keyboard.upArrowKey.wasPressedThisFrame)
+        {
+            uiDirection.y += 1;
+        }
+
+
+        if (keyboard.eKey.wasPressedThisFrame) {
+            inventory = true;
         }
     }
 

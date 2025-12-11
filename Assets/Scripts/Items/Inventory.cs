@@ -5,17 +5,19 @@ using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
+    public int numHotbarSlots;
     public int numItemSlots;
     public ItemContainer container { get; private set;}
 
     // amount of currencies
-    private Dictionary<Currency, int> currency;
+    public int numCurrencySlots = Enum.GetValues(typeof(Currency)).Length;
+    public CurrencyContainer currency { get; private set; }
 
     public void Start() {
         container = new(numItemSlots);
         currency = new();
-        foreach(Currency val in Enum.GetValues(typeof(Currency)))
-            currency.Add(val, 0);
+
+        currency[Currency.Gold] = 4;
     }
 }
 
@@ -27,8 +29,25 @@ public class ItemSlot {
 
 
 [System.Serializable]
+public class CurrencyContainer {
+    public int[] balances {get; private set;}
+
+    public CurrencyContainer() {
+        balances = new int[Enum.GetValues(typeof(Currency)).Length];
+        for (int i = 0; i < balances.Length; i++) 
+        {
+            balances[i] = 0;
+        }
+    }
+
+    public ref int this[Currency c] {
+        get => ref balances[(int)c];
+    }
+}
+
+[System.Serializable]
 public class ItemContainer {
-    public ItemSlot[] slots;
+    public ItemSlot[] slots {get; private set;}
 
     public ItemContainer(int count) {
         slots = new ItemSlot[count];
@@ -51,9 +70,21 @@ public class ItemContainer {
         Debug.Log("inventory: " + output.ToString());
     }
 
+    public void SwapItems(int first, int second) {
+        if (first == second) return;
+
+        var tmp = slots[first];
+        slots[first] = slots[second];
+        slots[second] = tmp;
+    }
+
     public void ConsumeItem(int slot) {
         if (slots[slot].count > 0)
+        {
             slots[slot].count -= 1;
+            if(slots[slot].count == 0)
+                slots[slot].storedItem = null;
+        }
         PrintState();
     }
 
