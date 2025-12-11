@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 using TMPro;
 
@@ -23,6 +24,16 @@ public class ItemHotbarSlot : MonoBehaviour
         } else {
             itemModel = null;
             itemText.GetComponent<TMP_Text>().text = "";
+            itemCount.GetComponent<TMP_Text>().text = "";
+        }
+    }
+
+    public void SetCurrency(Currency currency, int count) {
+        itemModel = null;
+        itemText.GetComponent<TMP_Text>().text = Enum.GetName(typeof(Currency), currency);
+        if (count > 0) {
+            itemCount.GetComponent<TMP_Text>().text = count.ToString();
+        } else {
             itemCount.GetComponent<TMP_Text>().text = "";
         }
     }
