@@ -231,7 +231,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &663558459 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 7117123524355538582, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
+  m_CorrespondingSourceObject: {fileID: 7038015854114532385, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
   m_PrefabInstance: {fileID: 2113634165}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &893231721
@@ -837,8 +837,7 @@ MonoBehaviour:
   enemyPrefab: {fileID: 6185520913894418997, guid: eddd686a1205a0944a9c026cc9c7d74b, type: 3}
   shopPrefab: {fileID: 8410230881569839391, guid: fab7d7c351eb0e9c7955ba13c50ba0da, type: 3}
   navPointPrefab: {fileID: 9146177703536160206, guid: f2f1d481022bcd044a6c8305272e3bee, type: 3}
-  inventory: {fileID: 1215588671}
-  playerStats: {fileID: 663558459}
+  canvas: {fileID: 234472488}
 --- !u!114 &1896217531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -879,9 +878,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1891828435688232542, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1891828435688232542, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5286065946957969519, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5286065946957969519, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7038015854114532385, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
       propertyPath: m_Name
       value: Canvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 7038015854114532385, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7299883490974400925, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
       propertyPath: m_Pivot.x
@@ -961,6 +980,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7299883490974400925, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8859691983232514703, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8859691983232514703, guid: 758dd1d80f8f28e41b779b0989e997e1, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

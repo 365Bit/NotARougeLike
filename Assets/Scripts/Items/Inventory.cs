@@ -5,17 +5,19 @@ using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
+    public int numHotbarSlots;
     public int numItemSlots;
     public ItemContainer container { get; private set;}
 
     // amount of currencies
-    private Dictionary<Currency, int> currency;
+    public int numCurrencySlots = Enum.GetValues(typeof(Currency)).Length;
+    public Dictionary<Currency, int> currency {get; private set;}
 
     public void Start() {
         container = new(numItemSlots);
         currency = new();
         foreach(Currency val in Enum.GetValues(typeof(Currency)))
-            currency.Add(val, 0);
+            currency.Add(val, 4);
     }
 }
 
@@ -49,6 +51,14 @@ public class ItemContainer {
             output.AppendFormat("{0} : {1}({2}x), ", i, (slots[i].storedItem != null) ? slots[i].storedItem.name : "none", slots[i].count);
         }
         Debug.Log("inventory: " + output.ToString());
+    }
+
+    public void SwapItems(int first, int second) {
+        if (first == second) return;
+
+        var tmp = slots[first];
+        slots[first] = slots[second];
+        slots[second] = tmp;
     }
 
     public void ConsumeItem(int slot) {
