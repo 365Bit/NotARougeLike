@@ -171,6 +171,46 @@ PrefabInstance:
       propertyPath: m_Name
       value: Definitions
       objectReference: {fileID: 0}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.data[3].cost
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.data[3].name
+      value: BowAmmo
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.data[3].itemModel
+      value: 
+      objectReference: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.data[3].displayName
+      value: Bow Ammo
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.data[3].itemModelUI
+      value: 
+      objectReference: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.data[3].maxPerShopSlot
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.data[3].dropProbability
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.data[3].shopProbability
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5196027272824433926, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: definitions.Array.data[3].maxPerInventorySlot
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 8408705079164422734, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
       propertyPath: definitions.Array.data[12].def.baseValue
       value: 100

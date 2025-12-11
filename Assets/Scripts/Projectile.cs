@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UIElements;
+using static UnityEditor.Progress;
 
 [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
 public class Projectile : MonoBehaviour
@@ -6,6 +8,13 @@ public class Projectile : MonoBehaviour
     // Components
     private Rigidbody rigidBody;
     private SphereCollider sphereCollider;
+
+    public GameObject droppedItemPrefab;
+
+    private ItemDefinitions itemDefinitions;
+    private ItemDefinition bowAmmo;
+    Vector3 travelDirection;
+    Rigidbody rb;
 
     private float damage;
 
@@ -20,6 +29,10 @@ public class Projectile : MonoBehaviour
 
         sphereCollider = GetComponent<SphereCollider>();
         sphereCollider.isTrigger = false;
+
+        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
+        bowAmmo = itemDefinitions.definitions[3];
+        rb = GetComponent<Rigidbody>();
     }
 
 
@@ -35,7 +48,7 @@ public class Projectile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        travelDirection = rb.linearVelocity.normalized;
     }
 
     private void OnBecameInvisible()
@@ -59,17 +72,20 @@ public class Projectile : MonoBehaviour
                 Debug.Log("Projectile dealing " + damage + " damage to " + parent.name);
                 destroyableObject.TakeDamage(damage);
             }
-        }
-
-        if (name.Contains("Opponent"))
+        } else if (name.Contains("Opponent"))
         {
             Opponent opponent = collision.gameObject.GetComponent<Opponent>();
             Debug.Log("Projectile dealing " + damage + " damage to " + name);
             opponent.TakeDamage(damage);
+            Destroy(this.gameObject);
         }
-
-        // Destroy the projectile on impact
-        Destroy(this.gameObject);
+        else
+        {
+            GameObject instance = Instantiate(droppedItemPrefab, this.transform.position, Quaternion.LookRotation(travelDirection));
+            instance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
+            instance.name = bowAmmo.name;
+            Destroy(this.gameObject);
+        }
     }
 
     public void SetDamage(float damage)
