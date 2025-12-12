@@ -336,6 +336,9 @@ public class Player : MonoBehaviour
             inventory.container.AddItem(item.item, item.count);
             item.Disable();
             return true;
+        } else if (transform.gameObject.TryGetComponent<TrapDoor>(out TrapDoor door)){
+            door.Interact();
+            return true;
         }
         return false;
     }
