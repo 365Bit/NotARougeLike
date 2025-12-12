@@ -66,7 +66,7 @@ public class ItemContainer {
     }
 
 
-    private void PrintState() {
+    public void PrintState() {
         StringBuilder output = new();
         for (int i = 0; i < slots.Length; i++) {
             output.AppendFormat("{0} : {1}({2}x), ", i, (slots[i].storedItem != null) ? slots[i].storedItem.name : "none", slots[i].count);
@@ -133,7 +133,7 @@ public class ItemContainer {
 
     public int GetSlotContaining(ItemDefinition item, int requiredAmount = 1) {
         for (int i = 0; i < slots.Length; i++) {
-            if (slots[i].storedItem == item && slots[i].count > requiredAmount) {
+            if (slots[i].storedItem == item && slots[i].count >= requiredAmount) {
                 return i;
             }
         }
