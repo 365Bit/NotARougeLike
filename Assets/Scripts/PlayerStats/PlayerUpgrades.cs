@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-public class PlayerUpgrades : MonoBehaviour
+public class PlayerUpgrades : MonoBehaviour,ISaveable
 {
     public PlayerUpgrades()
     {
