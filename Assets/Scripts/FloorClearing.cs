@@ -6,6 +6,10 @@ public class FloorClearing : MonoBehaviour
     // reduce Find calls
     private GameObject cachedOpponent;
 
+    // gameobject to activate when the level is cleared
+    public GameObject trapDoor;
+
+
     public bool CheckClearingCondition() {
         if (cachedOpponent != null && cachedOpponent.activeInHierarchy) return false;
 
@@ -16,10 +20,7 @@ public class FloorClearing : MonoBehaviour
     void Update()
     {
         if (CheckClearingCondition()) {
-            Debug.Log("Floor cleared, going to next level");
-            RunData.Instance.LevelDone();
-            GameSaver.save();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            trapDoor.GetComponent<TrapDoor>().Enable();
         }
     }
 }
