@@ -109,9 +109,8 @@ public class ItemContainer {
 
     // Selects an appropriate slot to add item, i.e. either a slot containing same item type or a free one
     public void AddItem(ItemDefinition item, int count) {
-        for  (int i = 0; i < 10 && count > 0; i++) {
-        // while (count > 0) {
-            int slot = GetSlotContaining(item, 1);
+        while (count > 0) {
+            int slot = GetSlotWithCapacity(item, 1);
             if (slot < 0)
                 slot = GetFreeSlot();
 
@@ -123,9 +122,18 @@ public class ItemContainer {
         }
     }
 
-    public int GetSlotContaining(ItemDefinition item, int requiredRemainingCapacity = 0) {
+    public int GetSlotWithCapacity(ItemDefinition item, int requiredRemainingCapacity = 1) {
         for (int i = 0; i < slots.Length; i++) {
             if (slots[i].storedItem == item && slots[i].count <= item.maxPerInventorySlot - requiredRemainingCapacity) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public int GetSlotContaining(ItemDefinition item, int requiredAmount = 1) {
+        for (int i = 0; i < slots.Length; i++) {
+            if (slots[i].storedItem == item && slots[i].count > requiredAmount) {
                 return i;
             }
         }
