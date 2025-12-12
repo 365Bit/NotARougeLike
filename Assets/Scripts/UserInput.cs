@@ -43,6 +43,7 @@ public class UserInput : MonoBehaviour
     {
         // Reset variables
         direction = Vector2.zero;
+        uiDirection = Vector2.zero;
 
         aim = false;
         interact = false;
@@ -133,21 +134,25 @@ public class UserInput : MonoBehaviour
 
         bool yButton = gamepad.yButton.isPressed;
 
-        // Item selection
+        // Item selection and ui navigation
         if (gamepad.dpad.left.wasPressedThisFrame)
         {
+            uiDirection.x -= 1;
             itemID = 0;
         }
         if (gamepad.dpad.up.wasPressedThisFrame)
         {
+            uiDirection.y += 1;
             itemID = 1;
         }
         if (gamepad.dpad.right.wasPressedThisFrame)
         {
+            uiDirection.x += 1;
             itemID = 2;
         }
         if (gamepad.dpad.down.wasPressedThisFrame)
         {
+            uiDirection.y -= 1;
             itemID = 3;
         }
     }
@@ -207,7 +212,6 @@ public class UserInput : MonoBehaviour
 
 
         // ui
-        uiDirection = Vector2.zero;
         if (keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame)
         {
             uiDirection.y -= 1;
