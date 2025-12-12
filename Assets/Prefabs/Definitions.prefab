@@ -81,10 +81,10 @@ MonoBehaviour:
     displayName: Bow Ammo
     itemModel: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
     itemModelUI: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
-    dropProbability: 0
-    shopProbability: 0
+    dropProbability: 0.39
+    shopProbability: 0.31
     cost: 2
-    maxPerShopSlot: 4
+    maxPerShopSlot: 20
     weight: 0
     maxPerInventorySlot: 10
 --- !u!114 &8408705079164422734
