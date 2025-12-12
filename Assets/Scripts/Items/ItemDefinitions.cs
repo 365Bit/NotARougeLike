@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 
 public enum Currency {
-    Gold = 0
+    Gold = 0,
+    XP = 1
 }
 
 [System.Serializable]
