@@ -14,10 +14,11 @@ public class Inventory : MonoBehaviour
     public CurrencyContainer currency { get; private set; }
 
     public void Start() {
-        container = new(numItemSlots);
-        currency = new();
+        RunData.Instance.InitializeItems(numItemSlots);
+        RunData.Instance.InitializeCurrencies();
 
-        currency[Currency.Gold] = 4;
+        container = RunData.Instance.items;
+        currency = RunData.Instance.currencies;
     }
 }
 
@@ -88,22 +89,35 @@ public class ItemContainer {
         PrintState();
     }
 
-    public void AddItem(int slot, ItemDefinition item, int count) {
+    // returns the number of items that have been added to the slot
+    public int AddItem(int slot, ItemDefinition item, int count) {
         // there was a different item, overwrite it
         if (slots[slot].storedItem != item)
             slots[slot].count = 0;
         slots[slot].storedItem = item;
-        slots[slot].count += count;
+
+        int remainingSpace = item.maxPerInventorySlot - slots[slot].count;
+        int actualCount = (remainingSpace < count) ? remainingSpace : count;
+        slots[slot].count += actualCount;
+
         PrintState();
+        return actualCount;
     }
 
     // Selects an appropriate slot to add item, i.e. either a slot containing same item type or a free one
     public void AddItem(ItemDefinition item, int count) {
-        int slot = GetSlotContaining(item);
-        if (slot < 0)
-            slot = GetFreeSlot();
-        if (slot >= 0)
-            AddItem(slot, item, count);
+        for  (int i = 0; i < 10 && count > 0; i++) {
+        // while (count > 0) {
+            int slot = GetSlotContaining(item, 1);
+            if (slot < 0)
+                slot = GetFreeSlot();
+
+            if (slot >= 0) {
+                count -= AddItem(slot, item, count);
+            } else {    // no free slots
+                count = 0;
+            }
+        }
     }
 
     public int GetSlotContaining(ItemDefinition item, int requiredRemainingCapacity = 0) {
