@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5196027272824433926}
   - component: {fileID: 8408705079164422734}
   - component: {fileID: 8351641477545658752}
+  - component: {fileID: 7895014659698534790}
   m_Layer: 0
   m_Name: Definitions
   m_TagString: Untagged
@@ -232,3 +233,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Constants
   itemSlots: 12
   hotbarSlots: 4
+--- !u!114 &7895014659698534790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d82afa8fe2c41651496da396770a3c85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
