@@ -113,8 +113,6 @@ public class Player : MonoBehaviour
         defaultYScale = transform.localScale.y;
 
         weapon.gameObject.SetActive(false);
-
-        inventory.container.AddItem(itemDefinitions[3], 10);
     }
 
     // Update is called once per frame

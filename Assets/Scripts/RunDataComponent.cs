@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class RunDataComponent : MonoBehaviour
 {
@@ -24,21 +25,25 @@ public class RunData {
     public int level = 0;
     public CurrencyContainer currencies {get; private set;} = null;
     public ItemContainer items {get; private set;} = null;
-    public PlayerUpgrades upgrades {get; private set;} = null;
+    public PlayerUpgradeState upgrades {get; private set;} = null;
 
-    public void InitializeUpgrades() {
-        if (upgrades == null)
+    // 
+    public void InitIfRequired() {
+        GameObject defs = GameObject.Find("Definitions");
+
+        if (upgrades == null) {
             upgrades = new();
-    }
-
-    public void InitializeCurrencies() {
-        if (currencies == null)
+        }
+    
+        if (currencies == null) {
             currencies = new();
-    }
-
-    public void InitializeItems(int numSlots) {
-        if (items == null)
-            items = new(numSlots);
+            currencies[Currency.Gold] += 5;
+        }
+    
+        if (items == null) {
+            items = new(defs.GetComponent<Constants>().itemSlots);
+            items.AddItem(defs.GetComponent<ItemDefinitions>()[3], 200);
+        }
     }
 
     // 
@@ -46,6 +51,13 @@ public class RunData {
         Debug.Log("Level " + level + " done");
         level += 1;
         currencies[Currency.XP] += 100;
+        currencies[Currency.Gold] += 5;
+
+        // for  testing
+        foreach (BaseStatKey key in Enum.GetValues(typeof(BaseStatKey))) {
+            upgrades.Upgrade(key);
+            upgrades.Upgrade(key);
+        }
     }
 
     // reset rundata and keep persistent stuff

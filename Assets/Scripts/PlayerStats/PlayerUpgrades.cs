@@ -3,27 +3,41 @@ using System;
 
 public class PlayerUpgrades : MonoBehaviour
 {
-    public PlayerUpgrades()
-    {
-        GameSaver.subscribe(this);
+    [SerializeField]
+    private PlayerUpgradeState levels;
+
+    public void Awake() {
+        RunData.Instance.InitIfRequired();
+
+        levels = RunData.Instance.upgrades;
     }
 
+    public ref int this[BaseStatKey stat] {
+        get => ref levels[stat];
+    }
+
+    public void Upgrade(BaseStatKey stat) {
+        levels[stat] += 1;
+    }
+}
+
+public class PlayerUpgradeState {
     [SerializeField]
     private int[] levels;
 
-    public void Awake() {
+    public PlayerUpgradeState() {
         levels = new int[Enum.GetValues(typeof(BaseStatKey)).Length];
         foreach (BaseStatKey key in Enum.GetValues(typeof(BaseStatKey))) {
             levels[(int)key] = 0;
         }
-        GameSaver.save();
     }
 
-    public int this[BaseStatKey stat] {
-        get => levels[(int)stat];
+    public ref int this[BaseStatKey stat] {
+        get => ref levels[(int)stat];
     }
 
     public void Upgrade(BaseStatKey stat) {
         levels[(int)stat] += 1;
     }
 }
+
