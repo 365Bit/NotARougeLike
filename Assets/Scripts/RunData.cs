@@ -1,24 +1,6 @@
 using UnityEngine;
 using System;
 
-public class RunDataComponent : MonoBehaviour
-{
-    public static RunData data;
-
-    public RunDataComponent() {
-        if (data == null) {
-            data = RunData.Instance;
-        }
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        GameSaver.subscribe(this);
-    }
-}
-
-
 // class to store run data, allows defining persistence
 [System.Serializable]
 public class RunData {
