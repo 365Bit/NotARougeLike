@@ -496,16 +496,18 @@ public class Player : MonoBehaviour
 
     void Shoot()
     {
-        int bowAmmoSlot = inventory.container.GetSlotContaining(itemDefinitions[3]);
+        ItemContainer items = inventory.container;
+        int bowAmmoSlot = items.GetSlotContaining(itemDefinitions[3], 1);
 
         Debug.Log("Bow Ammo Slot: " + bowAmmoSlot);
+        items.PrintState();
 
         if (fireCooldown > 0.0f || projectiles.Length == 0 || bowAmmoSlot == -1)
         {
             return;
         }
 
-        inventory.container.ConsumeItem(bowAmmoSlot);
+        items.ConsumeItem(bowAmmoSlot);
 
         Vector3 position = cameraTransform.position + transform.forward * 1.0f;
         Quaternion rotation = cameraTransform.rotation;
