@@ -5,17 +5,20 @@ using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
-    public int numHotbarSlots;
-    public int numItemSlots;
+    public int numHotbarSlots {get; private set;}
+    public int numItemSlots {get; private set;}
     public ItemContainer container { get; private set;}
 
     // amount of currencies
-    public int numCurrencySlots = Enum.GetValues(typeof(Currency)).Length;
+    public int numCurrencySlots {get; private set;} = Enum.GetValues(typeof(Currency)).Length;
     public CurrencyContainer currency { get; private set; }
 
     public void Start() {
-        RunData.Instance.InitializeItems(numItemSlots);
-        RunData.Instance.InitializeCurrencies();
+        RunData.Instance.InitIfRequired();
+
+        var defs = GameObject.Find("Definitions").GetComponent<Constants>();
+        numHotbarSlots = defs.hotbarSlots;
+        numItemSlots = defs.itemSlots;
 
         container = RunData.Instance.items;
         currency = RunData.Instance.currencies;
