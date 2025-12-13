@@ -11,12 +11,13 @@ public class UserInput : MonoBehaviour
     private Vector2 rotation;
 
     private bool controlPlayer {
-        get => !uiController.inventoryOpen && !player.isDead;
+        get => !uiController.upgradesOpen && !uiController.inventoryOpen && !player.isDead;
     }
 
     private bool aim;
     private bool interact;
     private bool inventory;
+    private bool upgrades;
     private bool jump;
     private bool run;
     private bool slide;
@@ -51,6 +52,7 @@ public class UserInput : MonoBehaviour
         slide = false;
         sneak = false;
         inventory = false;
+        upgrades = false;
 
         itemID = -1;
 
@@ -88,6 +90,17 @@ public class UserInput : MonoBehaviour
         if (uiController.inventoryOpen) {
             uiController.inventoryUI.GetComponent<InventoryUI>().MoveSelection(uiDirection);
         }
+
+        if (uiController.upgradesOpen) {
+            uiController.upgradesUI.GetComponent<UpgradeUI>().MoveSelection(uiDirection);
+        }
+
+
+        // toggle upgrades
+        if (upgrades && !uiController.upgradesOpen)
+            uiController.SwitchToUpgrades();
+        else if ((upgrades || escape) && uiController.upgradesOpen)
+            uiController.SwitchToGameplay();
 
         // toggle inventory
         if (inventory && !uiController.inventoryOpen)
@@ -226,6 +239,9 @@ public class UserInput : MonoBehaviour
         }
 
 
+        if (keyboard.uKey.wasPressedThisFrame) {
+            upgrades = true;
+        }
         if (keyboard.eKey.wasPressedThisFrame) {
             inventory = true;
         }
