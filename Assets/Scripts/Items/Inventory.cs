@@ -5,23 +5,22 @@ using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
-    public int numHotbarSlots {get; private set;}
-    public int numItemSlots {get; private set;}
+    public int numHotbarSlots  {get; private set;}
+    public int numItemSlots {get => container.slots.Length;}
     public ItemContainer container { get; private set;}
 
     // amount of currencies
     public int numCurrencySlots {get; private set;} = Enum.GetValues(typeof(Currency)).Length;
     public CurrencyContainer currency { get; private set; }
 
-    public void Start() {
-        RunData.Instance.InitIfRequired();
-
-        var defs = GameObject.Find("Definitions").GetComponent<Constants>();
-        numHotbarSlots = defs.hotbarSlots;
-        numItemSlots = defs.itemSlots;
-
+    public Inventory() {
         container = RunData.Instance.items;
         currency = RunData.Instance.currencies;
+    }
+
+    public void Start() {
+        var defs = GameObject.Find("Definitions").GetComponent<Constants>();
+        numHotbarSlots = defs.hotbarSlots;
     }
 }
 
@@ -51,20 +50,11 @@ public class CurrencyContainer {
 
 [System.Serializable]
 public class ItemContainer {
-    public ItemSlot[] slots {get; private set;}
-
-    public ItemContainer(int count) {
-        slots = new ItemSlot[count];
-        for (int i = 0; i < count; i++) 
-        {
-            slots[i] = new();
-        }
-    }
+    public ItemSlot[] slots {get; private set;} = new ItemSlot[0];
 
     public ItemSlot this[int slot] {
         get => slots[slot];
     }
-
 
     public void PrintState() {
         StringBuilder output = new();
@@ -72,6 +62,30 @@ public class ItemContainer {
             output.AppendFormat("{0} : {1}({2}x), ", i, (slots[i].storedItem != null) ? slots[i].storedItem.name : "none", slots[i].count);
         }
         Debug.Log("inventory: " + output.ToString());
+    }
+
+    public void Resize(int newSize) {
+        var nslots = new ItemSlot[newSize];
+        for (int i = 0; i < newSize; i++) 
+        {
+            nslots[i] = new();
+        }
+
+        // transfer items
+        if (slots != null) {
+            for(int i = 0; i < slots.Length && i < nslots.Length; i++) {
+                nslots[i] = slots[i];
+            }
+        }
+
+        slots = nslots;
+    }
+
+    public void Clear() {
+        for(int i = 0; i < slots.Length; i++) {
+            slots[i].count = 0;
+            slots[i].storedItem = null;
+        }
     }
 
     public void SwapItems(int first, int second) {

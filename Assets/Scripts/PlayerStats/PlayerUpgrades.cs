@@ -6,9 +6,7 @@ public class PlayerUpgrades : MonoBehaviour
     [SerializeField]
     private PlayerUpgradeState levels;
 
-    public void Awake() {
-        RunData.Instance.InitIfRequired();
-
+    public PlayerUpgrades() {
         levels = RunData.Instance.upgrades;
     }
 
