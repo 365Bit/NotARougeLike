@@ -11,6 +11,7 @@ public class UpgradeUI : MonoBehaviour
     private int selectedStat;
 
     private GameObject[] uiInstances;
+    private UpgradeCostDefinitions defs;
 
     // get array of stats
     private Array stats = Enum.GetValues(typeof(BaseStatKey));
@@ -28,6 +29,8 @@ public class UpgradeUI : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
+        defs = GameObject.Find("Definitions").GetComponent<UpgradeCostDefinitions>();
+
         // clear
         if (uiInstances != null) 
             foreach (var i in uiInstances) 
@@ -40,24 +43,31 @@ public class UpgradeUI : MonoBehaviour
             var obj = Instantiate(statUIPrefab, transform);
             obj.transform.localPosition = origin + offset * index;
 
-            var disp = obj.GetComponent<StatDisplay>();
-            disp.SetStat(key, 0);
-
             uiInstances[index] = obj;
             index++;
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    public void UpdateUpgrades() {
         int index = 0;
         foreach (GameObject i in uiInstances) {
             var disp = i.GetComponent<StatDisplay>();
-            disp.SetStat((BaseStatKey)stats.GetValue(index), 0);
+            var stat = (BaseStatKey)stats.GetValue(index);
+            int currentLevel = 0;
+            int maxLevel = 10;
+            int[] costs = defs[stat];
+            int cost = costs != null ? costs[currentLevel] : 1000;
+
+            disp.SetStat(stat, currentLevel, maxLevel);
             disp.SetSelected(index == selectedStat);
-            disp.SetUpgradeable(false);
+            disp.SetUpgradeable(currentLevel < maxLevel);
+            disp.SetCost(cost);
+
             index++;
         }
+    }
+
+    void Update() {
+        UpdateUpgrades();
     }
 }

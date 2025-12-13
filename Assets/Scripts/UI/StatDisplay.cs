@@ -1,20 +1,25 @@
 using UnityEngine;
+using UnityEngine.Events;
 using System;
+
 
 using UnityEngine.UI;
 using TMPro;
 
 public class StatDisplay : MonoBehaviour
 {
-    public TMP_Text nameText;
-    public TMP_Text levelText;
+    public TMP_Text nameText, levelText, costText;
     public Button upgradeButton;
 
     public Color background, selectedBackground;
 
-    public void SetStat(BaseStatKey stat, int level) {
+    public void SetStat(BaseStatKey stat, int level, int maxLevel) {
         nameText.text  = Enum.GetName(typeof(BaseStatKey), stat);
-        levelText.text = level.ToString();
+        levelText.text = level.ToString() + "/" + maxLevel.ToString();
+    }
+
+    public void SetCost(int cost) {
+        costText.text = cost.ToString();
     }
 
     public void SetSelected(bool selected) {
@@ -25,15 +30,8 @@ public class StatDisplay : MonoBehaviour
         upgradeButton.interactable = upgradeable;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         GetComponent<Image>().color = background;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
