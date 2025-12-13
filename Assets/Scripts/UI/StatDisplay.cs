@@ -8,6 +8,7 @@ using TMPro;
 
 public class StatDisplay : MonoBehaviour
 {
+    [Header("Rendering GameObjects")]
     public TMP_Text nameText, levelText, costText;
     public Button upgradeButton;
 

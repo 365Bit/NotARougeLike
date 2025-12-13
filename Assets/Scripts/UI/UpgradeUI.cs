@@ -3,12 +3,13 @@ using System;
 
 public class UpgradeUI : MonoBehaviour
 {
+    [Header("Rendering")]
     public GameObject statUIPrefab;
-
     public Vector2 origin;
     public Vector2 offset;
 
-    private int selectedStat;
+    [Header("Stat selection")]
+    public int selectedStat {get; private set;}
 
     private GameObject[] uiInstances;
     private UpgradeCostDefinitions defs;
@@ -21,22 +22,18 @@ public class UpgradeUI : MonoBehaviour
         selectedStat = (selectedStat - (int)delta.y + stats.Length) % stats.Length;
     }
 
-    public bool TryUpgrade() {
-        Debug.Log("trying to upgrade " + Enum.GetName(typeof(BaseStatKey), stats.GetValue(selectedStat)));
-        return false;
-    }
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         defs = GameObject.Find("Definitions").GetComponent<UpgradeCostDefinitions>();
 
-        // clear
-        if (uiInstances != null) 
+        // clear old ui objects
+        if (uiInstances != null) {
             foreach (var i in uiInstances) 
                 GameObject.Destroy(i);
-        else
+        } else {
             uiInstances = new GameObject[stats.Length];
+        }
 
         int index = 0;
         foreach(BaseStatKey key in stats) {
