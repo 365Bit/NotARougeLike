@@ -113,6 +113,9 @@ public class Player : MonoBehaviour
         defaultYScale = transform.localScale.y;
 
         weapon.gameObject.SetActive(false);
+
+        if (!RunData.Instance.Initialized)
+            RunData.Instance.NewRun();
     }
 
     // Update is called once per frame
@@ -217,7 +220,8 @@ public class Player : MonoBehaviour
 
         playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, currentFOV, zoomSpeed * Time.deltaTime);
 
-        characterController.Move(motion * Time.deltaTime);
+        if (characterController.enabled)
+            characterController.Move(motion * Time.deltaTime);
 
         RegenerateHealth();
         RegenerateMana();
