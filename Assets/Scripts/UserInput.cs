@@ -7,7 +7,6 @@ public class UserInput : MonoBehaviour
     private UIManager uiController;
 
     private Vector2 direction;
-    private Vector2 uiDirection;
     private Vector2 rotation;
 
     private bool controlPlayer {
@@ -25,7 +24,12 @@ public class UserInput : MonoBehaviour
 
     private int itemID;
 
+    // values for ui
+    private Vector2 uiDirection;
+    private bool uiSelect;
+
     public float mouseSensitivity = 0.1f;
+    public float stickSensitivity = 150f;
 
     void Awake()
     {
@@ -85,9 +89,14 @@ public class UserInput : MonoBehaviour
             }
         }
 
-        // move cursor
-        if (uiController.inventoryOpen && uiDirection != Vector2.zero) {
-            uiController.inventoryUI.GetComponent<InventoryUI>().MoveSelection(uiDirection);
+        // control inventory ui
+        if (uiController.inventoryOpen) {
+            var inv = uiController.inventoryUI.GetComponent<InventoryUI>();
+            if (uiDirection != Vector2.zero)
+                inv.MoveSelection(uiDirection);
+            
+            if (uiSelect)
+                inv.ToggleItemGrabbed();
         }
 
         // toggle inventory
@@ -109,10 +118,10 @@ public class UserInput : MonoBehaviour
         bool startButton = gamepad.startButton.isPressed;
 
         // Movement
-        direction = gamepad.leftStick.ReadValue() * Time.deltaTime;
+        direction = gamepad.leftStick.ReadValue();
 
         // Camera
-        rotation += gamepad.rightStick.ReadValue();
+        rotation += gamepad.rightStick.ReadValue() * Time.deltaTime * stickSensitivity;
         aim |= gamepad.leftTrigger.IsPressed();
 
         // Attack
@@ -154,6 +163,7 @@ public class UserInput : MonoBehaviour
             itemID = 3;
         }
 
+        uiSelect  = gamepad.aButton.wasPressedThisFrame;
         inventory = gamepad.yButton.wasPressedThisFrame;
     }
 
@@ -229,6 +239,7 @@ public class UserInput : MonoBehaviour
             uiDirection.y += 1;
         }
 
+        uiSelect  = keyboard.spaceKey.wasPressedThisFrame;
         inventory = keyboard.eKey.wasPressedThisFrame;
     }
 

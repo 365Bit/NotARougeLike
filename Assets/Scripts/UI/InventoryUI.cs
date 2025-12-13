@@ -73,6 +73,10 @@ public class InventoryUI : MonoBehaviour
         currentSlot = newSlot;
     }
 
+    public void ToggleItemGrabbed() {
+        grabbed = !grabbed;
+    }
+
     void Start() {
         player = GameObject.Find("Player").GetComponent<Player>();
         inventory = GameObject.Find("Player").GetComponent<Inventory>();
@@ -85,11 +89,6 @@ public class InventoryUI : MonoBehaviour
         numSlots = inventory.numItemSlots;
         if (slots == null || numSlots != slots.Length)
             InitializeSlots();
-
-        // todo: extract to UserInput script
-        Keyboard keyboard = Keyboard.current;
-        if (keyboard.spaceKey.wasPressedThisFrame)
-            grabbed = !grabbed;
 
         UpdateSlots();
     }
