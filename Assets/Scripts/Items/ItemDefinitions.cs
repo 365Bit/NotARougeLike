@@ -2,14 +2,9 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-public enum ItemType {
-    manaFruit,
-    healthFruit,
-    staminaFruit
-}
-
 public enum Currency {
-    Gold = 0
+    Gold = 0,
+    XP = 1
 }
 
 [System.Serializable]

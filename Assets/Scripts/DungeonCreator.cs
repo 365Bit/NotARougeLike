@@ -25,6 +25,7 @@ public class DungeonCreator : MonoBehaviour
     [Range(0, 2)]
     public int roomOffset;
     public GameObject wallPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab, navPointPrefab;
+    public GameObject trapDoorPrefab;
     List<Vector3Int> possibleDoorVerticalPosition;
     List<Vector3Int> possibleDoorHorizontalPosition;
     List<Vector3Int> possibleWallHorizontalPosition;
@@ -63,6 +64,7 @@ public class DungeonCreator : MonoBehaviour
         possibleWallHorizontalPosition = new List<Vector3Int>();
         possibleWallVerticalPosition = new List<Vector3Int>();
         CreatePlayer(listOfRooms);
+        CreateTrapDoor(listOfRooms);
         for (int i = 0; i < listOfRooms.Count; i++)
         {
             CreateMesh(listOfRooms[i].BottomLeftAreaCorner, listOfRooms[i].TopRightAreaCorner);
@@ -99,6 +101,32 @@ public class DungeonCreator : MonoBehaviour
         player.StartGame();
 
         canvas.SetActive(true);
+    }
+
+    // places the trapdoor in the room the furthest away from player
+    private void CreateTrapDoor(List<Node> listOfRooms) {
+        Transform player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        float maxDist = 0f;
+        Node selectedRoom = null;
+        foreach (var room in listOfRooms) {
+            if (room.Type != "room") continue;
+
+            Vector3 currentPos = new Vector3(  (room.BottomLeftAreaCorner.x + room.BottomRightAreaCorner.x) / 2,
+                                        0,
+                                        (room.BottomLeftAreaCorner.y + room.TopLeftAreaCorner.y) / 2);
+            float dist = (player.position - currentPos).magnitude;
+            if (dist > maxDist) {
+                maxDist = dist;
+                selectedRoom = room;
+            }
+        }
+
+        // place in center of the selected room
+        Vector3 pos = new Vector3(  (selectedRoom.BottomLeftAreaCorner.x + selectedRoom.BottomRightAreaCorner.x) / 2,
+                                    0,
+                                    (selectedRoom.BottomLeftAreaCorner.y + selectedRoom.TopLeftAreaCorner.y) / 2);
+        Instantiate(trapDoorPrefab, pos, Quaternion.identity);
     }
 
     private void CreateEnemy(List<Node> listOfRooms)

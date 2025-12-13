@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class ItemHotbar : MonoBehaviour
 {
@@ -20,7 +21,11 @@ public class ItemHotbar : MonoBehaviour
     }
 
     void InitializeSlots() {
-        int numSlots = playerInventory.numHotbarSlots;
+        if (slots != null)  // destroy old slots
+            foreach (var s in slots)
+                GameObject.Destroy(s);
+
+        int numSlots = Math.Min(playerInventory.numHotbarSlots, playerInventory.numItemSlots);
         slots = new GameObject[numSlots];
 
         for (int i = 0; i < numSlots; i++) {
@@ -30,6 +35,8 @@ public class ItemHotbar : MonoBehaviour
     }
 
     void UpdateSlots() {
+        if (slots == null) return;
+
         for (int i = 0; i < slots.Length; i++) {
             GameObject slot = slots[i];
             var s = slot.GetComponent<ItemHotbarSlot>();
@@ -42,7 +49,7 @@ public class ItemHotbar : MonoBehaviour
     void Update()
     {
         // check if slot count has changed
-        var numSlots = playerInventory.numHotbarSlots;
+        int numSlots = Math.Min(playerInventory.numHotbarSlots, playerInventory.numItemSlots);
         if (slots == null || numSlots != slots.Length)
             InitializeSlots();
 
