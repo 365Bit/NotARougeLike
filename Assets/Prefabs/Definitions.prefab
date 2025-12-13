@@ -87,7 +87,7 @@ MonoBehaviour:
     cost: 2
     maxPerShopSlot: 20
     weight: 0
-    maxPerInventorySlot: 10
+    maxPerInventorySlot: 32
 --- !u!114 &8408705079164422734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,6 +233,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Constants
   itemSlots: 12
   hotbarSlots: 4
+  initialGold: 5
+  initialXP: 0
+  initialAmmo: 256
 --- !u!114 &7895014659698534790
 MonoBehaviour:
   m_ObjectHideFlags: 0
