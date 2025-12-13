@@ -21,6 +21,10 @@ public class StatDisplay : MonoBehaviour
         GetComponent<Image>().color = selected ? selectedBackground : background;
     }
 
+    public void SetUpgradeable(bool upgradeable) {
+        upgradeButton.interactable = upgradeable;
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {

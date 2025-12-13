@@ -16,8 +16,8 @@ public class UpgradeUI : MonoBehaviour
     private Array stats = Enum.GetValues(typeof(BaseStatKey));
 
     // 
-    public void MoveSelection(int delta) {
-        selectedStat = (selectedStat + delta + stats.Length) % stats.Length;
+    public void MoveSelection(Vector2 delta) {
+        selectedStat = (selectedStat - (int)delta.y + stats.Length) % stats.Length;
     }
 
     public bool TryUpgrade() {
@@ -42,7 +42,6 @@ public class UpgradeUI : MonoBehaviour
 
             var disp = obj.GetComponent<StatDisplay>();
             disp.SetStat(key, 0);
-            disp.SetSelected(false);
 
             uiInstances[index] = obj;
             index++;
@@ -54,7 +53,10 @@ public class UpgradeUI : MonoBehaviour
     {
         int index = 0;
         foreach (GameObject i in uiInstances) {
-            i.GetComponent<StatDisplay>().SetSelected(index == selectedStat);
+            var disp = i.GetComponent<StatDisplay>();
+            disp.SetStat((BaseStatKey)stats.GetValue(index), 0);
+            disp.SetSelected(index == selectedStat);
+            disp.SetUpgradeable(false);
             index++;
         }
     }
