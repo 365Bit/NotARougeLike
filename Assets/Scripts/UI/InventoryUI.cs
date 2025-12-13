@@ -65,6 +65,7 @@ public class InventoryUI : MonoBehaviour
     }
 
     public void MoveSelection(Vector2 delta) {
+        if (numSlots == 0) return;
         int newSlot = (currentSlot + (int)Math.Round(delta.x) + numSlots) % numSlots;
         newSlot = (newSlot + (int)Math.Round(delta.y) * numColumns + numSlots) % numSlots;
         if (grabbed)

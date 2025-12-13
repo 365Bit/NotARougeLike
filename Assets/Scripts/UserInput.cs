@@ -86,7 +86,7 @@ public class UserInput : MonoBehaviour
         }
 
         // move cursor
-        if (uiController.inventoryOpen) {
+        if (uiController.inventoryOpen && uiDirection != Vector2.zero) {
             uiController.inventoryUI.GetComponent<InventoryUI>().MoveSelection(uiDirection);
         }
 
@@ -109,7 +109,7 @@ public class UserInput : MonoBehaviour
         bool startButton = gamepad.startButton.isPressed;
 
         // Movement
-        direction = gamepad.leftStick.ReadValue();
+        direction = gamepad.leftStick.ReadValue() * Time.deltaTime;
 
         // Camera
         rotation += gamepad.rightStick.ReadValue();
@@ -132,8 +132,6 @@ public class UserInput : MonoBehaviour
         slide |= gamepad.rightShoulder.isPressed;
         sneak |= gamepad.leftShoulder.isPressed;
 
-        bool yButton = gamepad.yButton.isPressed;
-
         // Item selection and ui navigation
         if (gamepad.dpad.left.wasPressedThisFrame)
         {
@@ -155,6 +153,8 @@ public class UserInput : MonoBehaviour
             uiDirection.y -= 1;
             itemID = 3;
         }
+
+        inventory = gamepad.yButton.wasPressedThisFrame;
     }
 
     void KeyboardInput()
@@ -229,10 +229,7 @@ public class UserInput : MonoBehaviour
             uiDirection.y += 1;
         }
 
-
-        if (keyboard.eKey.wasPressedThisFrame) {
-            inventory = true;
-        }
+        inventory = keyboard.eKey.wasPressedThisFrame;
     }
 
     void MouseInput()
