@@ -15,7 +15,6 @@ public class TrapDoor : MonoBehaviour
 
         Debug.Log("Floor cleared, going to next level");
         RunData.Instance.LevelDone();
-        GameSaver.save();
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
