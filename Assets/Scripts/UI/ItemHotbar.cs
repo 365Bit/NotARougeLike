@@ -22,7 +22,7 @@ public class ItemHotbar : MonoBehaviour
 
     void InitializeSlots() {
         if (slots != null)  // destroy old slots
-            foreach (var s in slots)
+            foreach (GameObject s in slots)
                 GameObject.Destroy(s);
 
         int numSlots = Math.Min(playerInventory.numHotbarSlots, playerInventory.numItemSlots);
@@ -39,7 +39,7 @@ public class ItemHotbar : MonoBehaviour
 
         for (int i = 0; i < slots.Length; i++) {
             GameObject slot = slots[i];
-            var s = slot.GetComponent<ItemHotbarSlot>();
+            ItemHotbarSlot s = slot.GetComponent<ItemHotbarSlot>();
             s.SetItem(playerInventory.container[i].storedItem, playerInventory.container[i].count);
             s.SetSelected(false);
         }

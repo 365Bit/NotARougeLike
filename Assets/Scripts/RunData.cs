@@ -25,7 +25,7 @@ public class RunData {
     public void NewRun() {
         Debug.Log("starting new run");
         GameObject defs = GameObject.Find("Definitions");
-        var constants = defs.GetComponent<Constants>();
+        Constants constants = defs.GetComponent<Constants>();
 
         // back to first level
         level = 0;
@@ -51,7 +51,7 @@ public class RunData {
     public void NewGame() {
         Debug.Log("starting new game");
         GameObject defs = GameObject.Find("Definitions");
-        var constants = defs.GetComponent<Constants>();
+        Constants constants = defs.GetComponent<Constants>();
 
         // back to first level
         level = 0;

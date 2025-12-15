@@ -19,7 +19,7 @@ public class Inventory : MonoBehaviour
     }
 
     public void Start() {
-        var defs = GameObject.Find("Definitions").GetComponent<Constants>();
+        Constants defs = GameObject.Find("Definitions").GetComponent<Constants>();
         numHotbarSlots = defs.hotbarSlots;
 
         GameSaver.subscribe(currency);
@@ -65,7 +65,7 @@ public class ItemContainer {
     }
 
     public void Resize(int newSize) {
-        var nslots = new ItemSlot[newSize];
+        ItemSlot[] nslots = new ItemSlot[newSize];
         for (int i = 0; i < newSize; i++) 
         {
             nslots[i] = new();
@@ -91,7 +91,7 @@ public class ItemContainer {
     public void SwapItems(int first, int second) {
         if (first == second) return;
 
-        var tmp = slots[first];
+        ItemSlot tmp = slots[first];
         slots[first] = slots[second];
         slots[second] = tmp;
     }

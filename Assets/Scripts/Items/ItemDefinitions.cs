@@ -47,7 +47,7 @@ public class ItemDefinitions : MonoBehaviour
     void Start()
     {
         // normalize probabilities
-        var probabilitySum = 0.0f;
+        float probabilitySum = 0.0f;
         foreach(ItemDefinition def in definitions)
             probabilitySum += def.shopProbability;
 

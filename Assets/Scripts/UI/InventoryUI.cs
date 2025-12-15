@@ -46,7 +46,7 @@ public class InventoryUI : MonoBehaviour
     void UpdateSlots() {
         for (int i = 0; i < slots.Length; i++) {
             GameObject slot = slots[i];
-            var s = slot.GetComponent<ItemHotbarSlot>();
+            ItemHotbarSlot s = slot.GetComponent<ItemHotbarSlot>();
             s.SetItem(inventory.container[i].storedItem, inventory.container[i].count);
             s.SetSelected(i == currentSlot);
             slot.GetComponent<Button>().onClick.AddListener(delegate { OnClick(i); });
