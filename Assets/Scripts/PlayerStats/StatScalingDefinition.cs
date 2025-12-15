@@ -63,13 +63,13 @@ public class ScalingFormula {
     public float ComputeFrom(PlayerUpgrades upgradeLevels) {
         float result = baseValue;
         if (scalingInBaseStat != null) {
-            if (operation == Operation.Multiplication) {
-                foreach (Operand s in scalingInBaseStat) {
-                    result *= s.value[upgradeLevels[s.stat]];
-                }
-            } else {
-                foreach (Operand s in scalingInBaseStat) {
-                    result += s.value[upgradeLevels[s.stat]];
+            foreach (Operand s in scalingInBaseStat) {
+                int index = (upgradeLevels[s.stat] < s.value.Length) ? upgradeLevels[s.stat] : s.value.Length - 1;
+                float value = s.value[index];
+                if (operation == Operation.Multiplication) {
+                    result *= value;
+                } else {
+                    result += value;
                 }
             }
         }

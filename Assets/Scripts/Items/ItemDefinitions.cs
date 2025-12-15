@@ -2,14 +2,9 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-public enum ItemType {
-    manaFruit,
-    healthFruit,
-    staminaFruit
-}
-
 public enum Currency {
-    Gold = 0
+    Gold = 0,
+    XP = 1
 }
 
 [System.Serializable]
@@ -52,7 +47,7 @@ public class ItemDefinitions : MonoBehaviour
     void Start()
     {
         // normalize probabilities
-        var probabilitySum = 0.0f;
+        float probabilitySum = 0.0f;
         foreach(ItemDefinition def in definitions)
             probabilitySum += def.shopProbability;
 

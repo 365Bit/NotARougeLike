@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3264794840061447751}
   - component: {fileID: 5196027272824433926}
   - component: {fileID: 8408705079164422734}
+  - component: {fileID: 8351641477545658752}
+  - component: {fileID: 7895014659698534790}
   m_Layer: 0
   m_Name: Definitions
   m_TagString: Untagged
@@ -80,12 +82,12 @@ MonoBehaviour:
     displayName: Bow Ammo
     itemModel: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
     itemModelUI: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
-    dropProbability: 0
-    shopProbability: 0
+    dropProbability: 0.39
+    shopProbability: 0.31
     cost: 2
-    maxPerShopSlot: 4
+    maxPerShopSlot: 20
     weight: 0
-    maxPerInventorySlot: 10
+    maxPerInventorySlot: 32
 --- !u!114 &8408705079164422734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,3 +219,32 @@ MonoBehaviour:
       baseValue: 15
       operation: 1
       scalingInBaseStat: []
+--- !u!114 &8351641477545658752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6761e8b1e93989789cb6412eaeb21b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Constants
+  itemSlots: 12
+  hotbarSlots: 4
+  initialGold: 5
+  initialXP: 0
+  initialAmmo: 256
+--- !u!114 &7895014659698534790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d82afa8fe2c41651496da396770a3c85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'

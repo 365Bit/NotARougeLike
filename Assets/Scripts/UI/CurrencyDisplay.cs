@@ -15,7 +15,7 @@ public class CurrencyDisplay : MonoBehaviour
     private GameObject[] slots;
 
     void InitializeSlots() {
-        var numSlots = playerInventory.numCurrencySlots;
+        int numSlots = playerInventory.numCurrencySlots;
         slots = new GameObject[numSlots];
 
         for (int i = 0; i < numSlots; i++) {
@@ -26,8 +26,8 @@ public class CurrencyDisplay : MonoBehaviour
 
     void UpdateSlots() {
         for (int i = 0; i < slots.Length; i++) {
-            var slot = slots[i];
-            var s = slot.GetComponent<ItemHotbarSlot>();
+            GameObject slot = slots[i];
+            ItemHotbarSlot s = slot.GetComponent<ItemHotbarSlot>();
             s.SetCurrency((Currency)i, playerInventory.currency[(Currency)i]);
             s.SetSelected(false);
         }

@@ -5,32 +5,36 @@ using System.Collections.Generic;
 
 public class Inventory : MonoBehaviour
 {
-    public int numHotbarSlots;
-    public int numItemSlots;
+    public int numHotbarSlots  {get; private set;}
+    public int numItemSlots {get => container.slots.Length;}
     public ItemContainer container { get; private set;}
 
     // amount of currencies
-    public int numCurrencySlots = Enum.GetValues(typeof(Currency)).Length;
+    public int numCurrencySlots {get; private set;} = Enum.GetValues(typeof(Currency)).Length;
     public CurrencyContainer currency { get; private set; }
 
-    public void Start() {
-        container = new(numItemSlots);
-        currency = new();
+    public Inventory() {
+        container = RunData.Instance.items;
+        currency = RunData.Instance.currencies;
+    }
 
-        currency[Currency.Gold] = 4;
+    public void Start() {
+        Constants defs = GameObject.Find("Definitions").GetComponent<Constants>();
+        numHotbarSlots = defs.hotbarSlots;
+
+        GameSaver.subscribe(currency);
     }
 }
 
-[System.Serializable]
 public class ItemSlot {
     public ItemDefinition storedItem = null;
     public int count = 0;
 }
 
 
-[System.Serializable]
+[Serializable]
 public class CurrencyContainer {
-    public int[] balances {get; private set;}
+    public int[] balances;
 
     public CurrencyContainer() {
         balances = new int[Enum.GetValues(typeof(Currency)).Length];
@@ -45,24 +49,14 @@ public class CurrencyContainer {
     }
 }
 
-[System.Serializable]
 public class ItemContainer {
-    public ItemSlot[] slots {get; private set;}
-
-    public ItemContainer(int count) {
-        slots = new ItemSlot[count];
-        for (int i = 0; i < count; i++) 
-        {
-            slots[i] = new();
-        }
-    }
+    public ItemSlot[] slots {get; private set;} = new ItemSlot[0];
 
     public ItemSlot this[int slot] {
         get => slots[slot];
     }
 
-
-    private void PrintState() {
+    public void PrintState() {
         StringBuilder output = new();
         for (int i = 0; i < slots.Length; i++) {
             output.AppendFormat("{0} : {1}({2}x), ", i, (slots[i].storedItem != null) ? slots[i].storedItem.name : "none", slots[i].count);
@@ -70,10 +64,34 @@ public class ItemContainer {
         Debug.Log("inventory: " + output.ToString());
     }
 
+    public void Resize(int newSize) {
+        ItemSlot[] nslots = new ItemSlot[newSize];
+        for (int i = 0; i < newSize; i++) 
+        {
+            nslots[i] = new();
+        }
+
+        // transfer items
+        if (slots != null) {
+            for(int i = 0; i < slots.Length && i < nslots.Length; i++) {
+                nslots[i] = slots[i];
+            }
+        }
+
+        slots = nslots;
+    }
+
+    public void Clear() {
+        for(int i = 0; i < slots.Length; i++) {
+            slots[i].count = 0;
+            slots[i].storedItem = null;
+        }
+    }
+
     public void SwapItems(int first, int second) {
         if (first == second) return;
 
-        var tmp = slots[first];
+        ItemSlot tmp = slots[first];
         slots[first] = slots[second];
         slots[second] = tmp;
     }
@@ -88,27 +106,48 @@ public class ItemContainer {
         PrintState();
     }
 
-    public void AddItem(int slot, ItemDefinition item, int count) {
+    // returns the number of items that have been added to the slot
+    public int AddItem(int slot, ItemDefinition item, int count) {
         // there was a different item, overwrite it
         if (slots[slot].storedItem != item)
             slots[slot].count = 0;
         slots[slot].storedItem = item;
-        slots[slot].count += count;
+
+        int remainingSpace = item.maxPerInventorySlot - slots[slot].count;
+        int actualCount = (remainingSpace < count) ? remainingSpace : count;
+        slots[slot].count += actualCount;
+
         PrintState();
+        return actualCount;
     }
 
     // Selects an appropriate slot to add item, i.e. either a slot containing same item type or a free one
     public void AddItem(ItemDefinition item, int count) {
-        int slot = GetSlotContaining(item);
-        if (slot < 0)
-            slot = GetFreeSlot();
-        if (slot >= 0)
-            AddItem(slot, item, count);
+        while (count > 0) {
+            int slot = GetSlotWithCapacity(item, 1);
+            if (slot < 0)
+                slot = GetFreeSlot();
+
+            if (slot >= 0) {
+                count -= AddItem(slot, item, count);
+            } else {    // no free slots
+                count = 0;
+            }
+        }
     }
 
-    public int GetSlotContaining(ItemDefinition item, int requiredRemainingCapacity = 0) {
+    public int GetSlotWithCapacity(ItemDefinition item, int requiredRemainingCapacity = 1) {
         for (int i = 0; i < slots.Length; i++) {
             if (slots[i].storedItem == item && slots[i].count <= item.maxPerInventorySlot - requiredRemainingCapacity) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public int GetSlotContaining(ItemDefinition item, int requiredAmount = 1) {
+        for (int i = 0; i < slots.Length; i++) {
+            if (slots[i].storedItem == item && slots[i].count >= requiredAmount) {
                 return i;
             }
         }
