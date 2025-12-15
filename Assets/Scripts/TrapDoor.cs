@@ -3,15 +3,15 @@ using UnityEngine.SceneManagement;
 
 public class TrapDoor : MonoBehaviour
 {
-    private bool isenabled = false;
+    private bool isEnabled = false;
 
     public void Enable() {
-        isenabled = true;
+        isEnabled = true;
     }
 
     public void Interact()
     {
-        if (!isenabled) return;
+        if (!isEnabled) return;
 
         Debug.Log("Floor cleared, going to next level");
         RunData.Instance.LevelDone();
