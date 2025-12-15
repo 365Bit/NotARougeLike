@@ -21,19 +21,20 @@ public class Inventory : MonoBehaviour
     public void Start() {
         var defs = GameObject.Find("Definitions").GetComponent<Constants>();
         numHotbarSlots = defs.hotbarSlots;
+
+        GameSaver.subscribe(currency);
     }
 }
 
-[System.Serializable]
 public class ItemSlot {
     public ItemDefinition storedItem = null;
     public int count = 0;
 }
 
 
-[System.Serializable]
+[Serializable]
 public class CurrencyContainer {
-    public int[] balances {get; private set;}
+    public int[] balances;
 
     public CurrencyContainer() {
         balances = new int[Enum.GetValues(typeof(Currency)).Length];
@@ -48,7 +49,6 @@ public class CurrencyContainer {
     }
 }
 
-[System.Serializable]
 public class ItemContainer {
     public ItemSlot[] slots {get; private set;} = new ItemSlot[0];
 

@@ -3,11 +3,14 @@ using System;
 
 public class PlayerUpgrades : MonoBehaviour
 {
-    [SerializeField]
     private PlayerUpgradeState levels;
 
     public PlayerUpgrades() {
         levels = RunData.Instance.upgrades;
+    }
+
+    void Awake() {
+        GameSaver.subscribe(levels);
     }
 
     public ref int this[BaseStatKey stat] {
@@ -19,9 +22,9 @@ public class PlayerUpgrades : MonoBehaviour
     }
 }
 
+[Serializable]
 public class PlayerUpgradeState {
-    [SerializeField]
-    private int[] levels;
+    public int[] levels;
 
     public PlayerUpgradeState() {
         levels = new int[Enum.GetValues(typeof(BaseStatKey)).Length];

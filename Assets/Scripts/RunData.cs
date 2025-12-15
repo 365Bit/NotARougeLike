@@ -3,7 +3,6 @@ using System;
 
 // class to store run data, allows defining persistence
 // can be saved to disk entirely (inventory gets reset when starting new run)
-[System.Serializable]
 public class RunData {
     public int level = -1;
     public CurrencyContainer currencies {get; private set;} = new();
