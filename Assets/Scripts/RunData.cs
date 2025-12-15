@@ -19,11 +19,6 @@ public class RunData {
         level += 1;
         currencies[Currency.XP] += 100;
         currencies[Currency.Gold] += 5;
-
-        // for  testing
-        foreach (BaseStatKey key in Enum.GetValues(typeof(BaseStatKey))) {
-            upgrades.Upgrade(key);
-        }
     }
 
     // reset rundata and keep persistent stuff
@@ -41,6 +36,31 @@ public class RunData {
 
         // create new and empty item container
         // here we could define persistence for specific items
+        items.Clear();
+        items.Resize(constants.itemSlots);
+
+        // player upgrades are kept
+
+
+        // add initial items and currencies
+        items.AddItem(defs.GetComponent<ItemDefinitions>()[3], constants.initialAmmo);
+        currencies[Currency.Gold] = constants.initialGold;
+        currencies[Currency.XP] += constants.initialXP;
+    }
+
+    public void NewGame() {
+        Debug.Log("starting new game");
+        GameObject defs = GameObject.Find("Definitions");
+        var constants = defs.GetComponent<Constants>();
+
+        // back to first level
+        level = 0;
+
+        // reset all currencies
+        foreach (Currency c in Enum.GetValues(typeof(Currency)))
+            currencies[c] = 0;
+
+        // clear items
         items.Clear();
         items.Resize(constants.itemSlots);
 
