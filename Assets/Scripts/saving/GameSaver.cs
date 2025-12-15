@@ -13,7 +13,6 @@ class GameSaver
     private static List<(string, WeakReference)> saveables = new List<(string, WeakReference)>();
     private static string saveDirectory;
 
-
     static GameSaver()
     {
         var home = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
@@ -46,7 +45,7 @@ class GameSaver
     {
         if (name == null)
         {
-            name = typeof(T).Name;
+            name = self.GetType().Name;
         }
         saveables.RemoveAll(s => { return !s.Item2.IsAlive; });
         if (saveables.Any(s => { return s.Item1 == name; }))
@@ -54,7 +53,7 @@ class GameSaver
             return;
             throw new DuplicateNameException($"{name} already subscribed for gamesaves");
         }
-        var reference = new WeakReference(self);
+        WeakReference reference = new WeakReference(self);
         saveables.Add((name, reference));
     }
 
@@ -67,7 +66,7 @@ class GameSaver
         Directory.CreateDirectory(saveDirectory);
         using (var file = new Writer(Path.Combine(saveDirectory, "save.json")))
         {
-
+            file.stream.WriteLine($"\"save time\":\"{DateTime.Now.ToString()}\",");
             file.stream.WriteLine("\"data\":{");
             file.indent+=1;
             for (int i = 0; i < saveables.Count; i++)
@@ -79,10 +78,15 @@ class GameSaver
                     saveables.RemoveAt(i--);
                     continue;
                 }
-                file.writeValue(saveable.Item1, saveable.Item2.Target);
+                file.writePair(saveable.Item1, saveable.Item2.Target);
+                file.write<PlayerUpgrades>((PlayerUpgrades)saveable.Item2.Target);
                 if (i < saveables.Count - 1)
                 {
-                    file.stream.Write(",");
+                    file.stream.WriteLine(",");
+                }
+                else
+                {
+                    file.stream.WriteLine();
                 }
             }
             file.indent--;
