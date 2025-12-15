@@ -56,6 +56,7 @@ public class UserInput : MonoBehaviour
         slide = false;
         sneak = false;
         inventory = false;
+        uiSelect = false;
 
         itemID = -1;
 
@@ -118,7 +119,7 @@ public class UserInput : MonoBehaviour
         bool startButton = gamepad.startButton.isPressed;
 
         // Movement
-        direction = gamepad.leftStick.ReadValue();
+        direction += gamepad.leftStick.ReadValue();
 
         // Camera
         rotation += gamepad.rightStick.ReadValue() * Time.deltaTime * stickSensitivity;
@@ -163,8 +164,8 @@ public class UserInput : MonoBehaviour
             itemID = 3;
         }
 
-        uiSelect  = gamepad.aButton.wasPressedThisFrame;
-        inventory = gamepad.yButton.wasPressedThisFrame;
+        uiSelect  |= gamepad.aButton.wasPressedThisFrame;
+        inventory |= gamepad.yButton.wasPressedThisFrame;
     }
 
     void KeyboardInput()
@@ -239,8 +240,8 @@ public class UserInput : MonoBehaviour
             uiDirection.y += 1;
         }
 
-        uiSelect  = keyboard.spaceKey.wasPressedThisFrame;
-        inventory = keyboard.eKey.wasPressedThisFrame;
+        uiSelect  |= keyboard.spaceKey.wasPressedThisFrame;
+        inventory |= keyboard.eKey.wasPressedThisFrame;
     }
 
     void MouseInput()
