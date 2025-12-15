@@ -324,7 +324,7 @@ public class Player : MonoBehaviour
     public bool RaycastInteractible(out RaycastHit hit) {
         Vector3 position = cameraTransform.position + cameraTransform.forward * 0.1f;
         Debug.DrawRay(position, cameraTransform.forward, Color.white, 1.0f);
-        var interactionDistance = 10f;
+        float interactionDistance = 10f;
         return Physics.Raycast(position, cameraTransform.forward, out hit, interactionDistance, ~LayerMask.GetMask("Player"));
     }
 
@@ -552,10 +552,10 @@ public class Player : MonoBehaviour
 
     public void UseItem(int itemID)
     {
-        var inv = GetComponent<Inventory>().container;
-        var slot = inv[itemID];
-        var item = slot.storedItem;
-        var count = slot.count;
+        ItemContainer inv = GetComponent<Inventory>().container;
+        ItemSlot slot = inv[itemID];
+        ItemDefinition item = slot.storedItem;
+        int count = slot.count;
 
         if (item == null) return;
 
