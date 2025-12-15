@@ -5,6 +5,7 @@ public class UserInput : MonoBehaviour
 {
     private Player player;
     private UIManager uiController;
+    private InventoryUI inventoryUI;
 
     private Vector2 direction;
     private Vector2 rotation;
@@ -35,6 +36,7 @@ public class UserInput : MonoBehaviour
     {
         player = GameObject.Find("Player").GetComponent<Player>();
         uiController = GetComponent<UIManager>();
+        inventoryUI = uiController.inventoryUI.GetComponent<InventoryUI>();
 
         rotation = Vector2.zero;
 
@@ -92,12 +94,11 @@ public class UserInput : MonoBehaviour
 
         // control inventory ui
         if (uiController.inventoryOpen) {
-            var inv = uiController.inventoryUI.GetComponent<InventoryUI>();
             if (uiDirection != Vector2.zero)
-                inv.MoveSelection(uiDirection);
+                inventoryUI.MoveSelection(uiDirection);
             
             if (uiSelect)
-                inv.ToggleItemGrabbed();
+                inventoryUI.ToggleItemGrabbed();
         }
 
         // toggle inventory
