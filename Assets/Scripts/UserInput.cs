@@ -283,6 +283,17 @@ public class UserInput : MonoBehaviour
         }
 
 
+        //For testing save/load
+        if (keyboard.f5Key.wasPressedThisFrame)
+        {
+            GameSaver.save();
+        }
+        if(keyboard.f8Key.wasPressedThisFrame)
+        {
+            GameSaver.load();
+        }
+
+
         // ui
         if (keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame)
         {
