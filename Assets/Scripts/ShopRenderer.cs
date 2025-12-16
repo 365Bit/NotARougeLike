@@ -5,68 +5,55 @@ using TMPro;
 
 public class ShopRenderer : MonoBehaviour
 {
-    [System.Serializable]
-    public struct ItemSlotConfig {
-        public Vector3 position;
-    }
-
-    [Header("General")]
-    public ItemDefinitions itemDefinitions;
-
-    [Header("Item Slots")]
-    public int numItemSlots;
     private ItemContainer items;
 
-
     [Header("Rendering")]
-    public ItemSlotConfig[] slotProperties;
+    private Transform[] slotTransforms;
     public GameObject itemSlotPrefab;
     // where to instantiate item slots
     public Transform slotDisplayParent;
-    public Vector3 itemScale;
-
-
-    public void Awake() {
-        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
-
-        items = new();
-        items.Resize(numItemSlots);
-    }
 
     public void ShowItems() {
-        foreach(Transform child in slotDisplayParent) {
-            Destroy(child);
+        // get transforms from children
+        if (slotTransforms == null) {
+            slotTransforms = new Transform[slotDisplayParent.childCount];
+
+            // 
+            for (int i = 0; i < slotDisplayParent.childCount; i++) {
+                slotTransforms[i] = slotDisplayParent.GetChild(i);
+            }
         }
 
-        foreach(var (slot, slotDisplay) in items.slots.Zip(slotProperties, (a,b)=>(a,b))) {
-            if (slot.storedItem == null) {
+        // destroy old slots
+        foreach(Transform child in slotDisplayParent) {
+            Destroy(child.gameObject);
+        }
+
+        // create new slots
+        foreach(var (slot, slotTransform) in items.slots.Zip(slotTransforms, (a,b)=>(a,b))) {
+            if (slot.storedItem == null || slot.count == 0) {
                 // no item
             } else {
                 Transform slotInstance = Instantiate(itemSlotPrefab, slotDisplayParent).transform;
-                slotInstance.localPosition = slotDisplay.position;
+                slotInstance.localPosition = slotTransform.localPosition;
+                slotInstance.localRotation = slotTransform.localRotation;
+                slotInstance.localScale = slotTransform.localScale;
                 slotInstance.GetComponent<ShopItemSlot>().SetItem(slot.storedItem, slot.count);
             }
         }
     }
 
-    // TODO: extract to dungeon creator
-    public void AddRandomItems() {
-        foreach (ItemSlot slot in items.slots) {
-            slot.storedItem = null;
-
-            // select random definition
-            float random = UnityEngine.Random.Range(0f,1f);
-            foreach (ItemDefinition def in itemDefinitions.definitions) {
-                if (random <= def.shopProbability) {
-                    slot.storedItem = def;
-                    slot.count = 1;
-                    break;
-                }
-                random -= def.shopProbability;
-            }
-        }
-
+    public void SetItems(ItemContainer items) {
+        this.items = items;
+        if (slotDisplayParent.childCount < items.slots.Length)
+            this.items.Resize(slotDisplayParent.childCount);
         ShowItems();
     }
 
+    public void RemoveItem(int slot) {
+        if (items == null) return;
+
+        items.ConsumeItem(slot);
+        ShowItems();
+    }
 }
