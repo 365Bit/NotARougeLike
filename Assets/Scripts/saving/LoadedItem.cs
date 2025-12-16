@@ -38,7 +38,7 @@ class LoadedItem
         return rawData!=null;
     }
 
-    string dataToString()
+    public override string ToString()
     {
         if(isDict())
             return dict.ToString();
@@ -53,7 +53,7 @@ class LoadedItem
         get
         {
             if(!isList())
-                throw new LoadException($"{dataToString()} is not a List");
+                throw new LoadException($"{ToString()} is not a List");
             return list[key];
         }
     }
@@ -64,13 +64,13 @@ class LoadedItem
         get
         {
             if(!isDict())
-                throw new LoadException($"{dataToString()} is not a Dictionary");
+                throw new LoadException($"{ToString()} is not a Dictionary");
             return dict[key];
         }
     }
 
     T convertTo<T>()
     {
-        throw new LoadException($"cannot convert {dataToString()} to type {typeof(T).Name}");
+        throw new LoadException($"cannot convert {ToString()} to type {typeof(T).Name}");
     }
 }
