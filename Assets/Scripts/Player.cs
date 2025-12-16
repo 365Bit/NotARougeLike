@@ -41,9 +41,6 @@ public class Player : MonoBehaviour
     private Vector3 scale;
 
     private float currentFOV;
-    private float currentHealth;
-    private float currentMana;
-    private float currentStamina;
 
     private float defaultYScale;
     private float fireCooldown;
@@ -71,6 +68,7 @@ public class Player : MonoBehaviour
     public Weapon weapon;
 
     private Inventory inventory;
+    private Constitution constitution;
     private ItemDefinitions itemDefinitions;
     private PlayerStats stats;
 
@@ -80,6 +78,7 @@ public class Player : MonoBehaviour
     {
         stats = GetComponent<PlayerStats>();
         inventory = GetComponent<Inventory>();
+        constitution = GetComponent<Constitution>();
         itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
 
         GameObject mainCamera = GameObject.Find("Main Camera");
@@ -99,10 +98,6 @@ public class Player : MonoBehaviour
         attackType = AttackType.Shoot;
         hitState = HitState.Idle;
 
-        currentHealth = stats.maxHealth;
-        currentMana = stats.maxMana;
-        currentStamina = stats.maxStamina;
-
         fireCooldown = 0.0f;
         hitCooldown = 0.0f;
         hitTime = 0.0f;
@@ -114,8 +109,11 @@ public class Player : MonoBehaviour
 
         weapon.gameObject.SetActive(false);
 
-        if (!RunData.Instance.Initialized)
+        if (!RunData.Instance.Initialized) {
             RunData.Instance.NewRun();
+        } else {
+            attackType = RunData.Instance.selectedAttack;
+        }
     }
 
     // Update is called once per frame
@@ -223,9 +221,10 @@ public class Player : MonoBehaviour
         if (characterController.enabled)
             characterController.Move(motion * Time.deltaTime);
 
-        RegenerateHealth();
-        RegenerateMana();
-        RegenrerateStamina();
+        constitution.RegenerateHealth();
+        constitution.RegenerateMana();
+        bool idle = motion.x >= -0.1f && motion.x <= 0.1f && motion.y >= -0.1f && motion.y <= 0.1f && motion.z >= -0.1f && motion.z <= 0.1f;
+        constitution.RegenerateStamina(idle);
     }
 
     public void Aim(bool value)
@@ -269,6 +268,8 @@ public class Player : MonoBehaviour
         {
             attackType = AttackType.Hit;
         }
+
+        RunData.Instance.selectedAttack = attackType;
     }
 
     private void Die()
@@ -283,24 +284,21 @@ public class Player : MonoBehaviour
     {
         isDead = false;
         characterController.enabled = true;
-        currentHealth = stats.maxHealth;
-        currentMana = stats.maxMana;
-        currentStamina = stats.maxStamina;
     }
 
     public float GetHealth()
     {
-        return currentHealth;
+        return constitution.Health;
     }
 
     public float GetMana()
     {
-        return currentMana;
+        return constitution.Mana;
     }
 
     public float GetStamina()
     {
-        return currentStamina;
+        return constitution.Stamina;
     }
 
     void Hit()
@@ -385,9 +383,9 @@ public class Player : MonoBehaviour
 
     public void Jump()
     {
-        if (grounded && currentStamina >= stats.jumpConsRate)
+        if (grounded && constitution.Stamina >= stats.jumpConsRate)
         {
-            currentStamina -= stats.jumpConsRate;
+            constitution.Stamina -= stats.jumpConsRate;
             motion.y = Mathf.Sqrt(stats.jumpHeight * -2f * gravity);
         }
     }
@@ -399,9 +397,9 @@ public class Player : MonoBehaviour
 
         float speed = stats.walkSpeed;
 
-        if (run && currentStamina >= stats.runConsRate)
+        if (run && constitution.Stamina >= stats.runConsRate)
         {
-            currentStamina -= stats.runConsRate * Time.deltaTime;
+            constitution.Stamina -= stats.runConsRate * Time.deltaTime;
             speed = stats.runSpeed;
         }
         else if (sneak)
@@ -437,43 +435,6 @@ public class Player : MonoBehaviour
                 Quaternion.Euler(0.0f, 0.0f, 0.0f), ratio);
             rightShoulderTransform.localRotation = Quaternion.Slerp(rightShoulderTransform.localRotation,
                 Quaternion.Euler(0.0f, 0.0f, 0.0f), ratio);
-        }
-    }
-
-    void RegenerateHealth()
-    {
-        if (currentHealth < stats.maxHealth)
-        {
-            float health = currentHealth + stats.healthRegRate * Time.deltaTime;
-            currentHealth = Mathf.Min(health, stats.maxHealth);
-        }
-    }
-
-    void RegenerateMana()
-    {
-        if (currentMana < stats.maxMana)
-        {
-            float mana = currentMana + stats.manaRegRate * Time.deltaTime;
-            currentMana = Mathf.Min(mana, stats.maxMana);
-        }
-    }
-
-    void RegenrerateStamina()
-    {
-        if (currentStamina < stats.maxStamina)
-        {
-            float rate = stats.staminaRegRate;
-
-            if (motion.x >= -0.1f && motion.x <= 0.1f &&
-                motion.y >= -0.1f && motion.y <= 0.1f &&
-                motion.z >= -0.1f && motion.z <= 0.1f)
-            {
-                // Increase regeneration rate when idle
-                rate *= 1.5f;
-            }
-
-            float stamina = currentStamina + rate * Time.deltaTime;
-            currentStamina = Mathf.Min(stamina, stats.maxStamina);
         }
     }
 
@@ -525,10 +486,10 @@ public class Player : MonoBehaviour
 
     public void Slide(bool value)
     {
-        if (value && currentStamina >= stats.slideConsRate &&
+        if (value && constitution.Stamina >= stats.slideConsRate &&
             grounded && !slide && slideCooldown == 0.0f)
         {
-            currentStamina -= stats.slideConsRate;
+            constitution.Stamina -= stats.slideConsRate;
 
             slide = true;
             slideTime = stats.maxSlideTime;
@@ -562,16 +523,16 @@ public class Player : MonoBehaviour
         switch (item.name)
         {
             case "health_fruit": // Health Fruit
-                currentHealth += 30.0f;
-                currentHealth = Mathf.Clamp(currentHealth, 0.0f, stats.maxHealth);
+                constitution.Health += 30.0f;
+                constitution.Health = Mathf.Clamp(constitution.Health, 0.0f, stats.maxHealth);
                 break;
             case "mana_fruit": // Mana Fruit
-                currentMana += 10.0f;
-                currentMana = Mathf.Clamp(currentMana, 0.0f, stats.maxMana);
+                constitution.Mana += 10.0f;
+                constitution.Mana = Mathf.Clamp(constitution.Mana, 0.0f, stats.maxMana);
                 break;
             case "stamina_fruit": // Stamina Fruit
-                currentStamina += 20.0f;
-                currentStamina = Mathf.Clamp(currentStamina, 0.0f, stats.maxStamina);
+                constitution.Stamina += 20.0f;
+                constitution.Stamina = Mathf.Clamp(constitution.Stamina, 0.0f, stats.maxStamina);
                 break;
             default:
                 break;
@@ -582,11 +543,10 @@ public class Player : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        currentHealth -= damage;
+        constitution.TakeDamage(damage);
 
-        if (currentHealth <= 0.0f)
+        if (constitution.Health <= 0.0f)
         {
-            currentHealth = 0.0f;
             Die();
         }
     }
