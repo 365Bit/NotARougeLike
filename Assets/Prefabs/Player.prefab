@@ -151,14 +151,13 @@ GameObject:
   - component: {fileID: 3514569408268076930}
   - component: {fileID: 5408861311225402296}
   - component: {fileID: 335269052502208620}
-  - component: {fileID: 62203805369549304}
   - component: {fileID: 3948242591594315538}
   - component: {fileID: 8439484915624340096}
   - component: {fileID: 1939592861400707939}
   - component: {fileID: 1195309795827131598}
   m_Layer: 6
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -172,7 +171,7 @@ Transform:
   m_GameObject: {fileID: 309834695554700441}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 92, y: 2, z: 3}
+  m_LocalPosition: {x: 59, y: 2, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -313,19 +312,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &62203805369549304
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 309834695554700441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c14fd3552390f8459b3ab55ffa9158f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mouseSensitivity: 0.1
 --- !u!114 &3948242591594315538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -344,6 +330,7 @@ MonoBehaviour:
   projectiles:
   - {fileID: 7974811766441290857, guid: 60e49ade76f5c004293e0e18fd49dbb0, type: 3}
   weapon: {fileID: 5109643459192554882}
+  isDead: 0
 --- !u!114 &8439484915624340096
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -356,7 +343,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7b0b0bd39727be73b5d90365994a0b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
-  numItemSlots: 4
+  numHotbarSlots: 4
+  numItemSlots: 12
+  numCurrencySlots: 1
 --- !u!114 &1939592861400707939
 MonoBehaviour:
   m_ObjectHideFlags: 0

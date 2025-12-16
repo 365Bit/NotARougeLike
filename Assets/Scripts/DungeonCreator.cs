@@ -24,13 +24,17 @@ public class DungeonCreator : MonoBehaviour
     public float roomTopCornerMidifier;
     [Range(0, 2)]
     public int roomOffset;
-    public GameObject wallPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab;
+    public GameObject wallPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab, navPointPrefab;
+    public GameObject trapDoorPrefab;
     List<Vector3Int> possibleDoorVerticalPosition;
     List<Vector3Int> possibleDoorHorizontalPosition;
     List<Vector3Int> possibleWallHorizontalPosition;
     List<Vector3Int> possibleWallVerticalPosition;
 
     ItemDefinitions itemDefinitions;
+
+    [Header("User Interfaces")]
+    public GameObject canvas;
 
     // Start is called before the first frame update
     void Start()
@@ -40,8 +44,6 @@ public class DungeonCreator : MonoBehaviour
         navMeshSurface = GetComponent<NavMeshSurface>();
 
         CreateDungeon();
-
-        navMeshSurface.BuildNavMesh();
     }
 
     public void CreateDungeon()
@@ -62,6 +64,7 @@ public class DungeonCreator : MonoBehaviour
         possibleWallHorizontalPosition = new List<Vector3Int>();
         possibleWallVerticalPosition = new List<Vector3Int>();
         CreatePlayer(listOfRooms);
+        CreateTrapDoor(listOfRooms);
         for (int i = 0; i < listOfRooms.Count; i++)
         {
             CreateMesh(listOfRooms[i].BottomLeftAreaCorner, listOfRooms[i].TopRightAreaCorner);
@@ -69,7 +72,10 @@ public class DungeonCreator : MonoBehaviour
         CreateWalls(wallParent);
         CreateLoot(listOfRooms);
         CreateEnemy(listOfRooms);
+        CreateNavPoint(listOfRooms);
         CreateShop(listOfRooms);
+
+        navMeshSurface.BuildNavMesh();
     }
 
     private void CreatePlayer(List<Node> listOfRooms)
@@ -87,7 +93,40 @@ public class DungeonCreator : MonoBehaviour
                 playerPosX,
                 2,
                 playerPosY);
-        playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        //playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        //GameObject player = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        Player player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        player.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
+        player.name = "Player";
+        player.StartGame();
+
+        canvas.SetActive(true);
+    }
+
+    // places the trapdoor in the room the furthest away from player
+    private void CreateTrapDoor(List<Node> listOfRooms) {
+        Transform player = GameObject.FindGameObjectWithTag("Player").transform;
+
+        float maxDist = 0f;
+        Node selectedRoom = null;
+        foreach (var room in listOfRooms) {
+            if (room.Type != "room") continue;
+
+            Vector3 currentPos = new Vector3(  (room.BottomLeftAreaCorner.x + room.BottomRightAreaCorner.x) / 2,
+                                        0,
+                                        (room.BottomLeftAreaCorner.y + room.TopLeftAreaCorner.y) / 2);
+            float dist = (player.position - currentPos).magnitude;
+            if (dist > maxDist) {
+                maxDist = dist;
+                selectedRoom = room;
+            }
+        }
+
+        // place in center of the selected room
+        Vector3 pos = new Vector3(  (selectedRoom.BottomLeftAreaCorner.x + selectedRoom.BottomRightAreaCorner.x) / 2,
+                                    0,
+                                    (selectedRoom.BottomLeftAreaCorner.y + selectedRoom.TopLeftAreaCorner.y) / 2);
+        Instantiate(trapDoorPrefab, pos, Quaternion.identity);
     }
 
     private void CreateEnemy(List<Node> listOfRooms)
@@ -104,8 +143,55 @@ public class DungeonCreator : MonoBehaviour
                     enemyPosY);
                 if(UnityEngine.Random.Range(0f,1f) > 0.3)
                 {
-                    Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
+                    GameObject foe = Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
+                    Opponent opponent = foe.GetComponent<Opponent>();
+                    opponent.spawnRoom = room;
                 }   
+            }
+        }
+    }
+
+    private void CreateNavPoint(List<Node> listOfRooms)
+    {
+        foreach( var room in listOfRooms)
+        {
+            if (room.Type == "room")
+            {
+                int navPointX = room.BottomLeftAreaCorner.x + 5;
+                int navPointY = room.BottomLeftAreaCorner.y + 5;
+                Vector3 navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+
+                navPointX = room.TopLeftAreaCorner.x + 5;
+                navPointY = room.TopLeftAreaCorner.y - 5;
+                navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+
+                navPointX = room.TopRightAreaCorner.x - 5;
+                navPointY = room.TopRightAreaCorner.y - 5;
+                navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+
+                navPointX = room.BottomRightAreaCorner.x - 5;
+                navPointY = room.BottomRightAreaCorner.y + 5;
+                navPointPos = new Vector3(
+                    navPointX,
+                    0.5f,
+                    navPointY);
+
+                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
             }
         }
     }
@@ -154,13 +240,32 @@ public class DungeonCreator : MonoBehaviour
                 int shopY = (room.BottomLeftAreaCorner.y + 1 + room.TopLeftAreaCorner.y) / 2;
                 Vector3 shopPos = new Vector3(
                     shopX,
-                    0.35f,
+                    0,
                     shopY);
                 if(UnityEngine.Random.Range(0f,1f) < shopProb)
                 {
-                    var shop = Instantiate(shopPrefab, shopPos, Quaternion.identity);
-                    // TODO
-                    shop.GetComponent<ShopRenderer>().AddRandomItems();
+                    GameObject shop = Instantiate(shopPrefab, shopPos, Quaternion.identity);
+
+                    // compute random inventory of shop
+                    ItemContainer items = new();
+                    items.Resize(3);
+
+                    foreach (ItemSlot slot in items.slots) {
+                        slot.storedItem = null;
+
+                        // select random definition
+                        float random = UnityEngine.Random.Range(0f,1f);
+                        foreach (ItemDefinition def in itemDefinitions.definitions) {
+                            if (random <= def.shopProbability) {
+                                slot.storedItem = def;
+                                slot.count = 1;
+                                break;
+                            }
+                            random -= def.shopProbability;
+                        }
+                    }
+
+                    shop.GetComponent<ShopRenderer>().SetItems(items);
                 }   
             }
         }
