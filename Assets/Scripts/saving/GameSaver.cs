@@ -135,8 +135,6 @@ class GameSaver
             }
         }
 
-            toSave.Add("save time", DateTime.Now.ToString());
-
         Debug.Log("finish loading");
 
     }
