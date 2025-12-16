@@ -78,6 +78,25 @@ class GameSaver
             Debug.Log("finish saving");
         }
     }
+
+    public static void load()
+    {
+        Debug.Log("start loading");
+        Directory.CreateDirectory(saveDirectory);
+        {
+            Dictionary<string, System.Object> toSave = new Dictionary<string, System.Object>();
+
+            toSave.Add("save time", DateTime.Now.ToString());
+
+            saveables.RemoveAll(s => !s.Item2.IsAlive);
+            toSave.Add("data", (Dictionary<string, System.Object>)saveables.ToDictionary(s => s.Item1, s => s.Item2.Target));
+
+            Writer.write(Path.Combine(saveDirectory, "save.json"), toSave);
+
+            Debug.Log("finish loading");
+        }
+    }
+
 }
 
 interface ISaveable
