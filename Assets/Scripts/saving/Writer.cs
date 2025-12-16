@@ -34,8 +34,10 @@ class Writer : IDisposable
 
     public static void write(string path, Dictionary<string, System.Object> data)
     {
-        Writer writer = new Writer(path);
-        writer.write(data);
+        using (Writer writer = new Writer(path))
+        {
+            writer.write(data);
+        }
     }
 
     void write(System.Object data)
