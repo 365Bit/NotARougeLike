@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 class Loader
@@ -17,7 +18,7 @@ class Loader
     {
         var content = new StringBuilder((int)new FileInfo(path).Length);
         reader = new StreamReader(path);
-        for (var read = reader.Read(); read >= 0;)
+        for (int read =' '; (read=reader.Read()) >= 0;)
         {
             char c = (char)read;
             if (c == ' ' || c == '\t' || c =='\r' || c=='\n')
@@ -32,17 +33,17 @@ class Loader
 
     private LoadedItem load(string data)
     {
-        if (data[0] == '{' && data[-1] == '}')
+        if (data.First() == '{' && data.Last() == '}')
         {
             var dict = new Dictionary<string, LoadedItem>();
-            foreach (var line in data.Substring(1, data.Length - 2).Split(','))
+            foreach (var line in data.Substring(1, data.Length - 1).Split(','))
             {
-                var item = line.Split(':');
-                dict.Add(item[0], load(item[1]));
+                var item = splitTuple(line);
+                dict.Add(item.Item1,load(item.Item2));
             }
             return new LoadedItem(dict);
         }
-        else if (data[0] == '[' && data[-1] == ']')
+        else if (data.First() == '[' && data.Last() == ']')
         {
             var list = new List<LoadedItem>();
             foreach (var item in data.Substring(1, data.Length - 2).Split(','))
@@ -58,6 +59,22 @@ class Loader
         {
             throw new LoadException("could not deserialize:\n" + data);
         }
+    }
+
+    private Tuple<string,string> splitTuple(string tuple)
+    {
+        bool inString=false;
+        for(int i = 0; i < tuple.Length; i++)
+        {
+            if (tuple[i] == '"' && tuple.ElementAtOrDefault(i - 1) != '\\')
+            {
+                inString=!inString;
+            }else if (!inString && tuple[i] == ':')
+            {
+                return new Tuple<string, string>(tuple.Substring(0,i),tuple.Substring(i+1));
+            }
+        }
+        throw new LoadException($"The string\"{tuple}\" cannot be loaded as a tuple. No colon was found");
     }
 
 }
@@ -124,7 +141,7 @@ class LoadedItem
     {
         get
         {
-            if(!isList())
+            if(!isDict())
                 throw new LoadException($"{dataToString()} is not a Dictionary");
             return dict[key];
         }
