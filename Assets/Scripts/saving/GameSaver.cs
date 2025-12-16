@@ -91,7 +91,7 @@ class GameSaver
         {
             var loader = new Loader(loadPath);
             cleanUpSubscriptions();
-            Debug.Log($"found same from {loader.loaded["save time"]}");
+            Debug.Log($"found save from {loader.loaded["save time"]}");
         }
 
 
