@@ -240,13 +240,32 @@ public class DungeonCreator : MonoBehaviour
                 int shopY = (room.BottomLeftAreaCorner.y + 1 + room.TopLeftAreaCorner.y) / 2;
                 Vector3 shopPos = new Vector3(
                     shopX,
-                    0.35f,
+                    0,
                     shopY);
                 if(UnityEngine.Random.Range(0f,1f) < shopProb)
                 {
-                    var shop = Instantiate(shopPrefab, shopPos, Quaternion.identity);
-                    // TODO
-                    shop.GetComponent<ShopRenderer>().AddRandomItems();
+                    GameObject shop = Instantiate(shopPrefab, shopPos, Quaternion.identity);
+
+                    // compute random inventory of shop
+                    ItemContainer items = new();
+                    items.Resize(3);
+
+                    foreach (ItemSlot slot in items.slots) {
+                        slot.storedItem = null;
+
+                        // select random definition
+                        float random = UnityEngine.Random.Range(0f,1f);
+                        foreach (ItemDefinition def in itemDefinitions.definitions) {
+                            if (random <= def.shopProbability) {
+                                slot.storedItem = def;
+                                slot.count = 1;
+                                break;
+                            }
+                            random -= def.shopProbability;
+                        }
+                    }
+
+                    shop.GetComponent<ShopRenderer>().SetItems(items);
                 }   
             }
         }

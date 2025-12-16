@@ -334,7 +334,7 @@ public class Player : MonoBehaviour
             if (inventory.currency[Currency.Gold] < slot.item.cost) return false;
             inventory.currency[Currency.Gold] -= slot.item.cost;
             inventory.container.AddItem(slot.item, slot.count);
-            slot.Disable();
+            slot.shop.RemoveItem(slot.Index);
             return true;
         } else if (transform.gameObject.TryGetComponent<DroppedItem>(out DroppedItem item)) {
             inventory.container.AddItem(item.item, item.count);
