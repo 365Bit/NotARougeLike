@@ -13,9 +13,12 @@ public class ShopItemSlot : MonoBehaviour
 
     public TMP_Text costText;
 
-    public void SetItem(ItemDefinition item, int count) {
-        this.count = count;
-        this.item = item;
+    public void Init(ShopRenderer renderer, int slot) {
+        Index = slot;
+        shop = renderer;
+        ItemContainer itemContainer = renderer.Items;
+        count = itemContainer[slot].count;
+        item = itemContainer[slot].storedItem;
 
         Transform instance = Instantiate(item.itemModel, transform).transform;
         instance.localPosition = modelPosition;
@@ -24,12 +27,8 @@ public class ShopItemSlot : MonoBehaviour
         costText.text = item.cost.ToString();
     }
 
-    public void Disable() {
-        count--;
-        if (count == 0)
-            Destroy(gameObject); //suicide this gameobject
-    }
-
+    public ShopRenderer shop;
+    public int Index;
     public int Cost { get => item.cost; }
     public int Count { get => count; }
     public string ItemName { get => item.name; }

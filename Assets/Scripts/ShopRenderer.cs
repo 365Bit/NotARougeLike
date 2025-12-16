@@ -5,22 +5,30 @@ using TMPro;
 
 public class ShopRenderer : MonoBehaviour
 {
-    private ItemContainer items;
+    public ItemContainer Items;
 
     [Header("Rendering")]
-    private Transform[] slotTransforms;
+    private TransformData[] slotTransforms;
     public GameObject itemSlotPrefab;
-    // where to instantiate item slots
+    // how to instantiate item slots
+    struct TransformData {
+        public Vector3 localPosition;
+        public Quaternion localRotation;
+        public Vector3 localScale;
+    }
     public Transform slotDisplayParent;
 
     public void ShowItems() {
         // get transforms from children
         if (slotTransforms == null) {
-            slotTransforms = new Transform[slotDisplayParent.childCount];
+            slotTransforms = new TransformData[slotDisplayParent.childCount];
 
             // 
             for (int i = 0; i < slotDisplayParent.childCount; i++) {
-                slotTransforms[i] = slotDisplayParent.GetChild(i);
+                Transform t = slotDisplayParent.GetChild(i);
+                slotTransforms[i].localPosition = t.localPosition;
+                slotTransforms[i].localRotation = t.localRotation;
+                slotTransforms[i].localScale = t.localScale;
             }
         }
 
@@ -30,7 +38,10 @@ public class ShopRenderer : MonoBehaviour
         }
 
         // create new slots
-        foreach(var (slot, slotTransform) in items.slots.Zip(slotTransforms, (a,b)=>(a,b))) {
+        for (int slotIndex = 0; slotIndex < Items.slots.Length && slotIndex < slotTransforms.Length; slotIndex++) {
+            ItemSlot slot = Items[slotIndex];
+            TransformData slotTransform = slotTransforms[slotIndex];
+
             if (slot.storedItem == null || slot.count == 0) {
                 // no item
             } else {
@@ -38,22 +49,20 @@ public class ShopRenderer : MonoBehaviour
                 slotInstance.localPosition = slotTransform.localPosition;
                 slotInstance.localRotation = slotTransform.localRotation;
                 slotInstance.localScale = slotTransform.localScale;
-                slotInstance.GetComponent<ShopItemSlot>().SetItem(slot.storedItem, slot.count);
+                slotInstance.GetComponent<ShopItemSlot>().Init(this, slotIndex);
             }
         }
     }
 
     public void SetItems(ItemContainer items) {
-        this.items = items;
-        if (slotDisplayParent.childCount < items.slots.Length)
-            this.items.Resize(slotDisplayParent.childCount);
+        this.Items = items;
         ShowItems();
     }
 
     public void RemoveItem(int slot) {
-        if (items == null) return;
+        if (Items == null) return;
 
-        items.ConsumeItem(slot);
+        Items.ConsumeItem(slot);
         ShowItems();
     }
 }
