@@ -16,7 +16,6 @@ public class PlayerUpgrades : MonoBehaviour,ISaveable
         foreach (BaseStatKey key in Enum.GetValues(typeof(BaseStatKey))) {
             levels[(int)key] = 0;
         }
-        GameSaver.save();
     }
 
     public int this[BaseStatKey stat] {

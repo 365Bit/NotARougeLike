@@ -182,6 +182,17 @@ public class UserInput : MonoBehaviour
         {
             itemID = 3;
         }
+
+
+        //For testing save/load
+        if (keyboard.f5Key.wasPressedThisFrame)
+        {
+            GameSaver.save();
+        }
+        if(keyboard.f8Key.wasPressedThisFrame)
+        {
+            GameSaver.load();
+        }
     }
 
     void MouseInput()
