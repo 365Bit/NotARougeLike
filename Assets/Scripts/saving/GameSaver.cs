@@ -65,46 +65,24 @@ class GameSaver
     {
         Debug.Log("start saving");
         Directory.CreateDirectory(saveDirectory);
-        using (var file = new Writer(Path.Combine(saveDirectory, "save.json")))
         {
-            file.stream.WriteLine($"\"save time\":\"{DateTime.Now.ToString()}\",");
-            file.stream.WriteLine("\"data\":{");
-            file.indent+=1;
-            for (int i = 0; i < saveables.Count; i++)
-            {
-                var saveable = saveables[i];
-                //remove everyone that was subscribed but has been deleted since
-                if (!saveable.Item2.IsAlive)
-                {
-                    saveables.RemoveAt(i--);
-                    continue;
-                }
-                file.writePair(saveable.Item1, saveable.Item2.Target);
-                file.write<PlayerUpgrades>((PlayerUpgrades)saveable.Item2.Target);
-                if (i < saveables.Count - 1)
-                {
-                    file.stream.WriteLine(",");
-                }
-                else
-                {
-                    file.stream.WriteLine();
-                }
-            }
-            file.indent--;
-            file.stream.WriteLine("}");
+            Dictionary<string, System.Object> toSave = new Dictionary<string, System.Object>();
+
+            toSave.Add("save time", DateTime.Now.ToString());
+
+            saveables.RemoveAll(s => !s.Item2.IsAlive);
+            toSave.Add("data", (Dictionary<string, System.Object>)saveables.ToDictionary(s => s.Item1, s => s.Item2.Target));
+
+            Writer.write(Path.Combine(saveDirectory, "save.json"), toSave);
+
+            Debug.Log("finish saving");
         }
-        Debug.Log("finish saving");
     }
-
-
-
-
-
 }
 
 interface ISaveable
 {
-    
+
 }
 
 class SaveAble : Attribute

@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,63 +9,106 @@ using Unity.VisualScripting;
 
 class Writer : IDisposable
 {
-    public StreamWriter stream
-    {
-        private set;
-        get;
-    }
+    private StreamWriter stream;
     bool disposed = false;
     public int indent = 0;
 
-    public Writer(string path)
+    private Writer(string path)
     {
-        File.Open(path,FileMode.Truncate).Close();
+        File.Open(path, FileMode.Truncate).Close();
         stream = new StreamWriter(path, false);
-        stream.WriteLine("{");
     }
 
-    public void writePair<T>(string name, T value)
+    void writePair(string name, System.Object value)
     {
         stream.Write(new string('\t', indent));
         stream.Write($"\"{name}\":");
-        write<T>(value);
-    }
-    public void writePair(string name)
-    {
-        stream.Write(new string('\n', indent));
-        stream.Write($"\"{name}\":null");
+        write(value);
     }
 
-    
-    public void write<T>(T data)
+
+    public static void write(string path,Dictionary<string,System.Object> data)
+    {
+        Writer writer = new Writer(path);
+        writer.write(data);
+    }
+
+    void write(System.Object data)
     {
         var type = data.GetType();
-        if (type.GetInterfaces().Contains(typeof(ISaveable)))
+        if (data == null)
         {
-            
+            stream.Write("null");
         }
-        stream.Write($"\"#Not Implemented data Type {typeof(T).Name}#\"");
+        else if (data is string str)
+        {
+            stream.Write($"\"{str}\"");
+        }
+        else if (data is bool value)
+        {
+            stream.Write('"');
+            if (value)
+                stream.Write("true");
+            else
+                stream.Write("false");
+            stream.Write('"');
+        }
+        else if (data is IConvertible num)
+        {
+            stream.Write($"\"{num.ToString()}\"");
+        }
+        else if(data is System.Collections.Generic.Dictionary<string, Object> dict)
+        {
+            writeDict(dict);
+        }
+        else if (data is System.Collections.IEnumerable list)
+        {
+            writeList(list);
+        }
+        else if (getSaveableMemebrs(data).Count() > 0)
+        {
+            writeObject(data);
+        }
+        else
+        {
+            stream.Write($"\"#Not Implemented data Type {data.GetType().Name}#\"");
+        }
     }
 
     private IEnumerable<MemberInfo> getSaveableMemebrs(Object obj)
     {
         return obj.GetType().GetMembers(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).Where(
-            m=>m.GetCustomAttributes(typeof(SaveAble)).Any()
+            m => m.GetCustomAttributes(typeof(SaveAble)).Any()
         );
     }
 
-    public void writeObject<T>(T obj)where T:ISaveable
+    void writeObject(Object obj)
+    {
+        writeDict((System.Collections.Generic.Dictionary<string, Object>)getSaveableMemebrs(obj).ToDictionary(m => m.Name, m =>
+        {
+            if (m.MemberType == MemberTypes.Field)
+            {
+                return ((FieldInfo)m).GetValue(obj);
+            }
+            else if (m.MemberType == MemberTypes.Property)
+            {
+                return ((PropertyInfo)m).GetValue(obj);
+            }
+            else
+            {
+                throw new UnsavableException($"Only Fields and Properties are sAveable, not {m.MemberType}");
+            }
+        }));
+    }
+
+    void writeDict(Dictionary<string, Object> dict)
     {
         stream.WriteLine("{");
         indent++;
         bool first = true;
-        var type=obj.GetType();
-        foreach ()
+        var type = dict.GetType();
+        foreach (var item in dict)
         {
-            if (!member.GetCustomAttributes(typeof(SaveAble)).Any())
-            {
-                continue;
-            }
             if (first)
             {
                 first = false;
@@ -73,24 +117,29 @@ class Writer : IDisposable
             {
                 stream.WriteLine(",");
             }
-            if (member.MemberType == MemberTypes.Field)
-            {
-                writePair(member.Name,((FieldInfo)member).GetValue(obj));
-            }
-            if (member.MemberType == MemberTypes.Property)
-            {
-                writePair(member.Name,((PropertyInfo)member).GetValue(obj));
-            }
+            writePair(item.Key,item.Value);
         }
         indent--;
-        stream.WriteLine("}");
+        stream.WriteLine(new string('\t', indent) + "}");
     }
 
-
-    public void write(long num)
+    void writeList(System.Collections.IEnumerable collection)
     {
-        
+        stream.WriteLine("[");
+        indent++;
+        bool first = true;
+        foreach (var item in collection)
+        {
+            if (!first)
+                stream.WriteLine(",");
+            first = false;
+            stream.Write(new string('\t', indent));
+            write(item);
+        }
+        stream.WriteLine("]");
     }
+
+
 
 
     public void Dispose()
@@ -98,7 +147,6 @@ class Writer : IDisposable
         if (disposed)
             return;
 
-        stream.WriteLine("}");
         stream.Close();
     }
 
@@ -107,4 +155,23 @@ class Writer : IDisposable
         Dispose();
     }
 
+}
+
+
+class UnsavableException : Exception
+{
+    public UnsavableException()
+    {
+
+    }
+
+    public UnsavableException(string message) : base(message)
+    {
+
+    }
+
+    public UnsavableException(string message, Exception innerException) : base(message, innerException)
+    {
+        
+    }
 }
