@@ -47,7 +47,7 @@ class GameSaver
         {
             name = self.GetType().Name;
         }
-        saveables.RemoveAll(s => { return !s.Item2.IsAlive; });
+        cleanUpSubscriptions();
         if (saveables.Any(s => { return s.Item1 == name; }))
         {
             return;
@@ -64,36 +64,48 @@ class GameSaver
     {
         Debug.Log("start saving");
         Directory.CreateDirectory(saveDirectory);
-        {
-            Dictionary<string, System.Object> toSave = new Dictionary<string, System.Object>();
 
-            toSave.Add("save time", DateTime.Now.ToString());
+        Dictionary<string, System.Object> toSave = new Dictionary<string, System.Object>();
 
-            saveables.RemoveAll(s => !s.Item2.IsAlive);
-            toSave.Add("data", (Dictionary<string, System.Object>)saveables.ToDictionary(s => s.Item1, s => s.Item2.Target));
+        toSave.Add("save time", DateTime.Now.ToString());
 
-            Writer.write(Path.Combine(saveDirectory, "save.json"), toSave);
+        cleanUpSubscriptions();
+        toSave.Add("data", (Dictionary<string, System.Object>)saveables.ToDictionary(s => s.Item1, s => s.Item2.Target));
 
-            Debug.Log("finish saving");
-        }
+        Writer.write(Path.Combine(saveDirectory, "save.json"), toSave);
+
+        Debug.Log("finish saving");
+
     }
 
     public static void load()
     {
         Debug.Log("start loading");
-        Directory.CreateDirectory(saveDirectory);
+
+        var loadPath = Path.Combine(saveDirectory,"save.json");
+        if (!File.Exists(loadPath))
         {
-            Dictionary<string, System.Object> toSave = new Dictionary<string, System.Object>();
-
-            toSave.Add("save time", DateTime.Now.ToString());
-
-            saveables.RemoveAll(s => !s.Item2.IsAlive);
-            toSave.Add("data", (Dictionary<string, System.Object>)saveables.ToDictionary(s => s.Item1, s => s.Item2.Target));
-
-            Writer.write(Path.Combine(saveDirectory, "save.json"), toSave);
-
-            Debug.Log("finish loading");
+            Debug.LogWarning($"No savegame in {loadPath}");
         }
+        else
+        {
+            var loader = new Loader(loadPath);
+            cleanUpSubscriptions();
+            Debug.Log($"found same from {loader.loaded["save time"]}");
+        }
+
+
+        Debug.Log("finish loading");
+
+    }
+
+    /// <summary>
+    /// Removes all Subscriptions from Object that are no longer alive
+    /// </summary>
+    public static void cleanUpSubscriptions()
+    {
+        saveables.RemoveAll(s => { return !s.Item2.IsAlive; });
+        
     }
 
 }
