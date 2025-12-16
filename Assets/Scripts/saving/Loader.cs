@@ -46,7 +46,7 @@ class Loader
         else if (data.First() == '[' && data.Last() == ']')
         {
             var list = new List<LoadedItem>();
-            foreach (var item in data.Substring(1, data.Length - 2).Split(','))
+            foreach (var item in data.Substring(1, data.Length - 1).Split(','))
             {
                 list.Add(load(item));
             }
@@ -57,7 +57,16 @@ class Loader
         }
         else
         {
-            throw new LoadException("could not deserialize:\n" + data);
+            string newData;
+            if (data.First() == '\"' && data.Last() == '\"')
+            {
+                newData=data.Substring(1,data.Length-1);
+            }
+            else
+            {
+                newData=data;
+            }
+            return new LoadedItem(newData);
         }
     }
 
