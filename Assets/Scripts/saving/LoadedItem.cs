@@ -1,48 +1,50 @@
 
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 class LoadedItem
 {
 
-    System.Collections.Generic.Dictionary<string,LoadedItem> dict;
+    System.Collections.Generic.Dictionary<string, LoadedItem> dict;
     List<LoadedItem> list;
 
     string rawData;
     public LoadedItem(Dictionary<string, LoadedItem> data)
     {
-        dict=data;
+        dict = data;
     }
 
     public LoadedItem(List<LoadedItem> data)
     {
-        list=data;
+        list = data;
     }
 
     public LoadedItem(string data)
     {
-        rawData=data;
+        rawData = data;
     }
 
     bool isDict()
     {
-        return dict!=null;
+        return dict != null;
     }
 
     bool isList()
     {
-        return list!=null;
+        return list != null;
     }
 
     bool isValue()
     {
-        return rawData!=null;
+        return rawData != null;
     }
 
     public override string ToString()
     {
-        if(isDict())
+        if (isDict())
             return dict.ToString();
-        else if(isList())
+        else if (isList())
             return list.ToString();
         else
             return rawData;
@@ -52,7 +54,7 @@ class LoadedItem
     {
         get
         {
-            if(!isList())
+            if (!isList())
                 throw new LoadException($"{ToString()} is not a List");
             return list[key];
         }
@@ -63,14 +65,29 @@ class LoadedItem
     {
         get
         {
-            if(!isDict())
+            if (!isDict())
                 throw new LoadException($"{ToString()} is not a Dictionary");
             return dict[key];
         }
     }
 
-    T convertTo<T>()
+    public Object convertTo(Type type)
     {
-        throw new LoadException($"cannot convert {ToString()} to type {typeof(T).Name}");
+        if (rawData == "null")
+        {
+            return null;
+        }
+        if (typeof(IEnumerable<Object>).IsConvertibleTo(type,false))
+        {
+            
+        }
+        try
+        {
+            var value = Convert.ChangeType(this.rawData, type);
+            if (value != null)
+                return value;
+        }
+        catch (InvalidCastException) { }
+        throw new LoadException($"cannot convert {ToString()} to type {type.Name}");
     }
 }
