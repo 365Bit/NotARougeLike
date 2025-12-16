@@ -4,7 +4,7 @@ using System;
 [RequireComponent(typeof(Inventory))]
 public class PlayerUpgrades : MonoBehaviour
 {
-    private PlayerUpgradeState levels;
+    public PlayerUpgradeState levels;
     private GameObject definitions;
 
     void Awake() {
