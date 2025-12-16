@@ -15,7 +15,12 @@ class Writer : IDisposable
 
     private Writer(string path)
     {
-        File.Open(path, FileMode.Truncate).Close();
+        try
+        {
+            File.Open(path, FileMode.Truncate).Close();
+        }
+        catch (FileNotFoundException) { }
+
         stream = new StreamWriter(path, false);
     }
 
@@ -27,7 +32,7 @@ class Writer : IDisposable
     }
 
 
-    public static void write(string path,Dictionary<string,System.Object> data)
+    public static void write(string path, Dictionary<string, System.Object> data)
     {
         Writer writer = new Writer(path);
         writer.write(data);
@@ -57,7 +62,7 @@ class Writer : IDisposable
         {
             stream.Write($"\"{num.ToString()}\"");
         }
-        else if(data is System.Collections.Generic.Dictionary<string, Object> dict)
+        else if (data is System.Collections.Generic.Dictionary<string, Object> dict)
         {
             writeDict(dict);
         }
@@ -117,7 +122,7 @@ class Writer : IDisposable
             {
                 stream.WriteLine(",");
             }
-            writePair(item.Key,item.Value);
+            writePair(item.Key, item.Value);
         }
         indent--;
         stream.WriteLine(new string('\t', indent) + "}");
@@ -172,6 +177,6 @@ class UnsavableException : Exception
 
     public UnsavableException(string message, Exception innerException) : base(message, innerException)
     {
-        
+
     }
 }
