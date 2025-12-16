@@ -82,7 +82,7 @@ class Writer : IDisposable
         }
     }
 
-    private IEnumerable<MemberInfo> getSaveableMemebrs(Object obj)
+    public static IEnumerable<MemberInfo> getSaveableMemebrs(Object obj)
     {
         return obj.GetType().GetMembers(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).Where(
             m => m.GetCustomAttributes(typeof(SaveAble)).Any()

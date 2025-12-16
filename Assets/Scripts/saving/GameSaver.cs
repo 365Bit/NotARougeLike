@@ -82,7 +82,7 @@ class GameSaver
     {
         Debug.Log("start loading");
 
-        var loadPath = Path.Combine(saveDirectory,"save.json");
+        var loadPath = Path.Combine(saveDirectory, "save.json");
         if (!File.Exists(loadPath))
         {
             Debug.LogWarning($"No savegame in {loadPath}");
@@ -92,6 +92,38 @@ class GameSaver
             var loader = new Loader(loadPath);
             cleanUpSubscriptions();
             Debug.Log($"found save from {loader.loaded["save time"]}");
+            var data = loader.loaded["data"];
+            foreach (var saveable in saveables)
+            {
+                LoadedItem loadedObject;
+                try
+                {
+                    loadedObject = data[saveable.Item1];
+                }
+                catch (IndexOutOfRangeException){continue;}
+                foreach (MemberInfo m in Writer.getSaveableMemebrs(saveable))
+                {
+                    System.Object obj = saveable.Item2.Target;
+                    LoadedItem loadedValue;
+                    try
+                    {
+                        loadedValue = loadedObject[m.Name];
+                    }
+                    catch (IndexOutOfRangeException) { continue; }
+                    if (m.MemberType == MemberTypes.Field)
+                    {
+                        ((FieldInfo)m).SetValue(obj, loadedValue.ConvertTo(((FieldInfo)m).FieldType));
+                    }
+                    else if (m.MemberType == MemberTypes.Property)
+                    {
+                        ((PropertyInfo)m).SetValue(obj,loadedValue.ConvertTo(((PropertyInfo)m).PropertyType));
+                    }
+                    else
+                    {
+                        throw new UnsavableException($"Only Fields and Properties are sAveable, not {m.MemberType}");
+                    }
+                }
+            }
         }
 
 
@@ -105,7 +137,7 @@ class GameSaver
     public static void cleanUpSubscriptions()
     {
         saveables.RemoveAll(s => { return !s.Item2.IsAlive; });
-        
+
     }
 
 }
