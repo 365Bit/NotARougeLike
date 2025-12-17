@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-public class PlayerUpgrades : MonoBehaviour
+public class PlayerUpgrades : MonoBehaviour,ISaveable
 {
     private PlayerUpgradeState levels;
 
@@ -24,6 +24,7 @@ public class PlayerUpgrades : MonoBehaviour
 
 [Serializable]
 public class PlayerUpgradeState {
+    [SaveAble]
     public int[] levels;
 
     public PlayerUpgradeState() {
