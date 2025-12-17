@@ -24,11 +24,11 @@ class Writer : IDisposable
         stream = new StreamWriter(path, false);
     }
 
-    void writePair(string name, System.Object value)
+    void writePair(string name, System.Object value,bool saveAll = false)
     {
         stream.Write(new string('\t', indent));
         stream.Write($"\"{name}\":");
-        write(value);
+        write(value,saveAll);
     }
 
 
@@ -40,7 +40,7 @@ class Writer : IDisposable
         }
     }
 
-    void write(System.Object data)
+    void write(System.Object data,bool saveAll=false)
     {
         var type = data.GetType();
         if (data == null)
@@ -66,15 +66,15 @@ class Writer : IDisposable
         }
         else if (data is System.Collections.Generic.Dictionary<string, Object> dict)
         {
-            writeDict(dict);
+            writeDict(dict,saveAll);
         }
         else if (data is System.Collections.IEnumerable list)
         {
-            writeList(list);
+            writeList(list,saveAll);
         }
-        else if (getSaveableMemebrs(data).Count() > 0)
+        else if (getSaveableMemebrs(data).Count() > 0||(data.GetType().IsClass&&saveAll))
         {
-            writeObject(data);
+            writeObject(data,saveAll);
         }
         else
         {
@@ -82,16 +82,16 @@ class Writer : IDisposable
         }
     }
 
-    public static IEnumerable<MemberInfo> getSaveableMemebrs(Object obj)
+    public static IEnumerable<MemberInfo> getSaveableMemebrs(Object obj,bool saveAll=false)
     {
         return obj.GetType().GetMembers(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).Where(
-            m => m.GetCustomAttributes(typeof(SaveAble)).Any()
+            m => saveAll|| m.GetCustomAttributes(typeof(SaveAble)).Any()
         );
     }
 
-    void writeObject(Object obj)
+    void writeObject(Object obj,bool saveAll=false)
     {
-        writeDict((System.Collections.Generic.Dictionary<string, Object>)getSaveableMemebrs(obj).ToDictionary(m => m.Name, m =>
+        writeDict((System.Collections.Generic.Dictionary<string, Object>)getSaveableMemebrs(obj,saveAll).ToDictionary(m => m.Name, m =>
         {
             if (m.MemberType == MemberTypes.Field)
             {
@@ -105,10 +105,10 @@ class Writer : IDisposable
             {
                 throw new UnsavableException($"Only Fields and Properties are sAveable, not {m.MemberType}");
             }
-        }));
+        }),true);
     }
 
-    void writeDict(Dictionary<string, Object> dict)
+    void writeDict(Dictionary<string, Object> dict,bool saveAll = false)
     {
         stream.WriteLine("{");
         indent++;
@@ -124,13 +124,13 @@ class Writer : IDisposable
             {
                 stream.WriteLine(",");
             }
-            writePair(item.Key, item.Value);
+            writePair(item.Key, item.Value,saveAll);
         }
         indent--;
         stream.WriteLine(new string('\t', indent) + "}");
     }
 
-    void writeList(System.Collections.IEnumerable collection)
+    void writeList(System.Collections.IEnumerable collection,bool saveAll = false)
     {
         stream.WriteLine("[");
         indent++;
@@ -141,7 +141,7 @@ class Writer : IDisposable
                 stream.WriteLine(",");
             first = false;
             stream.Write(new string('\t', indent));
-            write(item);
+            write(item,saveAll);
         }
         stream.WriteLine("]");
     }
