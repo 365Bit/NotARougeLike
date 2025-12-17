@@ -20,14 +20,14 @@ class GameSaver
         {
             saveDirectory = Path.Combine("game_saves", "not_a_rogue_like");
         }
-        else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            saveDirectory = Path.Combine(new string[] { home, "Saved Games", "NotARogueLike" });
-        }
-        else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            saveDirectory = Path.Combine(new string[] { home, ".local", "share", "not_a_rogue_like" });
-        }
+        // else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        // {
+        //     saveDirectory = Path.Combine(new string[] { home, "Saved Games", "NotARogueLike" });
+        // }
+        // else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        // {
+        //     saveDirectory = Path.Combine(new string[] { home, ".local", "share", "not_a_rogue_like" });
+        // }
         else
         {
             throw new NotImplementedException("There is no savegame location implemented for the current operating system.\nSupported are: Linux and MS Windows");
