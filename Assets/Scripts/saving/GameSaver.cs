@@ -101,7 +101,7 @@ class GameSaver
                     loadedObject = data[saveable.Item1];
                 }
                 catch (IndexOutOfRangeException){continue;}
-                foreach (MemberInfo m in Writer.getSaveableMemebrs(saveable))
+                foreach (MemberInfo m in Writer.getSaveableMemebrs(saveable.Item2.Target))
                 {
                     System.Object obj = saveable.Item2.Target;
                     LoadedItem loadedValue;
@@ -112,11 +112,11 @@ class GameSaver
                     catch (IndexOutOfRangeException) { continue; }
                     if (m.MemberType == MemberTypes.Field)
                     {
-                        ((FieldInfo)m).SetValue(obj, loadedValue.ConvertTo(((FieldInfo)m).FieldType));
+                        ((FieldInfo)m).SetValue(obj, loadedValue.getValue(((FieldInfo)m).FieldType));
                     }
                     else if (m.MemberType == MemberTypes.Property)
                     {
-                        ((PropertyInfo)m).SetValue(obj,loadedValue.ConvertTo(((PropertyInfo)m).PropertyType));
+                        ((PropertyInfo)m).SetValue(obj,loadedValue.getValue(((PropertyInfo)m).PropertyType));
                     }
                     else
                     {
