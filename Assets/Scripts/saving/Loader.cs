@@ -67,7 +67,7 @@ class Loader
             string newData;
             if (data.First() == '\"' && data.Last() == '\"')
             {
-                newData=data.Substring(1,data.Length-1);
+                newData=data.Substring(1,data.Length-2);
             }
             else
             {
@@ -134,7 +134,7 @@ class Loader
                 
             }
         }
-        output.Add(data.Substring(laststart));
+        output.Add(data.Substring(laststart,data.Length-laststart-1));
         return output;
     }
 

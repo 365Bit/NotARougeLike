@@ -71,7 +71,7 @@ class LoadedItem
         }
     }
 
-    public Object convertTo(Type type)
+    public Object getValue(Type type)
     {
         if (rawData == "null")
         {
@@ -83,7 +83,7 @@ class LoadedItem
         }
         try
         {
-            var value = Convert.ChangeType(this.rawData, type);
+            var value = System.Convert.ChangeType(this.rawData, type);
             if (value != null)
                 return value;
         }
