@@ -1,15 +1,15 @@
 using UnityEngine;
 using System;
 
+[RequireComponent(typeof(Inventory))]
 public class PlayerUpgrades : MonoBehaviour
 {
     private PlayerUpgradeState levels;
-
-    public PlayerUpgrades() {
-        levels = RunData.Instance.upgrades;
-    }
+    private GameObject definitions;
 
     void Awake() {
+        levels = RunData.Instance.upgrades;
+        definitions = GameObject.Find("Definitions");
         GameSaver.subscribe(levels);
     }
 
@@ -17,8 +17,31 @@ public class PlayerUpgrades : MonoBehaviour
         get => ref levels[stat];
     }
 
-    public void Upgrade(BaseStatKey stat) {
-        levels[stat] += 1;
+    public bool CanUpgrade(BaseStatKey stat, out int cost)
+    {
+        var defs = definitions.GetComponent<UpgradeCostDefinitions>();
+        var inventory = GetComponent<Inventory>();
+
+        int level = levels[stat];
+        int[] costs = defs[stat];
+        if (level < defs.MaxLevel(stat)) {
+            cost = costs[levels[stat]];
+        } else {
+            cost = -1;
+        }
+
+        return inventory.currency[Currency.XP] >= costs[levels[stat]];
+    }
+
+    public bool TryUpgrade(BaseStatKey stat)
+    {
+        if (CanUpgrade(stat, out int cost)) {
+            levels[stat] += 1;
+            GetComponent<Inventory>().currency[Currency.XP] -= cost;
+            return true;
+        }
+
+        return false;
     }
 }
 
@@ -35,10 +58,6 @@ public class PlayerUpgradeState {
 
     public ref int this[BaseStatKey stat] {
         get => ref levels[(int)stat];
-    }
-
-    public void Upgrade(BaseStatKey stat) {
-        levels[(int)stat] += 1;
     }
 }
 
