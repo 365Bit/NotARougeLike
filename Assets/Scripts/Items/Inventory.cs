@@ -34,6 +34,7 @@ public class ItemSlot {
 
 [Serializable]
 public class CurrencyContainer {
+    [SaveAble]
     public int[] balances;
 
     public CurrencyContainer() {
