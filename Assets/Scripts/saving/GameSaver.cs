@@ -37,6 +37,8 @@ class GameSaver
     /// <summary>
     /// Subscribes an object to the savegame system. 
     /// This must be done before an object can be saved or loaded.
+    /// Throws an exception if the object has no member that is marked as saveable.
+    /// Only fields and properties are stored
     /// </summary>
     /// <typeparam name="T">The Type of the object to Save</typeparam>
     /// <param name="self">reference to the object. Note that no reference is kept so the object can be garbage collected.</param>
@@ -52,6 +54,10 @@ class GameSaver
         {
             return;
             throw new DuplicateNameException($"{name} already subscribed for gamesaves");
+        }
+        if (!Writer.getSaveableMemebrs(self).Any())
+        {
+            throw new UnsavableException($"The Object {self} has no member marked as saveable");
         }
         WeakReference reference = new WeakReference(self);
         saveables.Add((name, reference));
