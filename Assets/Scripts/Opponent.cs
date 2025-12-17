@@ -145,9 +145,6 @@ public class Opponent : MonoBehaviour
                 Quaternion lookRotation = Quaternion.LookRotation(direction);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
                 Vector3 rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed).eulerAngles;
-                Debug.Log("Rotation: " + rotation);
-                float maxDegreesDelta = rotationSpeed;
-                Debug.Log("Max Delta: " + maxDegreesDelta);
             }
 
 
