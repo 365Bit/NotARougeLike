@@ -87,7 +87,7 @@ class Loader
                 inString=!inString;
             }else if (!inString && tuple[i] == ':')
             {
-                return new Tuple<string, string>(tuple.Substring(0+1,i-2),tuple.Substring(i+2));
+                return new Tuple<string, string>(tuple.Substring(0+1,i-2),tuple.Substring(i+1));
             }
         }
         throw new LoadException($"The string\"{tuple}\" cannot be loaded as a tuple. No colon was found");
