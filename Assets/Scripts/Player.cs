@@ -114,7 +114,8 @@ public class Player : MonoBehaviour
 
         weapon.gameObject.SetActive(false);
 
-        inventory.container.AddItem(itemDefinitions[3], 10);
+        if (!RunData.Instance.Initialized)
+            RunData.Instance.NewRun();
     }
 
     // Update is called once per frame
@@ -219,7 +220,8 @@ public class Player : MonoBehaviour
 
         playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, currentFOV, zoomSpeed * Time.deltaTime);
 
-        characterController.Move(motion * Time.deltaTime);
+        if (characterController.enabled)
+            characterController.Move(motion * Time.deltaTime);
 
         RegenerateHealth();
         RegenerateMana();
@@ -322,7 +324,7 @@ public class Player : MonoBehaviour
     public bool RaycastInteractible(out RaycastHit hit) {
         Vector3 position = cameraTransform.position + cameraTransform.forward * 0.1f;
         Debug.DrawRay(position, cameraTransform.forward, Color.white, 1.0f);
-        var interactionDistance = 10f;
+        float interactionDistance = 10f;
         return Physics.Raycast(position, cameraTransform.forward, out hit, interactionDistance, ~LayerMask.GetMask("Player"));
     }
 
@@ -332,11 +334,14 @@ public class Player : MonoBehaviour
             if (inventory.currency[Currency.Gold] < slot.item.cost) return false;
             inventory.currency[Currency.Gold] -= slot.item.cost;
             inventory.container.AddItem(slot.item, slot.count);
-            slot.Disable();
+            slot.shop.RemoveItem(slot.Index);
             return true;
         } else if (transform.gameObject.TryGetComponent<DroppedItem>(out DroppedItem item)) {
             inventory.container.AddItem(item.item, item.count);
             item.Disable();
+            return true;
+        } else if (transform.gameObject.TryGetComponent<TrapDoor>(out TrapDoor door)){
+            door.Interact();
             return true;
         }
         return false;
@@ -495,16 +500,18 @@ public class Player : MonoBehaviour
 
     void Shoot()
     {
-        int bowAmmoSlot = inventory.container.GetSlotContaining(itemDefinitions[3]);
+        ItemContainer items = inventory.container;
+        int bowAmmoSlot = items.GetSlotContaining(itemDefinitions[3], 1);
 
         Debug.Log("Bow Ammo Slot: " + bowAmmoSlot);
+        items.PrintState();
 
         if (fireCooldown > 0.0f || projectiles.Length == 0 || bowAmmoSlot == -1)
         {
             return;
         }
 
-        inventory.container.ConsumeItem(bowAmmoSlot);
+        items.ConsumeItem(bowAmmoSlot);
 
         Vector3 position = cameraTransform.position + transform.forward * 1.0f;
         Quaternion rotation = cameraTransform.rotation;
@@ -545,10 +552,10 @@ public class Player : MonoBehaviour
 
     public void UseItem(int itemID)
     {
-        var inv = GetComponent<Inventory>().container;
-        var slot = inv[itemID];
-        var item = slot.storedItem;
-        var count = slot.count;
+        ItemContainer inv = GetComponent<Inventory>().container;
+        ItemSlot slot = inv[itemID];
+        ItemDefinition item = slot.storedItem;
+        int count = slot.count;
 
         if (item == null) return;
 

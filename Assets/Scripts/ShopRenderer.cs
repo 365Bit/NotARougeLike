@@ -5,67 +5,64 @@ using TMPro;
 
 public class ShopRenderer : MonoBehaviour
 {
-    [System.Serializable]
-    public struct ItemSlotConfig {
-        public Vector3 position;
-    }
-
-    [Header("General")]
-    public ItemDefinitions itemDefinitions;
-
-    [Header("Item Slots")]
-    public int numItemSlots;
-    private ItemContainer items;
-
+    public ItemContainer Items;
 
     [Header("Rendering")]
-    public ItemSlotConfig[] slotProperties;
+    private TransformData[] slotTransforms;
     public GameObject itemSlotPrefab;
-    // where to instantiate item slots
-    public Transform slotDisplayParent;
-    public Vector3 itemScale;
-
-
-    public void Awake() {
-        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
-
-        items = new(numItemSlots);
+    // how to instantiate item slots
+    struct TransformData {
+        public Vector3 localPosition;
+        public Quaternion localRotation;
+        public Vector3 localScale;
     }
+    public Transform slotDisplayParent;
 
     public void ShowItems() {
-        foreach(Transform child in slotDisplayParent) {
-            Destroy(child);
+        // get transforms from children
+        if (slotTransforms == null) {
+            slotTransforms = new TransformData[slotDisplayParent.childCount];
+
+            // 
+            for (int i = 0; i < slotDisplayParent.childCount; i++) {
+                Transform t = slotDisplayParent.GetChild(i);
+                slotTransforms[i].localPosition = t.localPosition;
+                slotTransforms[i].localRotation = t.localRotation;
+                slotTransforms[i].localScale = t.localScale;
+            }
         }
 
-        foreach(var (slot, slotDisplay) in items.slots.Zip(slotProperties, (a,b)=>(a,b))) {
-            if (slot.storedItem == null) {
+        // destroy old slots
+        foreach(Transform child in slotDisplayParent) {
+            Destroy(child.gameObject);
+        }
+
+        // create new slots
+        for (int slotIndex = 0; slotIndex < Items.slots.Length && slotIndex < slotTransforms.Length; slotIndex++) {
+            ItemSlot slot = Items[slotIndex];
+            TransformData slotTransform = slotTransforms[slotIndex];
+
+            if (slot.storedItem == null || slot.count == 0) {
                 // no item
             } else {
                 Transform slotInstance = Instantiate(itemSlotPrefab, slotDisplayParent).transform;
-                slotInstance.localPosition = slotDisplay.position;
-                slotInstance.GetComponent<ShopItemSlot>().SetItem(slot.storedItem, slot.count);
+                slotInstance.localPosition = slotTransform.localPosition;
+                slotInstance.localRotation = slotTransform.localRotation;
+                slotInstance.localScale = slotTransform.localScale;
+                slotInstance.GetComponent<ShopItemSlot>().Init(this, slotIndex);
             }
         }
     }
 
-    // TODO: extract to dungeon creator
-    public void AddRandomItems() {
-        foreach (ItemSlot slot in items.slots) {
-            slot.storedItem = null;
-
-            // select random definition
-            float random = UnityEngine.Random.Range(0f,1f);
-            foreach (ItemDefinition def in itemDefinitions.definitions) {
-                if (random <= def.shopProbability) {
-                    slot.storedItem = def;
-                    slot.count = 1;
-                    break;
-                }
-                random -= def.shopProbability;
-            }
-        }
-
+    public void SetItems(ItemContainer items) {
+        this.Items = items;
         ShowItems();
     }
 
+    public void RemoveItem(int slot) {
+        if (Items == null) return;
+
+        Items.ConsumeItem(slot);
+        ShowItems();
+    }
 }

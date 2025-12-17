@@ -13,7 +13,7 @@ public class DroppedItem : MonoBehaviour
         this.item = item;
         this.count = count;
 
-        var instance = Instantiate(item.itemModel, transform).transform;
+        Transform instance = Instantiate(item.itemModel, transform).transform;
         instance.localPosition = modelPosition;
         instance.localScale = modelScale;
     }

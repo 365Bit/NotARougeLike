@@ -46,7 +46,7 @@ public class InventoryUI : MonoBehaviour
     void UpdateSlots() {
         for (int i = 0; i < slots.Length; i++) {
             GameObject slot = slots[i];
-            var s = slot.GetComponent<ItemHotbarSlot>();
+            ItemHotbarSlot s = slot.GetComponent<ItemHotbarSlot>();
             s.SetItem(inventory.container[i].storedItem, inventory.container[i].count);
             s.SetSelected(i == currentSlot);
             slot.GetComponent<Button>().onClick.AddListener(delegate { OnClick(i); });
@@ -65,11 +65,16 @@ public class InventoryUI : MonoBehaviour
     }
 
     public void MoveSelection(Vector2 delta) {
+        if (numSlots == 0) return;
         int newSlot = (currentSlot + (int)Math.Round(delta.x) + numSlots) % numSlots;
         newSlot = (newSlot + (int)Math.Round(delta.y) * numColumns + numSlots) % numSlots;
         if (grabbed)
             inventory.container.SwapItems(currentSlot, newSlot);
         currentSlot = newSlot;
+    }
+
+    public void ToggleItemGrabbed() {
+        grabbed = !grabbed;
     }
 
     void Start() {
@@ -84,11 +89,6 @@ public class InventoryUI : MonoBehaviour
         numSlots = inventory.numItemSlots;
         if (slots == null || numSlots != slots.Length)
             InitializeSlots();
-
-        // todo: extract to UserInput script
-        Keyboard keyboard = Keyboard.current;
-        if (keyboard.spaceKey.wasPressedThisFrame)
-            grabbed = !grabbed;
 
         UpdateSlots();
     }
