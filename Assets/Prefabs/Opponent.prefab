@@ -190,11 +190,13 @@ MonoBehaviour:
   hitZone: {fileID: 459530722346563427}
   hitRate: 2
   hitCooldown: 0
+  stunDuration: 0.5
   swingDuration: 0
   strikeDuration: 0.3
   returnDuration: 1.2
   attackRange: 3
   detectionRange: 15
+  rotationSpeed: 120
   playerGotHit: 0
   maxHealth: 100
   healthRegRate: 5
@@ -300,7 +302,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0970a84026186ce4fa33b6c1bdc9f6cb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1
+      value: -1.05
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0970a84026186ce4fa33b6c1bdc9f6cb, type: 3}
       propertyPath: m_LocalPosition.z
@@ -376,10 +378,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7092866819950500148, guid: 0970a84026186ce4fa33b6c1bdc9f6cb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5691642208674608738}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 0970a84026186ce4fa33b6c1bdc9f6cb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1826643759094404061}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0970a84026186ce4fa33b6c1bdc9f6cb, type: 3}
 --- !u!4 &1465735313316855563 stripped
 Transform:
@@ -391,20 +390,3 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0970a84026186ce4fa33b6c1bdc9f6cb, type: 3}
   m_PrefabInstance: {fileID: 8519045003156317759}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &8861064927423486830 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0970a84026186ce4fa33b6c1bdc9f6cb, type: 3}
-  m_PrefabInstance: {fileID: 8519045003156317759}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1826643759094404061
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8861064927423486830}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc2e9fd9195bb7f4992304f9210252b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
