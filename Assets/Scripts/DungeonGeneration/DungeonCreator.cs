@@ -220,7 +220,7 @@ public class DungeonCreator : MonoBehaviour
                 int shopY = (room.BottomLeftAreaCorner.y + 1 + room.TopLeftAreaCorner.y) / 2;
                 Vector3 shopPos = new Vector3(
                     shopX,
-                    0.35f,
+                    0f,
                     shopY);
                 if(UnityEngine.Random.Range(0f,1f) < shopProb)
                 {
