@@ -126,7 +126,7 @@ class Loader
                 list--;
             }else if (data[i] == ','&&dict==0&&list==0)
             {
-                output.Add(data.Substring(laststart,i-laststart-1));
+                output.Add(data.Substring(laststart,i-laststart));
                 laststart=i+1;
             }
             else
