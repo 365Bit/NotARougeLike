@@ -24,6 +24,7 @@ public class PlayerUpgrades : MonoBehaviour,ISaveable
 
 [Serializable]
 public class PlayerUpgradeState {
+    [SaveAble]
     public int[] levels;
 
     public PlayerUpgradeState() {
