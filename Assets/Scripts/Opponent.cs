@@ -18,15 +18,18 @@ public class Opponent : MonoBehaviour
     [Header("Combat")]
     private Animator animator;
     public HitZone hitZone;
-    public float hitRate = 1.0f;
+    public float hitRate;
     private float hitTime;
-    public float hitCooldown = 0.5f;
+    public float hitCooldown;
+    public float stunDuration;
+    private float stunTimer;
     //private Transform rightShoulderTransform;
-    public float swingDuration = 0.1f;
-    public float strikeDuration = 0.1f;
-    public float returnDuration = 0.1f;
-    public float attackRange = 3.0f;
-    public float detectionRange = 15.0f;
+    public float swingDuration;
+    public float strikeDuration;
+    public float returnDuration;
+    public float attackRange;
+    public float detectionRange;
+    public float rotationSpeed;
     private Vector3 restRotation = new Vector3(0.0f, 0.0f, 0.0f);
     private Vector3 swingRotation = new Vector3(-130.0f, 0.0f, 0.0f);
     private Vector3 strikeRotation = new Vector3(-30.0f, 0.0f, 0.0f);
@@ -57,6 +60,8 @@ public class Opponent : MonoBehaviour
     private int nextNavPointID = 0;
     bool wandering = false;
 
+    Vector3 localVelocity;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -82,15 +87,35 @@ public class Opponent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(navMeshAgent.speed > 0.1f)
+        if(animator.GetBool("isDead"))
         {
-            animator.SetBool("isMoving", true);
+            return;
+        }
+
+        localVelocity = transform.InverseTransformDirection(navMeshAgent.velocity);
+        if (localVelocity.z > 0.1f)
+        {
+            animator.SetBool("isMovingForward", true);
         }
         else
         {
-            animator.SetBool("isMoving", false);
+            animator.SetBool("isMovingForward", false);
         }
 
+        if(stunTimer > 0.0f)
+        {
+            stunTimer -= Time.deltaTime;
+            if(stunTimer < 0.0f)
+            {
+                stunTimer = 0.0f;
+            }
+            return;
+        }
+
+        if(stunTimer == 0.0f) 
+        {
+            navMeshAgent.isStopped = false;
+        }
 
         if (playerTransform == null)
         {
@@ -110,18 +135,43 @@ public class Opponent : MonoBehaviour
 
         if (distance <= detectionRange && !player.isDead)
         {
-            if (distance <= attackRange)
+            
+            navMeshAgent.updateRotation = false;
+            Vector3 direction = (playerTransform.position - transform.position).normalized;
+            direction.y = 0.0f;
+
+            if (direction != Vector3.zero)
             {
-                if(hitState == HitState.Idle)
-                    Attack();
+                Quaternion lookRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+                Vector3 rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed).eulerAngles;
+                Debug.Log("Rotation: " + rotation);
+                float maxDegreesDelta = rotationSpeed;
+                Debug.Log("Max Delta: " + maxDegreesDelta);
+            }
+
+
+            Vector3 playerOppDir = (transform.position - playerTransform.position).normalized;  
+            Vector3 targetPosition;
+            if (currentHealth < maxHealth * 0.5f)
+            {
+                targetPosition = playerTransform.position + playerOppDir * 7.5f;
             }
             else
             {
-                navMeshAgent.SetDestination(playerTransform.position);
+                targetPosition = playerTransform.position + playerOppDir * 2.5f;
+            }
+            navMeshAgent.SetDestination(targetPosition);
+
+            if (distance <= attackRange && hitState == HitState.Idle && hitCooldown == 0.0f)
+            {
+                Attack();
             }
         }
         else
         {
+
+            navMeshAgent.updateRotation = true;
             Wander();
             RegenerateHealth();
         }
@@ -162,7 +212,6 @@ public class Opponent : MonoBehaviour
                         hitState = HitState.Idle;
                         hitCooldown = 0.5f;
                         playerGotHit = false;
-                        navMeshAgent.isStopped = false;
 
                         break;
                     default:
@@ -177,12 +226,6 @@ public class Opponent : MonoBehaviour
         // TODO
         navMeshAgent.isStopped = true;
 
-        //transform.LookAt(playerTransform);
-
-        if (hitCooldown > 0.0f || hitState != HitState.Idle)
-        {
-            return;
-        }
         hitZone.SetDamage(20.0f);
         hitState = HitState.Swing;
         hitTime = 0.0f;
@@ -194,13 +237,16 @@ public class Opponent : MonoBehaviour
     void Die()
     {
         navMeshAgent.isStopped = true;
-        animator.SetTrigger("death");
+        animator.SetBool("isDead", true);
         Destroy(gameObject, 2.0f);
     }
 
     public void TakeDamage(float damage)
     {
+        navMeshAgent.isStopped = true;
         animator.SetTrigger("gotHit");
+        stunTimer = stunDuration;
+
         currentHealth -= damage;
 
         if (currentHealth <= 0.0f)
@@ -236,20 +282,22 @@ public class Opponent : MonoBehaviour
             //Vector3 targetPos = spawnPosition + new Vector3(randomDirection.x, randomDirection.y, 0) * wanderRadius;
             //randomDirection += spawnPosition;
 
-            List<NavPoint> targetList = spawnRoom.navPointList;
+            if(spawnRoom != null)
+            {
+                List<NavPoint> targetList = spawnRoom.navPointList;
 
-            Vector3 targetPos = targetList[nextNavPointID].transform.position;
+                Vector3 targetPos = targetList[nextNavPointID].transform.position;
 
-            NavMeshHit navHit;
-            NavMesh.SamplePosition(targetPos, out navHit, wanderRadius, NavMesh.AllAreas);
+                NavMeshHit navHit;
+                NavMesh.SamplePosition(targetPos, out navHit, wanderRadius, NavMesh.AllAreas);
 
-            navMeshAgent.SetDestination(navHit.position);
+                navMeshAgent.SetDestination(navHit.position);
 
-            wanderTime = 0.0f;
-            wandering = true;
-            nextNavPointID++;
-            nextNavPointID %= targetList.Count;
+                wanderTime = 0.0f;
+                wandering = true;
+                nextNavPointID++;
+                nextNavPointID %= targetList.Count;
+            }
         }
     }
-
 }

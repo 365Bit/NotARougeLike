@@ -19,10 +19,5 @@ public class ApplyRootNodeMotionOnDeath : MonoBehaviour
             transform.position += animator.deltaPosition;
             transform.rotation *= animator.deltaRotation;
         }
-        else
-        {
-            // Ignore root motion for other states
-        }
     }
-
 }
