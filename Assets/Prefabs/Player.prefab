@@ -155,6 +155,7 @@ GameObject:
   - component: {fileID: 8439484915624340096}
   - component: {fileID: 1939592861400707939}
   - component: {fileID: 1195309795827131598}
+  - component: {fileID: 8845670175015512211}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -343,9 +344,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7b0b0bd39727be73b5d90365994a0b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Inventory
-  numHotbarSlots: 4
-  numItemSlots: 12
-  numCurrencySlots: 1
 --- !u!114 &1939592861400707939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -358,7 +356,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859ecc0f927b18dadb24872a7e65c545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  levels: 
 --- !u!114 &1195309795827131598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,6 +368,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99ff3bef177338594b0de52d0add7e5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
+--- !u!114 &8845670175015512211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 309834695554700441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f260ed3fca2d04999210b5efcd7c1d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Constitution
 --- !u!1 &934793935829304382
 GameObject:
   m_ObjectHideFlags: 0

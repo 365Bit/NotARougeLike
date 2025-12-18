@@ -8,6 +8,9 @@ public class RunData {
     public CurrencyContainer currencies {get; private set;} = new();
     public ItemContainer items {get; private set;} = new();
     public PlayerUpgradeState upgrades {get; private set;} = new();
+    public ConstitutionState constitution {get; private set;} = new();
+    public Player.AttackType selectedAttack;
+
 
     public bool Initialized {
         get => level >= 0;
@@ -25,6 +28,7 @@ public class RunData {
     public void NewRun() {
         Debug.Log("starting new run");
         GameObject defs = GameObject.Find("Definitions");
+        StatScalingDefinitions statDef = defs.GetComponent<StatScalingDefinitions>();
         Constants constants = defs.GetComponent<Constants>();
 
         // back to first level
@@ -41,6 +45,10 @@ public class RunData {
 
         // player upgrades are kept
 
+        // reset constitution
+        constitution.health = PlayerStats.ComputeInitial(StatKey.MaxHealth, statDef, upgrades);
+        constitution.stamina = PlayerStats.ComputeInitial(StatKey.MaxStamina, statDef, upgrades);
+        constitution.mana = PlayerStats.ComputeInitial(StatKey.MaxMana, statDef, upgrades);
 
         // add initial items and currencies
         items.AddItem(defs.GetComponent<ItemDefinitions>()[3], constants.initialAmmo);
@@ -51,6 +59,7 @@ public class RunData {
     public void NewGame() {
         Debug.Log("starting new game");
         GameObject defs = GameObject.Find("Definitions");
+        StatScalingDefinitions statDef = defs.GetComponent<StatScalingDefinitions>();
         Constants constants = defs.GetComponent<Constants>();
 
         // back to first level
@@ -66,6 +75,10 @@ public class RunData {
 
         // player upgrades are kept
 
+        // reset constitution
+        constitution.health = PlayerStats.ComputeInitial(StatKey.MaxHealth, statDef, upgrades);
+        constitution.stamina = PlayerStats.ComputeInitial(StatKey.MaxStamina, statDef, upgrades);
+        constitution.mana = PlayerStats.ComputeInitial(StatKey.MaxMana, statDef, upgrades);
 
         // add initial items and currencies
         items.AddItem(defs.GetComponent<ItemDefinitions>()[3], constants.initialAmmo);
