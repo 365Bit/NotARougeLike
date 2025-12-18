@@ -2,12 +2,12 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using static UnityEditor.Progress;
 
-[RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
+[RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
 public class Projectile : MonoBehaviour
 {
     // Components
     private Rigidbody rigidBody;
-    private SphereCollider sphereCollider;
+    private BoxCollider boxCollider;
 
     public GameObject droppedItemPrefab;
 
@@ -27,8 +27,8 @@ public class Projectile : MonoBehaviour
         rigidBody = GetComponent<Rigidbody>();
         rigidBody.useGravity = true; // TODO: Make this projectile-specific
 
-        sphereCollider = GetComponent<SphereCollider>();
-        sphereCollider.isTrigger = false;
+        boxCollider = GetComponent<BoxCollider>();
+        boxCollider.isTrigger = false;
 
         itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
         bowAmmo = itemDefinitions.definitions[3];
