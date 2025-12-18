@@ -2142,13 +2142,15 @@ MonoBehaviour:
   strikeDuration: 0.3
   returnDuration: 1.2
   attackRange: 3
-  detectionRange: 15
+  detectionRange: 20
   rotationSpeed: 90
   playerGotHit: 0
   maxHealth: 100
   healthRegRate: 5
-  wanderInterval: 3
+  wanderInterval: 5
   wanderRadius: 5
+  viewAngle: 60
+  memoryDuration: 5
 --- !u!1 &8673311879040220446
 GameObject:
   m_ObjectHideFlags: 0

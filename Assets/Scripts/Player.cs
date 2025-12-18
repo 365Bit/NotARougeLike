@@ -66,6 +66,7 @@ public class Player : MonoBehaviour
     [Header("Combat")]
     public Projectile[] projectiles;
     public Weapon weapon;
+    public PlayerHitZone hitZone;
 
     private Inventory inventory;
     private Constitution constitution;
@@ -73,6 +74,7 @@ public class Player : MonoBehaviour
     private PlayerStats stats;
 
     public bool isDead = false;
+    private bool opponentGotHit;
 
     void Awake()
     {
@@ -108,6 +110,8 @@ public class Player : MonoBehaviour
         defaultYScale = transform.localScale.y;
 
         weapon.gameObject.SetActive(false);
+        hitZone.gameObject.SetActive(false);
+        opponentGotHit = false;
 
         if (!RunData.Instance.Initialized) {
             RunData.Instance.NewRun();
@@ -180,12 +184,16 @@ public class Player : MonoBehaviour
 
                         startRotation = Quaternion.Euler(strikeRotation);
                         endRotation = Quaternion.Euler(restRotation);
+                        hitZone.gameObject.SetActive(true);
+                        hitZone.SetDamage(20.0f);
                         break;
                     case HitState.Return:
                         hitState = HitState.Idle;
                         hitCooldown = 1.0f / stats.hitRate;
 
                         weapon.gameObject.SetActive(false);
+                        hitZone.gameObject.SetActive(false);
+                        opponentGotHit = false;
                         break;
                     default:
                         Debug.LogError("Unknown Hit State: " + hitState);
@@ -549,5 +557,15 @@ public class Player : MonoBehaviour
         {
             Die();
         }
+    }
+
+    public void SetOpponentGotHit(bool value)
+    {
+        opponentGotHit = value;
+    }
+
+    public bool GetOpponentGotHit()
+    {
+        return opponentGotHit;
     }
 }
