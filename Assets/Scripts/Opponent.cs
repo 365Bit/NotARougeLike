@@ -61,6 +61,11 @@ public class Opponent : MonoBehaviour
     bool wandering = false;
 
     Vector3 localVelocity;
+    private Quaternion lastRotation;
+    public float viewAngle;
+    private LayerMask obstacleMask;
+    private float memoryTimer;
+    public float memoryDuration;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -82,6 +87,7 @@ public class Opponent : MonoBehaviour
 
         animator = GetComponentInChildren<Animator>();
         animator.SetFloat("attackSpeed", hitRate);
+        obstacleMask = LayerMask.GetMask("Wall");
     }
 
     // Update is called once per frame
@@ -93,16 +99,13 @@ public class Opponent : MonoBehaviour
         }
 
         localVelocity = transform.InverseTransformDirection(navMeshAgent.velocity);
-        if (localVelocity.z > 0.1f)
-        {
-            animator.SetBool("isMovingForward", true);
-        }
-        else
-        {
-            animator.SetBool("isMovingForward", false);
-        }
 
-        if(stunTimer > 0.0f)
+        float moveX = localVelocity.x;
+        float moveZ = localVelocity.z;
+        animator.SetFloat("MoveX", moveX, 0.25f, Time.deltaTime);
+        animator.SetFloat("MoveZ", moveZ, 0.25f, Time.deltaTime);
+
+        if (stunTimer > 0.0f)
         {
             stunTimer -= Time.deltaTime;
             if(stunTimer < 0.0f)
@@ -133,9 +136,8 @@ public class Opponent : MonoBehaviour
             }
         }
 
-        if (distance <= detectionRange && !player.isDead)
+        if (CanSeePlayer() && !player.isDead)
         {
-            
             navMeshAgent.updateRotation = false;
             Vector3 direction = (playerTransform.position - transform.position).normalized;
             direction.y = 0.0f;
@@ -143,8 +145,24 @@ public class Opponent : MonoBehaviour
             if (direction != Vector3.zero)
             {
                 Quaternion lookRotation = Quaternion.LookRotation(direction);
+                lastRotation = transform.rotation;
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
-                Vector3 rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed).eulerAngles;
+                float signedAngularVelocity = Vector3.SignedAngle(
+                    lastRotation * Vector3.forward,
+                    transform.rotation * Vector3.forward,
+                    Vector3.up
+                ) / Time.deltaTime;
+                //Debug.Log("Signed Angular Velocity: " + signedAngularVelocity);
+                if (Mathf.Abs(signedAngularVelocity) > 170f)
+                {
+                    animator.SetTrigger("TurnAround180");
+                } else if (signedAngularVelocity > 45f) 
+                {
+                    animator.SetTrigger("TurnRight90");
+                } else if (signedAngularVelocity < -45f) 
+                { 
+                    animator.SetTrigger("TurnLeft90");
+                }
             }
 
 
@@ -167,7 +185,6 @@ public class Opponent : MonoBehaviour
         }
         else
         {
-
             navMeshAgent.updateRotation = true;
             Wander();
             RegenerateHealth();
@@ -217,6 +234,14 @@ public class Opponent : MonoBehaviour
                 }
             }
         }
+        if (memoryTimer > 0.0f)
+        {
+            memoryTimer -= Time.deltaTime;
+            if (memoryTimer < 0.0f)
+            {
+                memoryTimer = 0.0f;
+            }
+        }
     }
     void Attack()
     {
@@ -264,12 +289,13 @@ public class Opponent : MonoBehaviour
 
     void Wander()
     {
-        wanderTime += Time.deltaTime;
+        //wanderTime += Time.deltaTime;
         navMeshAgent.isStopped = false;
 
         if (navMeshAgent.remainingDistance < 1)
         {
-            wandering = false;
+            wanderTime -= Time.deltaTime;
+            if(wanderTime <= 0.0f) wandering = false;
         }
 
         if (!wandering)
@@ -290,11 +316,36 @@ public class Opponent : MonoBehaviour
 
                 navMeshAgent.SetDestination(navHit.position);
 
-                wanderTime = 0.0f;
+                wanderTime = Random.Range(wanderInterval * 0.5f, wanderInterval * 2.0f);
                 wandering = true;
                 nextNavPointID++;
                 nextNavPointID %= targetList.Count;
             }
         }
     }
+    bool CanSeePlayer()
+    {
+        if(stunTimer > 0.0f)
+        {
+            return true;
+        }
+
+        Vector3 toPlayer = playerTransform.position - transform.position;
+        float distanceToPlayer = toPlayer.magnitude;
+
+        if (distanceToPlayer > detectionRange) return false;
+        else if (distanceToPlayer < 5.0f && !player.isSneaking()) return true;
+
+        Vector3 forward = transform.forward;
+        toPlayer.Normalize();
+
+        float angleToPlayer = Vector3.Angle(forward, toPlayer);
+        if (angleToPlayer > viewAngle) return false;
+
+        if (Physics.Raycast(transform.position, toPlayer, distanceToPlayer, obstacleMask))
+            return false;
+
+        return true; // Player is visible
+    }
+
 }
