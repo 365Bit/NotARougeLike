@@ -1,21 +1,22 @@
+using System.ComponentModel;
 using UnityEngine;
 
-public class HitZone : MonoBehaviour
+public class PlayerHitZone : MonoBehaviour
 {
     private float damage;
-    private Opponent opponent;
+    private Player player;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        opponent = GetComponentInParent<Opponent>();
+        player = GetComponentInParent<Player>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         string name = other.gameObject.name;
 
-        if (name == "Opponent")
+        if (name == "Player")
         {
             // Ignore self triggers
             return;
@@ -35,18 +36,17 @@ public class HitZone : MonoBehaviour
             }
         }
 
-        if (name.Contains("Player"))
+        if (name.Contains("Opponent"))
         {
-            Player player = other.gameObject.GetComponent<Player>();
+            Opponent opponent = other.gameObject.GetComponent<Opponent>();
             Debug.Log("Zone dealing " + damage + " damage to " + name);
-            if (!opponent.playerGotHit)
+            if (!player.GetOpponentGotHit())
             {
-                player.TakeDamage(damage);
-                opponent.playerGotHit = true;
+                opponent.TakeDamage(damage);
+                player.SetOpponentGotHit(true);
             }
         }
     }
-
     public void SetDamage(float damage)
     {
         this.damage = damage;

@@ -4,19 +4,20 @@ using UnityEngine.InputSystem;
 public class UserInput : MonoBehaviour
 {
     private Player player;
+    private PlayerUpgrades playerUpgrades;
     private UIManager uiController;
     private InventoryUI inventoryUI;
+    private UpgradeUI upgradeUI;
 
     private Vector2 direction;
     private Vector2 rotation;
 
     private bool controlPlayer {
-        get => !uiController.inventoryOpen && !player.isDead;
+        get => !uiController.upgradesOpen && !uiController.inventoryOpen && !player.isDead;
     }
 
     private bool aim;
     private bool interact;
-    private bool inventory;
     private bool jump;
     private bool run;
     private bool slide;
@@ -24,6 +25,12 @@ public class UserInput : MonoBehaviour
     private bool escape;
 
     private int itemID;
+
+    // whether a ui should be toggled in this frame
+    private bool toggleUI;
+    private bool switchUI;
+    private bool inventory;
+    private bool upgrades;
 
     // values for ui
     private Vector2 uiDirection;
@@ -35,8 +42,10 @@ public class UserInput : MonoBehaviour
     void Awake()
     {
         player = GameObject.Find("Player").GetComponent<Player>();
+        playerUpgrades = GameObject.Find("Player").GetComponent<PlayerUpgrades>();
         uiController = GetComponent<UIManager>();
         inventoryUI = uiController.inventoryUI.GetComponent<InventoryUI>();
+        upgradeUI = uiController.upgradesUI.GetComponent<UpgradeUI>();
 
         rotation = Vector2.zero;
 
@@ -58,6 +67,9 @@ public class UserInput : MonoBehaviour
         slide = false;
         sneak = false;
         inventory = false;
+        upgrades = false;
+        toggleUI = false;
+        switchUI = false;
         uiSelect = false;
 
         itemID = -1;
@@ -92,6 +104,14 @@ public class UserInput : MonoBehaviour
             }
         }
 
+        // control upgrades ui
+        if (uiController.upgradesOpen) {
+            upgradeUI.MoveSelection(uiDirection);
+
+            if (uiSelect)
+                playerUpgrades.TryUpgrade(upgradeUI.selectedStat);
+        }
+
         // control inventory ui
         if (uiController.inventoryOpen) {
             if (uiDirection != Vector2.zero)
@@ -101,11 +121,45 @@ public class UserInput : MonoBehaviour
                 inventoryUI.ToggleItemGrabbed();
         }
 
-        // toggle inventory
-        if (inventory && !uiController.inventoryOpen)
-            uiController.SwitchToInventory();
-        else if ((inventory || escape) && uiController.inventoryOpen)
+        // handle switching between UIs
+        if (switchUI) {
+            if (uiController.upgradesOpen) {
+                uiController.SwitchToInventory();
+            } else if (uiController.inventoryOpen) {
+                uiController.SwitchToUpgrades();
+            }
+        }
+
+        if (escape) {
             uiController.SwitchToGameplay();
+        }
+
+        // handle toggling of ui
+        if (toggleUI) {
+            if (uiController.upgradesOpen || uiController.inventoryOpen) {
+                uiController.SwitchToGameplay();
+            } else {
+                uiController.SwitchToInventory();
+            }
+        }
+
+        // toggle upgrade ui
+        if (upgrades) {
+            if (uiController.upgradesOpen) {
+                uiController.SwitchToGameplay();
+            } else {
+                uiController.SwitchToUpgrades();
+            }
+        }
+
+        // toggle inventory ui
+        if (inventory) { 
+            if (uiController.inventoryOpen) {
+                uiController.SwitchToGameplay();
+            } else {
+                uiController.SwitchToInventory();
+            }
+        }
     }
 
     void GamepadInput()
@@ -165,8 +219,14 @@ public class UserInput : MonoBehaviour
             itemID = 3;
         }
 
-        uiSelect  |= gamepad.aButton.wasPressedThisFrame;
-        inventory |= gamepad.yButton.wasPressedThisFrame;
+        // from gameplay, open inventory using y-button
+        toggleUI |= gamepad.yButton.wasPressedThisFrame;
+
+        // from inventory/upgrades, switch using shoulder buttons
+        switchUI |= gamepad.rightShoulder.wasPressedThisFrame;
+        switchUI |= gamepad.leftShoulder.wasPressedThisFrame;
+
+        uiSelect |= gamepad.aButton.wasPressedThisFrame;
     }
 
     void KeyboardInput()
@@ -241,8 +301,13 @@ public class UserInput : MonoBehaviour
             uiDirection.y += 1;
         }
 
-        uiSelect  |= keyboard.spaceKey.wasPressedThisFrame;
+        // from inventory/upgrades, switch using tab
+        switchUI  |= keyboard.tabKey.wasPressedThisFrame;
+
+        upgrades  |= keyboard.uKey.wasPressedThisFrame;
         inventory |= keyboard.eKey.wasPressedThisFrame;
+
+        uiSelect  |= keyboard.spaceKey.wasPressedThisFrame;
     }
 
     void MouseInput()

@@ -60,7 +60,7 @@ public class ScalingFormula {
     // operand constists of a value per upgrade level of a base stat
     public Operand[] scalingInBaseStat;
 
-    public float ComputeFrom(PlayerUpgrades upgradeLevels) {
+    public float ComputeFrom(PlayerUpgradeState upgradeLevels) {
         float result = baseValue;
         if (scalingInBaseStat != null) {
             foreach (Operand s in scalingInBaseStat) {

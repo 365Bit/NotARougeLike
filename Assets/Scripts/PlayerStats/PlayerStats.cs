@@ -23,8 +23,12 @@ public class PlayerStats : MonoBehaviour
     }
 
     // 
-    private float Compute(StatKey stat) {
+    public float Compute(StatKey stat) {
         // TODO: check inventory for items with stat modifiers
+        return def[stat].ComputeFrom(upgrades.levels);
+    }
+
+    public static float ComputeInitial(StatKey stat, StatScalingDefinitions def, PlayerUpgradeState upgrades) {
         return def[stat].ComputeFrom(upgrades);
     }
 
