@@ -10,8 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1576648743897872727}
   - component: {fileID: 4071575476924804543}
-  - component: {fileID: 5798305150980407684}
-  - component: {fileID: 5305657949154678974}
+  - component: {fileID: 8690330570862342540}
+  - component: {fileID: 5107533188061079315}
+  - component: {fileID: 8158723005185026922}
+  - component: {fileID: -8092010828048132742}
+  - component: {fileID: 5107533188061079315}
   m_Layer: 0
   m_Name: DroppedItem
   m_TagString: Untagged
@@ -28,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 6834112976765427387}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.31965, y: 0, z: 6.37081}
+  m_LocalPosition: {x: 0, y: 0, z: -0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -47,9 +50,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   modelPosition: {x: 0, y: 0, z: 0}
-  modelScale: {x: 0.4, y: 0.4, z: 0.4}
-  modelRotation: {x: 0, y: 0, z: 0, w: 0}
---- !u!65 &5798305150980407684
+  modelScale: {x: 1, y: 1, z: 1}
+  modelRotation: {x: -0.70710677, y: 0, z: 0, w: 0.70710677}
+--- !u!114 &8690330570862342540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6834112976765427387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 539227d16cd76d24e9acd4b28d4b9daa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionHint
+  Text: Pick up
+--- !u!114 &5107533188061079315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6834112976765427387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9b7b4dc7e378fb5397ae934a4737e8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Attachable
+  attachedTo: {fileID: 0}
+--- !u!65 &8158723005185026922
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -64,22 +93,31 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &5305657949154678974
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6834112976765427387}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 539227d16cd76d24e9acd4b28d4b9daa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InteractionHint
-  Text: Pick up
+--- !u!54 &-8092010828048132742
+Rigidbody:
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
