@@ -48,6 +48,7 @@ public class AttachedObjects : MonoBehaviour
             return -1;
         }
 
+    protected int AttachTo(Transform obj, Transform target) {
         // if overwriting, detach first
         if (attachedObjects[index] != null)
             OnDetach(attachedObjects[index]);
