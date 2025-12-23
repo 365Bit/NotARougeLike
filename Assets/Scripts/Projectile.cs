@@ -115,6 +115,15 @@ public class Projectile : MonoBehaviour
 
             Destroy(this.gameObject);
         }
+
+        if (droppedInstance != null) {
+            if (hitObject.TryGetComponent<AttachedObjects>(out AttachedObjects a)) {
+                a.Attach(droppedInstance.transform);
+            } else {
+                var rb = droppedInstance.GetComponent<Rigidbody>();
+                rb.isKinematic = !hitObject.TryGetComponent<Rigidbody>(out Rigidbody _);
+            }
+        }
     }
 
     public void SetDamage(float damage)
