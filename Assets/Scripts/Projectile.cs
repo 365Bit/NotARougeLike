@@ -120,9 +120,12 @@ public class Projectile : MonoBehaviour
             if (hitObject.TryGetComponent<AttachedObjects>(out AttachedObjects a)) {
                 a.Attach(droppedInstance.transform);
             } else {
+                // if no AttachedObjects component, stick to objects that are not rigidbodies
                 var rb = droppedInstance.GetComponent<Rigidbody>();
                 rb.isKinematic = !hitObject.TryGetComponent<Rigidbody>(out Rigidbody _);
             }
+
+            Destroy(this.gameObject);
         }
     }
 
