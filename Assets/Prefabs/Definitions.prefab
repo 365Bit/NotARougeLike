@@ -263,7 +263,7 @@ MonoBehaviour:
   hotbarSlots: 4
   initialGold: 5
   initialXP: 0
-  initialAmmo: 256
+  initialAmmo: 16
 --- !u!114 &7895014659698534790
 MonoBehaviour:
   m_ObjectHideFlags: 0
