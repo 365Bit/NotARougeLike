@@ -21,6 +21,7 @@ public class Projectile : MonoBehaviour
     [Header("Properties")]
     public float speed;
     public float lifetime;
+    public Vector3 tipPosition;
 
     void Awake()
     {
@@ -81,7 +82,7 @@ public class Projectile : MonoBehaviour
         }
         else
         {
-            GameObject instance = Instantiate(droppedItemPrefab, this.transform.position, Quaternion.LookRotation(travelDirection));
+            GameObject instance = Instantiate(droppedItemPrefab, collision.GetContact(0).point - transform.TransformVector(tipPosition), transform.GetChild(0).rotation);
             instance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
             instance.name = bowAmmo.name;
             Destroy(this.gameObject);
