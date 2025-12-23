@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1576648743897872727}
   - component: {fileID: 4071575476924804543}
   - component: {fileID: 5798305150980407684}
+  - component: {fileID: 5305657949154678974}
   m_Layer: 0
   m_Name: DroppedItem
   m_TagString: Untagged
@@ -47,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   modelPosition: {x: 0, y: 0, z: 0}
   modelScale: {x: 0.4, y: 0.4, z: 0.4}
+  modelRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!65 &5798305150980407684
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -68,3 +70,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &5305657949154678974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6834112976765427387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 539227d16cd76d24e9acd4b28d4b9daa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionHint
+  Text: Pick up
