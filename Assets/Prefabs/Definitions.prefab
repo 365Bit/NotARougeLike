@@ -110,7 +110,14 @@ MonoBehaviour:
       - stat: 5
         value:
         - 1
+        - 1.1
+        - 1.2
+        - 1.4
+        - 1.6
+        - 1.8
         - 2
+        - 2.25
+        - 2.5
         - 3
         - 4
   - key: 1
@@ -184,17 +191,56 @@ MonoBehaviour:
     def:
       baseValue: 100
       operation: 1
-      scalingInBaseStat: []
+      scalingInBaseStat:
+      - stat: 0
+        value:
+        - 1
+        - 1.1
+        - 1.2
+        - 1.3
+        - 1.4
+        - 1.5
+        - 1.7
+        - 2
+        - 2.25
+        - 2.5
+        - 3
   - key: 13
     def:
-      baseValue: 2
+      baseValue: 1
       operation: 1
-      scalingInBaseStat: []
+      scalingInBaseStat:
+      - stat: 0
+        value:
+        - 1
+        - 1.1
+        - 1.2
+        - 1.3
+        - 1.45
+        - 1.6
+        - 1.8
+        - 2
+        - 2.25
+        - 2.5
+        - 3
   - key: 14
     def:
       baseValue: 1.5
       operation: 1
-      scalingInBaseStat: []
+      scalingInBaseStat:
+      - stat: 3
+        value:
+        - 1
+        - 1
+        - 1
+        - 1.1
+        - 1.1
+        - 1.1
+        - 1.2
+        - 1.2
+        - 1.2
+        - 1.3
+        - 1.3
   - key: 15
     def:
       baseValue: 100
