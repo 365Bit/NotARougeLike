@@ -2166,6 +2166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttachedObjects
   maximumAttachedObjects: 10
   mesh: {fileID: 5764523598682308999}
+  boneSnappingFactor: 0.7
 --- !u!1 &8673311879040220446
 GameObject:
   m_ObjectHideFlags: 0
