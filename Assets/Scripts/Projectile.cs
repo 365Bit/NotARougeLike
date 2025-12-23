@@ -38,6 +38,11 @@ public class Projectile : MonoBehaviour
         rigidBody.AddForce(transform.forward * speed, ForceMode.Impulse);
         lastPosition = transform.position;
 
+        // move one frame ahead already
+        transform.rotation = Quaternion.LookRotation(travelDirection);
+        travelDirection = rigidBody.linearVelocity.normalized;
+        transform.position += travelDirection * Time.deltaTime;
+
         // Destroy the projectile after its lifetime expires
         Destroy(this.gameObject, lifetime);
     }
@@ -69,53 +74,43 @@ public class Projectile : MonoBehaviour
 
         GameObject droppedInstance = null;
 
+        // if destroyable, deal damage
+        if (hit.transform.TryGetComponent<DestroyableObject>(out DestroyableObject destroyableObject)) {
+            Debug.Log("Projectile dealing " + damage + " damage to " + name);
+            destroyableObject.TakeDamage(damage);
+        }
 
-        if (name.Contains("chest"))
-        {
-            Transform parent = hit.transform.parent;
-            DestroyableObject destroyableObject = parent.GetComponent<DestroyableObject>();
-
-            if (destroyableObject != null)
-            {
-                Debug.Log("Projectile dealing " + damage + " damage to " + parent.name);
-                destroyableObject.TakeDamage(damage);
-            }
-
-            // instantiate dropped item and attach to opponent
-            droppedInstance = Instantiate(droppedItemPrefab, hit.point - transform.TransformVector(tipPosition) + travelDirection.normalized * 0.5f, transform.GetChild(0).rotation);
-            droppedInstance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
-            droppedInstance.name = bowAmmo.name;
-
-            Destroy(this.gameObject);
-        } else if (name.Contains("Opponent"))
-        {
-            Opponent opponent = hitObject.GetComponent<Opponent>();
+        // deal damage to opponent
+        if (hit.transform.TryGetComponent<Opponent>(out Opponent opponent)) {
             Debug.Log("Projectile dealing " + damage + " damage to " + name);
             opponent.TakeDamage(damage);
+        }
 
-            // instantiate dropped item and attach to opponent
-            droppedInstance = Instantiate(droppedItemPrefab, hit.point - transform.TransformVector(tipPosition) + travelDirection.normalized * 0.5f, transform.GetChild(0).rotation);
+        // arrow can penetrate opponent, so its position has be computed appropriately
+        if (name.Contains("Opponent"))
+        {
+            float penetrationFactor = 0.5f;
+            droppedInstance = Instantiate(droppedItemPrefab, hit.point - transform.TransformVector(tipPosition) + travelDirection.normalized * penetrationFactor, transform.GetChild(0).rotation);
             droppedInstance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
             droppedInstance.name = bowAmmo.name;
-
-            Destroy(this.gameObject);
         }
         else
         {
             droppedInstance = Instantiate(droppedItemPrefab, hit.point - transform.TransformVector(tipPosition), transform.GetChild(0).rotation);
             droppedInstance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
             droppedInstance.name = bowAmmo.name;
-
-            Destroy(this.gameObject);
         }
 
         if (droppedInstance != null) {
             if (hitObject.TryGetComponent<AttachedObjects>(out AttachedObjects a)) {
                 a.Attach(droppedInstance.transform);
             } else {
+                // if no AttachedObjects component, stick to objects that are not rigidbodies
                 var rb = droppedInstance.GetComponent<Rigidbody>();
                 rb.isKinematic = !hitObject.TryGetComponent<Rigidbody>(out Rigidbody _);
             }
+
+            Destroy(this.gameObject);
         }
     }
 
