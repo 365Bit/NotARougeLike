@@ -484,7 +484,7 @@ public class Player : MonoBehaviour
 
         items.ConsumeItem(bowAmmoSlot);
 
-        Vector3 position = cameraTransform.position + transform.forward * 1.0f;
+        Vector3 position = cameraTransform.position + cameraTransform.forward * 1.0f;
         Quaternion rotation = cameraTransform.rotation;
 
         Projectile instance = Instantiate(projectiles[0], position, rotation);
