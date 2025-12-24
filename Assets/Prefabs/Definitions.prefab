@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5196027272824433926}
   - component: {fileID: 8408705079164422734}
   - component: {fileID: -2637577086527989318}
+  - component: {fileID: 8785196659807477998}
   - component: {fileID: 8351641477545658752}
   - component: {fileID: 7895014659698534790}
   m_Layer: 0
@@ -86,9 +87,9 @@ MonoBehaviour:
     dropProbability: 0.39
     shopProbability: 0.31
     cost: 2
-    maxPerShopSlot: 20
+    maxPerShopSlot: 4
     weight: 0
-    maxPerInventorySlot: 32
+    maxPerInventorySlot: 4
 --- !u!114 &8408705079164422734
 MonoBehaviour:
   m_ObjectHideFlags: 0
