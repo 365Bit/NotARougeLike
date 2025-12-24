@@ -54,8 +54,16 @@ public class InterpolationScaling {
     // interpolation points
     public Point[] points;
 
+    // how to trat level values that are outside the given points
+    public bool cyclic;
+
     public float ComputeFrom(int level) {
         int index = 0;
+
+        if (cyclic) {
+            level = level % (points[points.Length - 1].level);
+        }
+
         for (; index + 1 < points.Length && points[index + 1].level <= level; index++);
 
         // index+1 still has to point into the array
@@ -82,6 +90,6 @@ public enum DungeonPropertyKey {
     // allows balancing of (scarce) resources 
     AvailableXP,
     AvailableGold,
-    AvailableAmmo
+    AvailableAmmoPerEnemy
 }
 
