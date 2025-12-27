@@ -45,9 +45,6 @@ public class DungeonCreator : MonoBehaviour
 
     ItemDefinitions itemDefinitions;
 
-    [Header("User Interfaces")]
-    public GameObject canvas;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -125,8 +122,6 @@ public class DungeonCreator : MonoBehaviour
         player.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
         player.name = "Player";
         player.StartGame();
-
-        canvas.SetActive(true);
     }
 
     private void CreateEnemy(List<Node> listOfRooms)
