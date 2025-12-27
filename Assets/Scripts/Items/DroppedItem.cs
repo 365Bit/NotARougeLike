@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class DroppedItem : MonoBehaviour
 {
@@ -10,12 +11,14 @@ public class DroppedItem : MonoBehaviour
     public ItemDefinition item {get; private set;}
     public int count {get; private set;}
 
+    public string interactionHintFormat;
+
     public void SetItem(ItemDefinition item, int count) {
         this.item = item;
         this.count = count;
 
         // put item name into interaction hint
-        GetComponent<InteractionHint>().Text = $"Pick up({item.displayName})";
+        GetComponent<InteractionHint>().Text = String.Format(interactionHintFormat, item.displayName, count);
 
         // instantiate prefab as child
         Transform instance = Instantiate(item.itemModel, transform).transform;

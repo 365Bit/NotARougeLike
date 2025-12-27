@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 5107533188061079315}
   - component: {fileID: 8158723005185026922}
   - component: {fileID: -8092010828048132742}
-  - component: {fileID: 5107533188061079315}
   m_Layer: 0
   m_Name: DroppedItem
   m_TagString: Untagged
@@ -52,6 +51,7 @@ MonoBehaviour:
   modelPosition: {x: 0, y: 0, z: 0}
   modelScale: {x: 1, y: 1, z: 1}
   modelRotation: {x: -0.70710677, y: 0, z: 0, w: 0.70710677}
+  interactionHintFormat: Pick up {0}
 --- !u!114 &8690330570862342540
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,6 +101,11 @@ BoxCollider:
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &-8092010828048132742
 Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6834112976765427387}
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
