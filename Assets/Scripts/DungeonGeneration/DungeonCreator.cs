@@ -29,12 +29,19 @@ public class DungeonCreator : MonoBehaviour
     List<Vector3Int> possibleHorizontalWallPosition;
     List<Vector3Int> possibleVerticalWallPosition;
 
+    // definitions
     ItemDefinitions itemDefinitions;
+    DungeonPropertyDefinitions dungeonPropertyDefinitions;
+
+    // current level
+    int level;
+    DungeonProperties properties;
 
     // Start is called before the first frame update
     void Start()
     {
         itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
+        dungeonPropertyDefinitions = GameObject.Find("Definitions").GetComponent<DungeonPropertyDefinitions>();
 
         navMeshSurface = GetComponent<NavMeshSurface>();
 
@@ -43,9 +50,13 @@ public class DungeonCreator : MonoBehaviour
 
     public void CreateDungeon()
     {
+        level = RunData.Instance.level;
+        properties = dungeonPropertyDefinitions.ComputeFrom(level);
+        int size = (int) properties[DungeonPropertyKey.Size];
+
         DestroyAllChildren();
-        DugeonGenerator generator = new DugeonGenerator(dungeonWidth, dungeonLength);
-        var listOfRooms = generator.CalculateDungeon(maxIterations,
+        DugeonGenerator generator = new DugeonGenerator(size * dungeonWidth, size * dungeonLength);
+        var listOfRooms = generator.CalculateDungeon(size * maxIterations,
             roomWidthMin,
             roomLengthMin,
             roomBottomCornerModifier,
