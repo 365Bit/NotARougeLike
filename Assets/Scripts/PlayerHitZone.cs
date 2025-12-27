@@ -24,16 +24,9 @@ public class PlayerHitZone : MonoBehaviour
 
         Debug.Log("Zone hit: " + name);
 
-        if (name.Contains("chest"))
-        {
-            Transform parent = other.gameObject.transform.parent;
-            DestroyableObject destroyableObject = parent.GetComponent<DestroyableObject>();
-
-            if (destroyableObject != null)
-            {
-                Debug.Log("Zone dealing " + damage + " damage to " + parent.name);
-                destroyableObject.TakeDamage(damage);
-            }
+        if (other.gameObject.TryGetComponent<DestroyableObject>(out DestroyableObject destroyableObject)) {
+            Debug.Log("Zone dealing " + damage + " damage to " + other.gameObject.name);
+            destroyableObject.TakeDamage(damage);
         }
 
         if (name.Contains("Opponent"))

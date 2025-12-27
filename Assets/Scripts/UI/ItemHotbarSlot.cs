@@ -18,7 +18,10 @@ public class ItemHotbarSlot : MonoBehaviour
         if (itemModel != null) Destroy(itemModel);
 
         if (count > 0 && item != null) {
-            itemModel = Instantiate(item.itemModelUI, transform);
+            if (item.itemModelUI != null)
+                itemModel = Instantiate(item.itemModelUI, transform);
+            else 
+                itemModel = null;
             itemText.GetComponent<TMP_Text>().text = item.displayName;
             itemCount.GetComponent<TMP_Text>().text = count.ToString();
         } else {

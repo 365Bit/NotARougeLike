@@ -81,8 +81,8 @@ MonoBehaviour:
     maxPerInventorySlot: 10
   - name: BowAmmo
     displayName: Bow Ammo
-    itemModel: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
-    itemModelUI: {fileID: 3299236393378255261, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
+    itemModel: {fileID: 6937730135751535858, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
+    itemModelUI: {fileID: 6937730135751535858, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
     dropProbability: 0.39
     shopProbability: 0.31
     cost: 2
@@ -263,7 +263,7 @@ MonoBehaviour:
   hotbarSlots: 4
   initialGold: 5
   initialXP: 0
-  initialAmmo: 256
+  initialAmmo: 16
 --- !u!114 &7895014659698534790
 MonoBehaviour:
   m_ObjectHideFlags: 0
