@@ -23,18 +23,28 @@ public class DungeonCreator : MonoBehaviour
     [Range(0, 2)]
     public int roomOffset;
 
-    public GameObject wallPrefab, pillarPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab, trapDoorPrefab, navPointPrefab;
+    public GameObject wallPrefab, pillarPrefab, playerPrefab, chestPrefab, shopPrefab, trapDoorPrefab, navPointPrefab;
     List<Vector3Int> possibleVerticalDoorPosition;
     List<Vector3Int> possibleHorizontalDoorPosition;
     List<Vector3Int> possibleHorizontalWallPosition;
     List<Vector3Int> possibleVerticalWallPosition;
 
+    // definitions
     ItemDefinitions itemDefinitions;
+    DungeonPropertyDefinitions dungeonPropertyDefinitions;
+    OpponentDefinitions opponentDefinitions;
+
+    // current level
+    int level;
+    DungeonProperties properties;
 
     // Start is called before the first frame update
     void Start()
     {
-        itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
+        GameObject defs = GameObject.Find("Definitions"); 
+        itemDefinitions = defs.GetComponent<ItemDefinitions>();
+        dungeonPropertyDefinitions = defs.GetComponent<DungeonPropertyDefinitions>();
+        opponentDefinitions = defs.GetComponent<OpponentDefinitions>();
 
         navMeshSurface = GetComponent<NavMeshSurface>();
 
@@ -43,9 +53,13 @@ public class DungeonCreator : MonoBehaviour
 
     public void CreateDungeon()
     {
+        level = RunData.Instance.level;
+        properties = dungeonPropertyDefinitions.ComputeFrom(level);
+        int size = (int) properties[DungeonPropertyKey.Size];
+
         DestroyAllChildren();
-        DugeonGenerator generator = new DugeonGenerator(dungeonWidth, dungeonLength);
-        var listOfRooms = generator.CalculateDungeon(maxIterations,
+        DugeonGenerator generator = new DugeonGenerator(size * dungeonWidth, size * dungeonLength);
+        var listOfRooms = generator.CalculateDungeon((int)Math.Clamp(Math.Log(size), 1, 5) * maxIterations,
             roomWidthMin,
             roomLengthMin,
             roomBottomCornerModifier,
@@ -93,6 +107,8 @@ public class DungeonCreator : MonoBehaviour
 
     private void CreateEnemy(List<Node> listOfRooms)
     {
+        int actualEnemyAmount = (int) (enemyAmount * properties[DungeonPropertyKey.EnemyCount]);
+
         bool isEnoughEnemies = false;
         int counter = 0;
         while (!isEnoughEnemies)
@@ -101,6 +117,9 @@ public class DungeonCreator : MonoBehaviour
             {
                 if (room.Type == "room")
                 {
+                    // TODO: select opponent class randomly
+                    int opponentClass = 0;
+
                     if(UnityEngine.Random.Range(0f,1f) > 0.5)
                     {
                         int enemyPosX = UnityEngine.Random.Range(room.BottomLeftAreaCorner.x + 2, room.BottomRightAreaCorner.x - 1);
@@ -110,19 +129,22 @@ public class DungeonCreator : MonoBehaviour
                             1,
                             enemyPosY);
 
-                        GameObject foe = Instantiate(enemyPrefab, enemyPos, Quaternion.identity);
+                        GameObject foe = Instantiate(opponentDefinitions.classes[opponentClass].prefab, enemyPos, Quaternion.identity);
                         Opponent opponent = foe.GetComponent<Opponent>();
                         opponent.spawnRoom = room;
 
+                        OpponentStats stats = foe.GetComponent<OpponentStats>(); 
+                        stats.ComputeFrom(opponentDefinitions.classes[opponentClass], (int)properties[DungeonPropertyKey.EnemyLevel]);
+
                         counter++;
                     }
-                    if (counter == enemyAmount)
+                    if (counter >= actualEnemyAmount)
                     {
                         break;
                     }
                 }
             }
-            isEnoughEnemies = counter >= enemyAmount;
+            isEnoughEnemies = counter >= actualEnemyAmount;
         }
     }
 
