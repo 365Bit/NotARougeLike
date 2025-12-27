@@ -81,7 +81,7 @@ MonoBehaviour:
     weight: 0
     maxPerInventorySlot: 10
   - name: BowAmmo
-    displayName: Bow Ammo
+    displayName: Arrow
     itemModel: {fileID: 6937730135751535858, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
     itemModelUI: {fileID: 6937730135751535858, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
     dropProbability: 0.39
