@@ -17,7 +17,6 @@ public class DungeonPropertyDefinitions : MonoBehaviour
     // internal data structure
     private InterpolationScaling[] _defs;
 
-    // put definitions into an array
     void Awake() {
         _defs = new InterpolationScaling[Enum.GetValues(typeof(DungeonPropertyKey)).Length];
         foreach (Def d in definitions) {
@@ -31,7 +30,7 @@ public class DungeonPropertyDefinitions : MonoBehaviour
     }
 
     // returns the dungeon properties for the given level
-    public Dictionary<DungeonPropertyKey, float> 
+    public DungeonProperties
     ComputeFrom(int level) {
         Dictionary<DungeonPropertyKey, float> result = new();
         
@@ -39,9 +38,14 @@ public class DungeonPropertyDefinitions : MonoBehaviour
             result.Add((DungeonPropertyKey) i, _defs[i].ComputeFrom(level));
         }
 
-        return result;
+        return new DungeonProperties(result);
     }
 }
+
+public class DungeonProperties : Dictionary<DungeonPropertyKey, float> {
+    public DungeonProperties(Dictionary<DungeonPropertyKey, float> b) : base(b) { }
+}
+
 
 [System.Serializable]
 public class InterpolationScaling {
@@ -54,7 +58,7 @@ public class InterpolationScaling {
     // interpolation points
     public Point[] points;
 
-    // how to trat level values that are outside the given points
+    // how to treat level values that are outside the given points
     public bool cyclic;
 
     public float ComputeFrom(int level) {
