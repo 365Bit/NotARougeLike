@@ -309,7 +309,124 @@ MonoBehaviour:
   definitions:
   - key: 0
     def:
-      points: []
+      points:
+      - level: 0
+        value: 1
+      - level: 1
+        value: 2
+      - level: 2
+        value: 1
+      - level: 3
+        value: 6
+      cyclic: 1
+  - key: 1
+    def:
+      points:
+      - level: 0
+        value: 0.1
+      - level: 1
+        value: 0.1
+      - level: 2
+        value: 0.5
+      - level: 3
+        value: 3
+      cyclic: 1
+  - key: 1
+    def:
+      points:
+      - level: 0
+        value: 0.1
+      - level: 1
+        value: 0.1
+      - level: 2
+        value: 0.5
+      - level: 3
+        value: 3
+      cyclic: 1
+  - key: 1
+    def:
+      points:
+      - level: 0
+        value: 1
+      - level: 1
+        value: 3
+      - level: 2
+        value: 0.5
+      - level: 3
+        value: 0.25
+      cyclic: 1
+  - key: 2
+    def:
+      points:
+      - level: 0
+        value: 1
+      - level: 1
+        value: 3
+      - level: 2
+        value: 0.5
+      - level: 3
+        value: 0.25
+      cyclic: 1
+  - key: 3
+    def:
+      points:
+      - level: 0
+        value: 1
+      - level: 1
+        value: 3
+      - level: 2
+        value: 0.5
+      - level: 3
+        value: 0.25
+      cyclic: 1
+  - key: 4
+    def:
+      points:
+      - level: 0
+        value: 1
+      - level: 1
+        value: 3
+      - level: 2
+        value: 0.5
+      - level: 3
+        value: 0.25
+      cyclic: 1
+  - key: 5
+    def:
+      points:
+      - level: 0
+        value: 1
+      - level: 1
+        value: 3
+      - level: 2
+        value: 0.5
+      - level: 3
+        value: 0.25
+      cyclic: 1
+  - key: 6
+    def:
+      points:
+      - level: 0
+        value: 1
+      - level: 1
+        value: 3
+      - level: 2
+        value: 0.5
+      - level: 3
+        value: 0.25
+      cyclic: 1
+  - key: 7
+    def:
+      points:
+      - level: 0
+        value: 1
+      - level: 1
+        value: 3
+      - level: 2
+        value: 0.5
+      - level: 3
+        value: 0.25
+      cyclic: 1
 --- !u!114 &8351641477545658752
 MonoBehaviour:
   m_ObjectHideFlags: 0
