@@ -50,6 +50,7 @@ public class DungeonCreator : MonoBehaviour
     private Dictionary<Vector3Int, DungeonSegment> horizontalWallOwners;
     private Dictionary<Vector3Int, DungeonSegment> verticalWallOwners;
 
+    // definitions
     ItemDefinitions itemDefinitions;
     DungeonPropertyDefinitions dungeonPropertyDefinitions;
     OpponentDefinitions opponentDefinitions;
