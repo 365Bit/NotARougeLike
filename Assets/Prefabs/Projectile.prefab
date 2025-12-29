@@ -76,7 +76,7 @@ MonoBehaviour:
   droppedItemPrefab: {fileID: 6834112976765427387, guid: 5c8515f40aecf6259b9c3cdb74d0a499, type: 3}
   speed: 100
   lifetime: 30
-  tipPosition: {x: 0, y: 0, z: 1.2}
+  tipPosition: {x: 0, y: 0, z: 3}
 --- !u!1001 &7820128142587269539
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -107,7 +107,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5cd765b255372084db586f176fb14f01, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 5cd765b255372084db586f176fb14f01, type: 3}
       propertyPath: m_LocalRotation.w
