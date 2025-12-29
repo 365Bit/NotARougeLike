@@ -1,41 +1,64 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 /// provides definitions on how to compute gameplay-stats from base-stats
 [DisallowMultipleComponent]
-public class StatScalingDefinitions : MonoBehaviour
+public class StatScalingDefinitions : KeyValueStoreComponent<StatKey, ScalingFormula>
+{ }
+
+
+[System.Serializable]
+public class KeyValueStoreComponent<Key, Value> : MonoBehaviour
+    where Key : System.Enum
+{
+    public KeyValueStore<Key, Value> data;
+
+    void Awake() { data.Init(); }
+
+    public Value this[Key key] { get => data[key]; }
+}
+
+[System.Serializable]
+public class KeyValueStore<Key, Value>
+    where Key : System.Enum
 {
     [System.Serializable]
     public struct Def {
-        public StatKey key;
-        public ScalingFormula def;
+        public Key key;
+        public Value def;
     };
 
     // for editor
     [SerializeField]
-    private Def[] definitions;
+    public Def[] definitions;
 
     // optimized datastructure
-    private ScalingFormula[] _defs;
+    [HideInInspector]
+    public Value[] _defs;
+
+    private int ToIndex(Key key) {
+        Type underlyingType = Enum.GetUnderlyingType(key.GetType());
+        return (int)Convert.ChangeType(key, underlyingType);
+    }
 
     // put definitions into an array
-    public void Awake() {
-        _defs = new ScalingFormula[Enum.GetValues(typeof(StatKey)).Length];
+    public void Init() {
+        _defs = new Value[Enum.GetValues(typeof(Key)).Length];
         foreach (Def d in definitions) {
-            _defs[(int)d.key] = d.def;
+            _defs[ToIndex(d.key)] = d.def;
         }
 
         // check definitions
         for (int i = 0; i < _defs.Length; i++) {
-            if (_defs[i] == null) Debug.Log("scaling undefined for " + Enum.GetName(typeof(StatKey), (StatKey) i));
+            if (_defs[i] == null) Debug.Log("scaling undefined for " + i);
         }
     }
 
-    public ScalingFormula this[StatKey stat] {
-        get => _defs[(int)stat];
+    public Value this[Key key] {
+        get => _defs[ToIndex(key)];
     }
 }
-
 
 [System.Serializable]
 public class ScalingFormula {

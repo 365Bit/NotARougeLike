@@ -43,8 +43,7 @@ public class ItemDefinitions : MonoBehaviour
     // 
     public ItemDefinition[] definitions;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         // normalize probabilities
         float probabilitySum = 0.0f;
