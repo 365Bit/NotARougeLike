@@ -2,40 +2,15 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-public class DungeonPropertyDefinitions : MonoBehaviour
+public class DungeonPropertyDefinitions : KeyValueStoreComponent<DungeonPropertyKey, InterpolationScaling>
 {
-    [System.Serializable]
-    public struct Def {
-        public DungeonPropertyKey key;
-        public InterpolationScaling def;
-    };
-
-    // for editor
-    [SerializeField]
-    private Def[] definitions;
-
-    // internal data structure
-    private InterpolationScaling[] _defs;
-
-    void Awake() {
-        _defs = new InterpolationScaling[Enum.GetValues(typeof(DungeonPropertyKey)).Length];
-        foreach (Def d in definitions) {
-            _defs[(int)d.key] = d.def;
-        }
-
-        // check definitions
-        for (int i = 0; i < _defs.Length; i++) {
-            if (_defs[i] == null) Debug.Log("scaling undefined for " + Enum.GetName(typeof(DungeonPropertyKey), (DungeonPropertyKey) i));
-        }
-    }
-
     // returns the dungeon properties for the given level
     public DungeonProperties
     ComputeFrom(int level) {
         Dictionary<DungeonPropertyKey, float> result = new();
         
-        for (int i = 0; i < _defs.Length; i++) {
-            result.Add((DungeonPropertyKey) i, _defs[i].ComputeFrom(level));
+        for (int i = 0; i < data._defs.Length; i++) {
+            result.Add((DungeonPropertyKey) i, data._defs[i].ComputeFrom(level));
         }
 
         return new DungeonProperties(result);
