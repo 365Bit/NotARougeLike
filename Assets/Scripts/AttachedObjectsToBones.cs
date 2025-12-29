@@ -27,8 +27,8 @@ public class AttachedObjectsToBones : AttachedObjects
 
 
         int idx = base.AttachTo(obj, bone);
-
-        offsets[idx] *= boneSnappingFactor;
+        if (idx > 0)
+            offsets[idx] *= boneSnappingFactor;
     }
 
     void Update() {
