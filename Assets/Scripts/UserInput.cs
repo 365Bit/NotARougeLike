@@ -222,16 +222,18 @@ public class UserInput : MonoBehaviour
             itemID = 3;
         }
 
-
-        //For testing save/load
+#if UNITY_EDITOR
+        // For testing save/load
         if (keyboard.f5Key.wasPressedThisFrame)
         {
             GameSaver.save();
         }
-        if(keyboard.f8Key.wasPressedThisFrame)
+        if (keyboard.f8Key.wasPressedThisFrame)
         {
             GameSaver.load();
         }
+#endif
+
         // ui
         if (keyboard.sKey.wasPressedThisFrame || keyboard.downArrowKey.wasPressedThisFrame)
         {
