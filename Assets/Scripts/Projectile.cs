@@ -86,17 +86,20 @@ public class Projectile : MonoBehaviour
             opponent.TakeDamage(damage);
         }
 
-        // arrow can penetrate opponent, so its position has be computed appropriately
+        // arrow can stick to opponent, so its position has be computed appropriately
         if (name.Contains("Opponent"))
         {
-            float penetrationFactor = 0.5f;
-            droppedInstance = Instantiate(droppedItemPrefab, hit.point - transform.TransformVector(tipPosition) + travelDirection.normalized * penetrationFactor, transform.GetChild(0).rotation);
+            Vector3 diffToOrthPlane = hit.transform.position - hit.point;
+            diffToOrthPlane.y = 0f;
+            Vector3 point = hit.point + travelDirection.normalized * Vector3.Dot(travelDirection.normalized, diffToOrthPlane);
+            droppedInstance = Instantiate(droppedItemPrefab, point, transform.GetChild(0).rotation);
             droppedInstance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
             droppedInstance.name = bowAmmo.name;
         }
         else
         {
-            droppedInstance = Instantiate(droppedItemPrefab, hit.point - transform.TransformVector(tipPosition), transform.GetChild(0).rotation);
+            float depthFactor = 0.5f; // 1 means the arrow does not go into the hit object, -1 means it fully goes in
+            droppedInstance = Instantiate(droppedItemPrefab, hit.point - transform.TransformVector(tipPosition * depthFactor), transform.GetChild(0).rotation);
             droppedInstance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
             droppedInstance.name = bowAmmo.name;
         }
