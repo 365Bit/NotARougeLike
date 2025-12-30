@@ -68,10 +68,14 @@ public class Player : MonoBehaviour
     public Weapon weapon;
     public PlayerHitZone hitZone;
 
+    [Header("Interaction")]
+    public float interactionDistance = 10f;
+
     private Inventory inventory;
     private Constitution constitution;
     private ItemDefinitions itemDefinitions;
     private PlayerStats stats;
+    private Crosshair crosshair;
 
     public bool isDead = false;
     private bool opponentGotHit;
@@ -81,6 +85,7 @@ public class Player : MonoBehaviour
         stats = GetComponent<PlayerStats>();
         inventory = GetComponent<Inventory>();
         constitution = GetComponent<Constitution>();
+        crosshair = GameObject.Find("Canvas/Crosshair").GetComponent<Crosshair>();
         itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
 
         GameObject mainCamera = GameObject.Find("Main Camera");
@@ -88,7 +93,6 @@ public class Player : MonoBehaviour
         playerCamera = mainCamera.GetComponent<Camera>();
         cameraTransform = mainCamera.GetComponent<Transform>();
         characterController = GetComponent<CharacterController>();
-        interactArea = GameObject.Find("Interaction Area").GetComponent<InteractionArea>();
 
         leftShoulderTransform = GameObject.Find("Left Shoulder").GetComponent<Transform>();
         rightShoulderTransform = GameObject.Find("Right Shoulder").GetComponent<Transform>();
@@ -233,6 +237,15 @@ public class Player : MonoBehaviour
         constitution.RegenerateMana();
         bool idle = motion.x >= -0.1f && motion.x <= 0.1f && motion.y >= -0.1f && motion.y <= 0.1f && motion.z >= -0.1f && motion.z <= 0.1f;
         constitution.RegenerateStamina(idle);
+
+        // give interaction hint
+        if (RaycastInteractible(out RaycastHit hit)) {
+            if (hit.transform.gameObject.TryGetComponent<InteractionHint>(out InteractionHint hint)) {
+                crosshair.SetInteractionText(hint.Text);
+            } else {
+                crosshair.Reset();
+            }
+        }
     }
 
     public void Aim(bool value)
@@ -326,11 +339,9 @@ public class Player : MonoBehaviour
         endRotation = Quaternion.Euler(swingRotation);
     }
 
-
+    // use raycast to find object for interaction
     public bool RaycastInteractible(out RaycastHit hit) {
         Vector3 position = cameraTransform.position + cameraTransform.forward * 0.1f;
-        Debug.DrawRay(position, cameraTransform.forward, Color.white, 1.0f);
-        float interactionDistance = 10f;
         return Physics.Raycast(position, cameraTransform.forward, out hit, interactionDistance, ~LayerMask.GetMask("Player"));
     }
 
@@ -355,17 +366,8 @@ public class Player : MonoBehaviour
 
     public void Interact()
     {
-        bool done = false;
-
-        // first check interaction area
-        if (interactArea.triggerObject != null)
-        {
-            done = InteractWith(interactArea.triggerObject.transform);
-        }
-
-        // then try raycasting
-        if (!done && RaycastInteractible(out RaycastHit hit)) {
-            done = InteractWith(hit.transform);
+        if (RaycastInteractible(out RaycastHit hit)) {
+            InteractWith(hit.transform);
         }
     }
 
@@ -482,7 +484,7 @@ public class Player : MonoBehaviour
 
         items.ConsumeItem(bowAmmoSlot);
 
-        Vector3 position = cameraTransform.position + transform.forward * 1.0f;
+        Vector3 position = cameraTransform.position + cameraTransform.forward * 1.0f;
         Quaternion rotation = cameraTransform.rotation;
 
         Projectile instance = Instantiate(projectiles[0], position, rotation);

@@ -2,37 +2,33 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using static UnityEditor.Progress;
 
-[RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
+[RequireComponent(typeof(Rigidbody))]
 public class Projectile : MonoBehaviour
 {
     // Components
     private Rigidbody rigidBody;
-    private BoxCollider boxCollider;
 
     public GameObject droppedItemPrefab;
 
     private ItemDefinitions itemDefinitions;
     private ItemDefinition bowAmmo;
     Vector3 travelDirection;
-    Rigidbody rb;
+    Vector3 lastPosition;
 
     private float damage;
 
     [Header("Properties")]
     public float speed;
     public float lifetime;
+    public Vector3 tipPosition;
 
     void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
         rigidBody.useGravity = true; // TODO: Make this projectile-specific
 
-        boxCollider = GetComponent<BoxCollider>();
-        boxCollider.isTrigger = false;
-
         itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
         bowAmmo = itemDefinitions.definitions[3];
-        rb = GetComponent<Rigidbody>();
     }
 
 
@@ -40,6 +36,12 @@ public class Projectile : MonoBehaviour
     void Start()
     {
         rigidBody.AddForce(transform.forward * speed, ForceMode.Impulse);
+        lastPosition = transform.position;
+
+        // move one frame ahead already
+        transform.rotation = Quaternion.LookRotation(travelDirection);
+        travelDirection = rigidBody.linearVelocity.normalized;
+        transform.position += travelDirection * Time.deltaTime;
 
         // Destroy the projectile after its lifetime expires
         Destroy(this.gameObject, lifetime);
@@ -48,7 +50,14 @@ public class Projectile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        travelDirection = rb.linearVelocity.normalized;
+        travelDirection = rigidBody.linearVelocity.normalized;
+        transform.rotation = Quaternion.LookRotation(travelDirection);
+
+        if (Physics.Raycast(lastPosition, travelDirection, out RaycastHit hit, 1.2f * (transform.position - lastPosition).magnitude)) {
+            OnHit(hit);
+        }
+
+        lastPosition = transform.position;
     }
 
     private void OnBecameInvisible()
@@ -57,33 +66,53 @@ public class Projectile : MonoBehaviour
         Destroy(this.gameObject);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnHit(RaycastHit hit)
     {
-        string name = collision.gameObject.name;
+        GameObject hitObject = hit.transform.gameObject;
+        string name = hitObject.name;
         Debug.Log("Projectile hit: " + name);
 
-        if (name.Contains("chest"))
-        {
-            Transform parent = collision.gameObject.transform.parent;
-            DestroyableObject destroyableObject = parent.GetComponent<DestroyableObject>();
+        GameObject droppedInstance = null;
 
-            if (destroyableObject != null)
-            {
-                Debug.Log("Projectile dealing " + damage + " damage to " + parent.name);
-                destroyableObject.TakeDamage(damage);
-            }
-        } else if (name.Contains("Opponent"))
-        {
-            Opponent opponent = collision.gameObject.GetComponent<Opponent>();
+        // if destroyable, deal damage
+        if (hit.transform.TryGetComponent<DestroyableObject>(out DestroyableObject destroyableObject)) {
+            Debug.Log("Projectile dealing " + damage + " damage to " + name);
+            destroyableObject.TakeDamage(damage);
+        }
+
+        // deal damage to opponent
+        if (hit.transform.TryGetComponent<Opponent>(out Opponent opponent)) {
             Debug.Log("Projectile dealing " + damage + " damage to " + name);
             opponent.TakeDamage(damage);
-            Destroy(this.gameObject);
+        }
+
+        // arrow can stick to opponent, so its position has be computed appropriately
+        if (name.Contains("Opponent"))
+        {
+            Vector3 diffToOrthPlane = hit.transform.position - hit.point;
+            diffToOrthPlane.y = 0f;
+            Vector3 point = hit.point + travelDirection.normalized * Vector3.Dot(travelDirection.normalized, diffToOrthPlane);
+            droppedInstance = Instantiate(droppedItemPrefab, point, transform.GetChild(0).rotation);
+            droppedInstance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
+            droppedInstance.name = bowAmmo.name;
         }
         else
         {
-            GameObject instance = Instantiate(droppedItemPrefab, this.transform.position, Quaternion.LookRotation(travelDirection));
-            instance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
-            instance.name = bowAmmo.name;
+            float depthFactor = 0.5f; // 1 means the arrow does not go into the hit object, -1 means it fully goes in
+            droppedInstance = Instantiate(droppedItemPrefab, hit.point - transform.TransformVector(tipPosition * depthFactor), transform.GetChild(0).rotation);
+            droppedInstance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
+            droppedInstance.name = bowAmmo.name;
+        }
+
+        if (droppedInstance != null) {
+            if (hitObject.TryGetComponent<AttachedObjects>(out AttachedObjects a)) {
+                a.Attach(droppedInstance.transform);
+            } else {
+                // if no AttachedObjects component, stick to objects that are not rigidbodies
+                var rb = droppedInstance.GetComponent<Rigidbody>();
+                rb.isKinematic = !hitObject.TryGetComponent<Rigidbody>(out Rigidbody _);
+            }
+
             Destroy(this.gameObject);
         }
     }
