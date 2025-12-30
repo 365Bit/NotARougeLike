@@ -2025,6 +2025,7 @@ GameObject:
   - component: {fileID: 7431825396633380683}
   - component: {fileID: 4975561014754260319}
   - component: {fileID: 7261524907011688642}
+  - component: {fileID: 2069591081605510192}
   - component: {fileID: 2506817616126039836}
   - component: {fileID: 7685539837612636914}
   m_Layer: 0
@@ -2123,6 +2124,32 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &2069591081605510192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8282398908945130151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97912ec28d62fdc5a82cbc1d366788a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  hitRate: 2
+  hitCooldown: 0
+  stunDuration: 0
+  swingDuration: 0
+  strikeDuration: 0.3
+  returnDuration: 0.6
+  attackRange: 3
+  maxHealth: 100
+  healthRegRate: 5
+  wanderInterval: 3
+  wanderRadius: 5
+  rotationSpeed: 90
+  memoryDuration: 5
+  detectionRange: 20
 --- !u!114 &2506817616126039836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2136,22 +2163,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Opponent
   hitZone: {fileID: 2615748330894058864}
-  hitRate: 2
-  hitCooldown: 0
-  stunDuration: 0
-  swingDuration: 0
-  strikeDuration: 0.3
-  returnDuration: 1.2
-  attackRange: 3
-  detectionRange: 20
-  rotationSpeed: 90
   playerGotHit: 0
-  maxHealth: 100
-  healthRegRate: 5
-  wanderInterval: 5
-  wanderRadius: 5
   viewAngle: 60
-  memoryDuration: 5
 --- !u!114 &7685539837612636914
 MonoBehaviour:
   m_ObjectHideFlags: 0
