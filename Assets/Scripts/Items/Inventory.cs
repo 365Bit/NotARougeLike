@@ -16,13 +16,13 @@ public class Inventory : MonoBehaviour
     public Inventory() {
         container = RunData.Instance.items;
         currency = RunData.Instance.currencies;
+
+        GameSaver.subscribe(currency);
     }
 
     public void Start() {
         Constants defs = GameObject.Find("Definitions").GetComponent<Constants>();
         numHotbarSlots = defs.hotbarSlots;
-
-        GameSaver.subscribe(currency);
     }
 }
 
