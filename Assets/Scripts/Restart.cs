@@ -7,7 +7,6 @@ public class Restart : MonoBehaviour
     {
         Debug.Log("Restarting Level");
 
-        GameSaver.save();
         RunData.Instance.NewRun();
 
         //DungeonCreator dungeonCreator = GameObject.Find("DungeonCreator").GetComponent<DungeonCreator>();
