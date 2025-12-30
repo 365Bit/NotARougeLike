@@ -130,6 +130,8 @@ class GameSaver
                         throw new UnsavableException($"Only Fields and Properties are sAveable, not {m.MemberType}");
                     }
                 }
+
+                Debug.Log($"Loaded {saveable.Item1}");
             }
         }
 
