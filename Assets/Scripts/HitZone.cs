@@ -11,12 +11,6 @@ public class HitZone : MonoBehaviour
         opponent = GetComponentInParent<Opponent>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private void OnTriggerEnter(Collider other)
     {
         string name = other.gameObject.name;

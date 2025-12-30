@@ -11,14 +11,17 @@ public class UIManager : MonoBehaviour
     public GameObject playerStats { get; private set; }
     public GameObject hotbar { get; private set; }
     public GameObject inventoryUI { get; private set; }
+    public GameObject upgradesUI { get; private set; }
     public GameObject deathScreen { get; private set; }
 
-    public bool inventoryOpen { get => inventoryUI.active; }
+    public bool inventoryOpen { get => inventoryUI != null && inventoryUI.activeInHierarchy; }
+    public bool upgradesOpen { get => upgradesUI != null && upgradesUI.activeInHierarchy; }
 
     // set of possible ui states
     public enum UIState {
         Gameplay,
         Inventory,
+        Upgrades,
         Death,
         Pause
     };
@@ -26,12 +29,12 @@ public class UIManager : MonoBehaviour
 
 
     public void SwitchToGameplay() {
+        upgradesUI.SetActive(false);
+        inventoryUI.SetActive(false);
+        deathScreen.SetActive(false);
+
         playerStats.SetActive(true);
         hotbar.SetActive(true);
-
-        inventoryUI.SetActive(false);
-
-        deathScreen.SetActive(false);
 
         currentState = UIState.Gameplay;
     }
@@ -39,17 +42,30 @@ public class UIManager : MonoBehaviour
     public void SwitchToInventory() {
         playerStats.SetActive(false);
         hotbar.SetActive(false);
+        upgradesUI.SetActive(false);
 
         inventoryUI.SetActive(true);
 
         currentState = UIState.Inventory;
     }
 
+    public void SwitchToUpgrades() {
+        playerStats.SetActive(false);
+        hotbar.SetActive(false);
+        inventoryUI.SetActive(false);
+
+        upgradesUI.SetActive(true);
+
+        currentState = UIState.Inventory;
+    }
+
+
     public void SwitchToDeathScreen() {
         playerStats.SetActive(false);
         hotbar.SetActive(false);
 
         inventoryUI.SetActive(false);
+        upgradesUI.SetActive(false);
 
         deathScreen.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
@@ -64,6 +80,7 @@ public class UIManager : MonoBehaviour
         hotbar = GameObject.Find("Hotbar");
 
         inventoryUI = GameObject.Find("Inventory");
+        upgradesUI = GameObject.Find("Upgrades");
 
         deathScreen = GameObject.Find("Death Screen");
 

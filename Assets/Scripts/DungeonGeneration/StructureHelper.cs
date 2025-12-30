@@ -44,7 +44,7 @@ public static class StructureHelper
         int maxY = boundaryRightPoint.y - offset;
         return new Vector2Int(
             Random.Range(minX, (int)(minX + (maxX - minX) * pointModifier)),
-            Random.Range(minY, (int)(minY + (minY - minY) * pointModifier)));
+            Random.Range(minY, (int)(minY + (maxY - minY) * pointModifier)));
     }
 
     public static Vector2Int GenerateTopRightCornerBetween(

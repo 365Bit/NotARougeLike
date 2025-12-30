@@ -8,7 +8,7 @@ public class CorridorNode : Node
     private Node structure1;
     private Node structure2;
     private int corridorWidth;
-    private int modifierDistanceFromWall=1;
+    private int modifierDistanceFromWall=2;
 
     public CorridorNode(Node node1, Node node2, int corridorWidth) : base(null)
     {
@@ -77,10 +77,12 @@ public class CorridorNode : Node
         {
             rightStructure = possibleNeighboursInRightStructureList[0];
         }
-        int y = GetValidYForNeighourLeftRight(leftStructure.TopLeftAreaCorner, leftStructure.BottomRightAreaCorner,
+        int y = GetValidYForNeighourLeftRight(
+            leftStructure.TopLeftAreaCorner, 
+            leftStructure.BottomRightAreaCorner,
             rightStructure.TopLeftAreaCorner,
             rightStructure.BottomLeftAreaCorner);
-        while(y==-1 && sortedLeftStructure.Count > 1)
+        while(y == -1 && sortedLeftStructure.Count > 1)
         {
             sortedLeftStructure = sortedLeftStructure.Where(
                 child => child.TopLeftAreaCorner.y != leftStructure.TopLeftAreaCorner.y).ToList();
@@ -99,14 +101,14 @@ public class CorridorNode : Node
         {
             return StructureHelper.CalculateMiddlePoint(
                 leftNodeDown + new Vector2Int(0, modifierDistanceFromWall),
-                leftNodeUp - new Vector2Int(0, modifierDistanceFromWall + this.corridorWidth)
+                leftNodeUp - new Vector2Int(0, modifierDistanceFromWall) //+ this.corridorWidth)
                 ).y;
         }
         if(rightNodeUp.y <= leftNodeUp.y && leftNodeDown.y <= rightNodeDown.y)
         {
             return StructureHelper.CalculateMiddlePoint(
                 rightNodeDown+new Vector2Int(0,modifierDistanceFromWall),
-                rightNodeUp - new Vector2Int(0, modifierDistanceFromWall+this.corridorWidth)
+                rightNodeUp - new Vector2Int(0, modifierDistanceFromWall)
                 ).y;
         }
         if(leftNodeUp.y >= rightNodeDown.y && leftNodeUp.y <= rightNodeUp.y)
@@ -120,7 +122,7 @@ public class CorridorNode : Node
         {
             return StructureHelper.CalculateMiddlePoint(
                 leftNodeDown+new Vector2Int(0,modifierDistanceFromWall),
-                rightNodeUp-new Vector2Int(0,modifierDistanceFromWall+this.corridorWidth)
+                rightNodeUp-new Vector2Int(0,modifierDistanceFromWall)
                 ).y;
         }
         return- 1;
