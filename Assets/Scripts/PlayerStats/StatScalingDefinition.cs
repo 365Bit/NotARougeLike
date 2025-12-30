@@ -34,7 +34,7 @@ public class KeyValueStore<Key, Value>
     public Def[] definitions;
 
     // optimized datastructure
-    [HideInInspector]
+    [HideInInspector, NonSerialized]
     public Value[] _defs;
 
     private int ToIndex(Key key) {
