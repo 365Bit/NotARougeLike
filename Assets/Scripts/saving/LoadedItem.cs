@@ -1,7 +1,6 @@
 
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 class LoadedItem
 {
@@ -77,17 +76,32 @@ class LoadedItem
         {
             return null;
         }
-        if (typeof(IEnumerable<Object>).IsConvertibleTo(type,false))
+
+        if (type.IsArray)
         {
-            
+            if (!isList())
+            {
+                throw new LoadException($"{ToString()} is not a List");
+            }
+
+            Type elementType = type.GetElementType();
+            Array array = Array.CreateInstance(elementType, list.Count);
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                array.SetValue(list[i].getValue(elementType), i);
+            }
+
+            return array;
         }
+
         try
         {
-            var value = System.Convert.ChangeType(this.rawData, type);
-            if (value != null)
-                return value;
+            return Convert.ChangeType(rawData, type);
         }
-        catch (InvalidCastException) { }
-        throw new LoadException($"cannot convert {ToString()} to type {type.Name}");
+        catch
+        {
+            throw new LoadException($"cannot convert {ToString()} to type {type.Name}");
+        }
     }
 }
