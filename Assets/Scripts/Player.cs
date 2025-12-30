@@ -118,7 +118,8 @@ public class Player : MonoBehaviour
         opponentGotHit = false;
 
         if (!RunData.Instance.Initialized) {
-            RunData.Instance.NewRun();
+            RunData.Instance.NewGame();
+            GameSaver.load();
         } else {
             attackType = RunData.Instance.selectedAttack;
         }
@@ -299,6 +300,7 @@ public class Player : MonoBehaviour
         isDead = true;
         characterController.enabled = false;
         UIManager.Instance.SwitchToDeathScreen();
+        GameSaver.save();
     }
 
     public void StartGame()
