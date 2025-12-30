@@ -183,6 +183,7 @@ public class Opponent : MonoBehaviour
 
             float duration = hitState == HitState.Swing ? stats.swingDuration :
                              hitState == HitState.Strike ? stats.strikeDuration : stats.returnDuration;
+            duration /= stats.hitRate;
 
             float ratio = Mathf.Clamp(hitTime / duration, 0.0f, 1.0f);
 
@@ -211,7 +212,7 @@ public class Opponent : MonoBehaviour
                     case HitState.Return:
                         hitZone.gameObject.SetActive(false);
                         hitState = HitState.Idle;
-                        hitCooldown = 0.5f;
+                        hitCooldown = 1f / stats.hitRate;
                         playerGotHit = false;
 
                         break;
