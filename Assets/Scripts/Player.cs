@@ -139,6 +139,10 @@ public class Player : MonoBehaviour
             motion.y = 0.0f;
         }
 
+        if (transform.position.y < -10) {
+            Die();
+        }
+
         if (fireCooldown > 0.0f)
         {
             fireCooldown -= Time.deltaTime;
