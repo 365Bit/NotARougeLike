@@ -4,7 +4,6 @@ using System.Linq;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Unity.VisualScripting;
 using System.Data;
 using System.Reflection;
 
@@ -20,14 +19,14 @@ class GameSaver
         {
             saveDirectory = Path.Combine("game_saves", "not_a_rogue_like");
         }
-        // else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        // {
-        //     saveDirectory = Path.Combine(new string[] { home, "Saved Games", "NotARogueLike" });
-        // }
-        // else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        // {
-        //     saveDirectory = Path.Combine(new string[] { home, ".local", "share", "not_a_rogue_like" });
-        // }
+        else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            saveDirectory = Path.Combine(new string[] { home, "Saved Games", "NotARogueLike" });
+        }
+        else if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            saveDirectory = Path.Combine(new string[] { home, ".local", "share", "not_a_rogue_like" });
+        }
         else
         {
             throw new NotImplementedException("There is no savegame location implemented for the current operating system.\nSupported are: Linux and MS Windows");
@@ -107,6 +106,7 @@ class GameSaver
                     loadedObject = data[saveable.Item1];
                 }
                 catch (IndexOutOfRangeException){continue;}
+
                 foreach (MemberInfo m in Writer.getSaveableMemebrs(saveable.Item2.Target))
                 {
                     System.Object obj = saveable.Item2.Target;
@@ -116,6 +116,7 @@ class GameSaver
                         loadedValue = loadedObject[m.Name];
                     }
                     catch (IndexOutOfRangeException) { continue; }
+
                     if (m.MemberType == MemberTypes.Field)
                     {
                         ((FieldInfo)m).SetValue(obj, loadedValue.getValue(((FieldInfo)m).FieldType));
