@@ -236,7 +236,7 @@ public class Opponent : MonoBehaviour
         // TODO
         navMeshAgent.isStopped = true;
 
-        hitZone.SetDamage(20.0f);
+        hitZone.SetDamage(stats.attackDamage);
         hitState = HitState.Swing;
         hitTime = 0.0f;
 
