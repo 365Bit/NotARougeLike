@@ -30,12 +30,13 @@ public class InterpolationScaling {
         public float value;
     }
 
+    [Tooltip("factor to apply")]
     public float baseValue = 1.0f;
 
-    // interpolation points
+    [Tooltip("interpolation points")]
     public Point[] points;
 
-    // how to treat level values that are outside the given points
+    [Tooltip("if true, cycles through the given points")]
     public bool cyclic;
 
     public float ComputeFrom(int level) {
