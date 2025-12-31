@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEditor.Experimental.GraphView;
@@ -15,7 +15,10 @@ public class DungeonCreator : MonoBehaviour
     public int corridorWidth;
     public int enemyAmount;
     public float lootProb, shopProb;
+    [Header("Materials")]
     public Material material;
+    public Material floorMaterial, ceilingMaterial;
+
     [Range(0.0f, 0.3f)]
     public float roomBottomCornerModifier;
     [Range(0.7f, 1.0f)]
@@ -23,7 +26,9 @@ public class DungeonCreator : MonoBehaviour
     [Range(0, 2)]
     public int roomOffset;
 
-    public GameObject wallPrefab, pillarPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab, trapDoorPrefab, navPointPrefab;
+    [Header("Prefabs")]
+    public GameObject wallPrefab;
+    public GameObject pillarPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab, trapDoorPrefab, navPointPrefab;
     List<Vector3Int> possibleVerticalDoorPosition;
     List<Vector3Int> possibleHorizontalDoorPosition;
     List<Vector3Int> possibleHorizontalWallPosition;
@@ -470,6 +475,15 @@ public class DungeonCreator : MonoBehaviour
         Vector3 topLeftV = new Vector3(bottomLeftCorner.x, 0, topRightCorner.y);
         Vector3 topRightV = new Vector3(topRightCorner.x, 0, topRightCorner.y);
 
+        GameObject dungeonFloor = new GameObject("Mesh" + bottomLeftCorner);
+
+        MeshFilter meshFilter = dungeonFloor.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = dungeonFloor.AddComponent<MeshRenderer>();
+        MeshCollider meshCollider = dungeonFloor.AddComponent<MeshCollider>();
+
+        Mesh mesh = new Mesh();
+        mesh.name = "DungeonFloorMesh";
+
         Vector3[] vertices = new Vector3[]
         {
             topLeftV,
@@ -478,34 +492,30 @@ public class DungeonCreator : MonoBehaviour
             bottomRightV
         };
 
+        int[] triangles = new int[]
+        {
+            0, 1, 2,
+            2, 1, 3
+        };
+
         Vector2[] uvs = new Vector2[vertices.Length];
         for (int i = 0; i < uvs.Length; i++)
         {
             uvs[i] = new Vector2(vertices[i].x, vertices[i].z);
         }
 
-        int[] triangles = new int[]
-        {
-            0,
-            1,
-            2,
-            2,
-            1,
-            3
-        };
-        Mesh mesh = new Mesh();
         mesh.vertices = vertices;
-        mesh.uv = uvs;
         mesh.triangles = triangles;
+        mesh.uv = uvs;
 
-        GameObject dungeonFloor = new GameObject(type + name, typeof(MeshFilter), typeof(MeshRenderer));//"Mesh" + bottomLeftCorner
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
 
-        dungeonFloor.transform.position = Vector3.zero;
-        dungeonFloor.transform.localScale = Vector3.one;
-        dungeonFloor.GetComponent<MeshFilter>().mesh = mesh;
-        dungeonFloor.GetComponent<MeshRenderer>().material = material;
-        dungeonFloor.AddComponent<MeshCollider>();
-        dungeonFloor.transform.parent = transform;
+        meshFilter.mesh = mesh;
+        meshRenderer.material = floorMaterial;
+
+        meshCollider.sharedMesh = mesh;
+        meshCollider.convex = false;
 
         for (int row = (int)Math.Ceiling(bottomLeftV.x); row < (int)Math.Ceiling(bottomRightV.x); row++)
         {
