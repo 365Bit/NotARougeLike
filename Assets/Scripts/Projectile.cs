@@ -25,6 +25,7 @@ public class Projectile : MonoBehaviour
     void Awake()
     {
         rigidBody = GetComponent<Rigidbody>();
+        rigidBody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
         rigidBody.useGravity = true; // TODO: Make this projectile-specific
 
         itemDefinitions = GameObject.Find("Definitions").GetComponent<ItemDefinitions>();
