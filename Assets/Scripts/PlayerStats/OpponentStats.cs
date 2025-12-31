@@ -11,6 +11,7 @@ public class OpponentStats : MonoBehaviour
     public float strikeDuration;
     public float returnDuration;
     public float attackRange;
+    public float attackDamage;
 
     [Header("Health")]
     public float maxHealth;
@@ -34,6 +35,7 @@ public class OpponentStats : MonoBehaviour
 		strikeDuration = def[OpponentStatKey.StrikeDuration].ComputeFrom(level);
 		returnDuration = def[OpponentStatKey.ReturnDuration].ComputeFrom(level);
 		attackRange = def[OpponentStatKey.AttackRange].ComputeFrom(level);
+		attackDamage = def[OpponentStatKey.AttackDamage].ComputeFrom(level);
 
 		maxHealth = def[OpponentStatKey.MaxHealth].ComputeFrom(level);
 		healthRegRate = def[OpponentStatKey.HealthRegRate].ComputeFrom(level);
@@ -55,6 +57,7 @@ public enum OpponentStatKey {
     StrikeDuration,
     ReturnDuration,
     AttackRange,
+    AttackDamage,
     MaxHealth,
     HealthRegRate,
     WanderInterval,
