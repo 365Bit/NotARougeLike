@@ -75,6 +75,8 @@ public class Opponent : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         animator.SetFloat("attackSpeed", stats.hitRate);
         obstacleMask = LayerMask.GetMask("Wall");
+
+        navMeshAgent.speed = stats.movementSpeed;
     }
 
     // Update is called once per frame
