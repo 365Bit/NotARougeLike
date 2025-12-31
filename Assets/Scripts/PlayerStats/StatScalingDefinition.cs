@@ -25,9 +25,26 @@ public class KeyValueStore<Key, Value>
 {
     [System.Serializable]
     public struct Def {
-        public Key key;
+        [Tooltip("property key")]
+        public string key;
+        [Tooltip("definition")]
         public Value def;
     };
+
+    static Dictionary<string, Key> stringToKey = new();
+    static Dictionary<Key, string> keyToString = new();
+
+    static KeyValueStore() {
+        var names = Enum.GetNames(typeof(Key));
+        var values = Enum.GetValues(typeof(Key));
+
+        for (int i = 0; i < names.Length; i++) {
+            string n = (string)names.GetValue(i);
+            Key k = (Key)values.GetValue(i);
+            stringToKey.Add(n, k);
+            keyToString.Add(k, n);
+        }
+    }
 
     // for editor
     [SerializeField]
@@ -40,6 +57,10 @@ public class KeyValueStore<Key, Value>
     private int ToIndex(Key key) {
         Type underlyingType = Enum.GetUnderlyingType(key.GetType());
         return (int)Convert.ChangeType(key, underlyingType);
+    }
+
+    private int ToIndex(string name) {
+        return ToIndex(stringToKey[name]);
     }
 
     // put definitions into an array
@@ -66,8 +87,8 @@ public class ScalingFormula {
     public struct Operand {
         [Tooltip("The base stat to depend on")]
         public BaseStatKey stat;
-        [Tooltip("value for each upgrade level")]
-        public float[] value;
+        [Tooltip("scaling in level of base stat")]
+        public InterpolationScaling value;
     }
 
     // defines how the values should be combined
@@ -75,20 +96,20 @@ public class ScalingFormula {
         Addition, Multiplication
     };
 
-    // initial value
+    [Tooltip("base factor")]
     public float baseValue;
 
-    // how to combine operands
+    [Tooltip("how to combine values from base stats")]
     public Operation operation;
-    // operand constists of a value per upgrade level of a base stat
+    [Tooltip("scaling in different base stats (base value should be 1 for multiplication, 0 for addition)")]
     public Operand[] scalingInBaseStat;
 
     public float ComputeFrom(PlayerUpgradeState upgradeLevels) {
         float result = baseValue;
         if (scalingInBaseStat != null) {
             foreach (Operand s in scalingInBaseStat) {
-                int index = (upgradeLevels[s.stat] < s.value.Length) ? upgradeLevels[s.stat] : s.value.Length - 1;
-                float value = s.value[index];
+                int level = upgradeLevels[s.stat];
+                float value = s.value.ComputeFrom(level);
                 if (operation == Operation.Multiplication) {
                     result *= value;
                 } else {
