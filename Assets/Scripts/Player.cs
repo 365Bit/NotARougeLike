@@ -118,10 +118,11 @@ public class Player : MonoBehaviour
         opponentGotHit = false;
 
         if (!RunData.Instance.Initialized) {
-            RunData.Instance.NewRun();
-        } else {
-            attackType = RunData.Instance.selectedAttack;
+            RunData.Instance.NewGame();
         }
+        GameSaver.load();
+
+        attackType = RunData.Instance.selectedAttack;
     }
 
     // Update is called once per frame
@@ -140,6 +141,10 @@ public class Player : MonoBehaviour
         else
         {
             motion.y = 0.0f;
+        }
+
+        if (transform.position.y < -10 && !isDead) {
+            Die();
         }
 
         if (fireCooldown > 0.0f)
@@ -299,6 +304,9 @@ public class Player : MonoBehaviour
         isDead = true;
         characterController.enabled = false;
         UIManager.Instance.SwitchToDeathScreen();
+        RunData.Instance.NewRun();
+        GameSaver.save();
+
     }
 
     public void StartGame()

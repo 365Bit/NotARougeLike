@@ -7,10 +7,13 @@ public class PlayerUpgrades : MonoBehaviour
     public PlayerUpgradeState levels;
     private GameObject definitions;
 
-    void Awake() {
+    public PlayerUpgrades() {
         levels = RunData.Instance.upgrades;
-        definitions = GameObject.Find("Definitions");
         GameSaver.subscribe(levels);
+    }
+
+    void Awake() {
+        definitions = GameObject.Find("Definitions");
     }
 
     public ref int this[BaseStatKey stat] {
@@ -47,6 +50,7 @@ public class PlayerUpgrades : MonoBehaviour
 
 [Serializable]
 public class PlayerUpgradeState {
+    [SaveAble]
     public int[] levels;
 
     public PlayerUpgradeState() {
