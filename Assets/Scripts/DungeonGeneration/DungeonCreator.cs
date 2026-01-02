@@ -105,6 +105,23 @@ public class DungeonCreator : MonoBehaviour
         player.StartGame();
     }
 
+    // selects opponent class randomly
+    private int SelectRandomOpponentClass()
+    {
+        float sample = UnityEngine.Random.Range(0,1f);
+        int opponentClass = 0;
+        for (int index = 0; index < opponentDefinitions.classes.Length; index++)
+        {
+            sample -= opponentDefinitions.classes[index].spawnProbability;
+            if (sample <= 0f)
+            {
+                opponentClass = index;
+                break;
+            }
+        }
+        return opponentClass;
+    }
+
     private void CreateEnemy(List<Node> listOfRooms)
     {
         int actualEnemyAmount = (int) (enemyAmount * properties[DungeonPropertyKey.EnemyCount]);
@@ -117,11 +134,10 @@ public class DungeonCreator : MonoBehaviour
             {
                 if (room.Type == "room")
                 {
-                    // TODO: select opponent class randomly
-                    int opponentClass = 0;
-
                     if(UnityEngine.Random.Range(0f,1f) > 0.5)
                     {
+                        int opponentClass = SelectRandomOpponentClass();
+
                         int enemyPosX = UnityEngine.Random.Range(room.BottomLeftAreaCorner.x + 2, room.BottomRightAreaCorner.x - 1);
                         int enemyPosY = UnityEngine.Random.Range(room.BottomLeftAreaCorner.y + 2, room.TopLeftAreaCorner.y - 1);
                         Vector3 enemyPos = new Vector3(
@@ -201,12 +217,12 @@ public class DungeonCreator : MonoBehaviour
             // select random definition
             float random = UnityEngine.Random.Range(0f,1f);
             foreach (ItemDefinition def in itemDefinitions.definitions) {
-                if (random <= def.shopProbability) {
+                random -= def.shopProbability;
+                if (random <= 0f) {
                     slot.storedItem = def;
                     slot.count = 1;
                     break;
                 }
-                random -= def.shopProbability;
             }
         }
     }
