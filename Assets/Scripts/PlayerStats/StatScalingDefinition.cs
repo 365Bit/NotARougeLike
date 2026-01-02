@@ -15,10 +15,16 @@ public class KeyValueStoreComponent<Key, Value> : MonoBehaviour
     public KeyValueStore<Key, Value> data;
 
     void Awake() { data.Init(); }
+    void OnValidate() { data.OnValidate(); }
 
     public Value this[Key key] { get => data[key]; }
 }
 
+/// <summary>
+/// An enum-indexed dictionary, that can be modified via the Unity Editor
+/// </summary>
+/// <typeparam name="Key">an enum type</typeparam>
+/// <typeparam name="Value"></typeparam>
 [System.Serializable]
 public class KeyValueStore<Key, Value>
     where Key : System.Enum
@@ -31,6 +37,7 @@ public class KeyValueStore<Key, Value>
         public Value def;
     };
 
+    // mappings between enums values and their names
     static Dictionary<string, Key> stringToKey = new();
     static Dictionary<Key, string> keyToString = new();
 
@@ -54,13 +61,18 @@ public class KeyValueStore<Key, Value>
     [HideInInspector, NonSerialized]
     public Value[] _defs;
 
-    private int ToIndex(Key key) {
+    private static int ToIndex(Key key) {
         Type underlyingType = Enum.GetUnderlyingType(key.GetType());
         return (int)Convert.ChangeType(key, underlyingType);
     }
 
-    private int ToIndex(string name) {
+    private static int ToIndex(string name) {
         return ToIndex(stringToKey[name]);
+    }
+
+    public void OnValidate()
+    {
+        Init();
     }
 
     // put definitions into an array
@@ -70,9 +82,12 @@ public class KeyValueStore<Key, Value>
             _defs[ToIndex(d.key)] = d.def;
         }
 
-        // check definitions
+        // check for missing definitions
         for (int i = 0; i < _defs.Length; i++) {
-            if (_defs[i] == null) Debug.Log("scaling undefined for " + i);
+            if (_defs[i] == null) {
+                Debug.LogError("scaling undefined for " + Enum.GetValues(typeof(Key)).GetValue(i));
+                _defs[i] = default;
+            }
         }
     }
 
@@ -97,12 +112,12 @@ public class ScalingFormula {
     };
 
     [Tooltip("base factor")]
-    public float baseValue;
+    public float baseValue = 1f;
 
     [Tooltip("how to combine values from base stats")]
-    public Operation operation;
+    public Operation operation = Operation.Multiplication;
     [Tooltip("scaling in different base stats (base value should be 1 for multiplication, 0 for addition)")]
-    public Operand[] scalingInBaseStat;
+    public Operand[] scalingInBaseStat = null;
 
     public float ComputeFrom(PlayerUpgradeState upgradeLevels) {
         float result = baseValue;
