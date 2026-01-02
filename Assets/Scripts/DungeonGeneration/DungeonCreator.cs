@@ -468,29 +468,16 @@ public class DungeonCreator : MonoBehaviour
         }
     }
 
-    private void CreateMesh(Vector2 bottomLeftCorner, Vector2 topRightCorner, String name, String type)
+    private void CreatePlane(String name, Material material, Vector2 position, Vector3[] vertices)
     {
-        Vector3 bottomLeftV = new Vector3(bottomLeftCorner.x, 0, bottomLeftCorner.y);
-        Vector3 bottomRightV = new Vector3(topRightCorner.x, 0, bottomLeftCorner.y);
-        Vector3 topLeftV = new Vector3(bottomLeftCorner.x, 0, topRightCorner.y);
-        Vector3 topRightV = new Vector3(topRightCorner.x, 0, topRightCorner.y);
+        GameObject plane = new GameObject(name + position);
 
-        GameObject dungeonFloor = new GameObject("Mesh" + bottomLeftCorner);
-
-        MeshFilter meshFilter = dungeonFloor.AddComponent<MeshFilter>();
-        MeshRenderer meshRenderer = dungeonFloor.AddComponent<MeshRenderer>();
-        MeshCollider meshCollider = dungeonFloor.AddComponent<MeshCollider>();
+        MeshFilter meshFilter = plane.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = plane.AddComponent<MeshRenderer>();
+        MeshCollider meshCollider = plane.AddComponent<MeshCollider>();
 
         Mesh mesh = new Mesh();
-        mesh.name = "DungeonFloorMesh";
-
-        Vector3[] vertices = new Vector3[]
-        {
-            topLeftV,
-            topRightV,
-            bottomLeftV,
-            bottomRightV
-        };
+        mesh.name = "Dungeon" + name + "Mesh";
 
         int[] triangles = new int[]
         {
@@ -512,10 +499,37 @@ public class DungeonCreator : MonoBehaviour
         mesh.RecalculateBounds();
 
         meshFilter.mesh = mesh;
-        meshRenderer.material = floorMaterial;
+        meshRenderer.material = material;
 
         meshCollider.sharedMesh = mesh;
         meshCollider.convex = false;
+    }
+
+    private void CreateMesh(Vector2 bottomLeftCorner, Vector2 topRightCorner, String roomType)
+    {
+        Vector3 bottomLeftV = new Vector3(bottomLeftCorner.x, 0, bottomLeftCorner.y);
+        Vector3 bottomRightV = new Vector3(topRightCorner.x, 0, bottomLeftCorner.y);
+        Vector3 topLeftV = new Vector3(bottomLeftCorner.x, 0, topRightCorner.y);
+        Vector3 topRightV = new Vector3(topRightCorner.x, 0, topRightCorner.y);
+
+        Vector3[] floorVertices = new Vector3[]
+        {
+            topLeftV,
+            topRightV,
+            bottomLeftV,
+            bottomRightV
+        };
+
+        Vector3[] ceilingVertices = new Vector3[]
+        {
+            new Vector3(bottomLeftV.x, 6, bottomLeftV.z),
+            new Vector3(bottomRightV.x, 6, bottomRightV.z),
+            new Vector3(topLeftV.x, 6, topLeftV.z),
+            new Vector3(topRightV.x, 6, topRightV.z)
+        };
+
+        CreatePlane("Floor", floorMaterial, bottomLeftCorner, floorVertices);
+        CreatePlane("Ceiling", ceilingMaterial, bottomLeftCorner, ceilingVertices);
 
         for (int row = (int)Math.Ceiling(bottomLeftV.x); row < (int)Math.Ceiling(bottomRightV.x); row++)
         {
