@@ -17,11 +17,6 @@ public class PlayerStats : MonoBehaviour
         Recompute();
     }
 
-    public void Update() { 
-        // TODO: only when necessary
-        Recompute();
-    }
-
     // 
     public float Compute(StatKey stat) {
         // TODO: check inventory for items with stat modifiers
