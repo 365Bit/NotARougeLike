@@ -85,7 +85,7 @@ public class KeyValueStore<Key, Value>
         // check for missing definitions
         for (int i = 0; i < _defs.Length; i++) {
             if (_defs[i] == null) {
-                Debug.LogError("scaling undefined for " + Enum.GetValues(typeof(Key)).GetValue(i));
+                Debug.LogWarning("scaling undefined for " + Enum.GetValues(typeof(Key)).GetValue(i));
                 _defs[i] = default;
             }
         }
