@@ -107,7 +107,7 @@ public class DungeonCreator : MonoBehaviour
         CreatePillars(listOfRooms);
         CreateLoot(listOfRooms);
         CreateEnemy(listOfRooms);
-        CreateNavPoint(listOfRooms);
+        CreateNavPoints(listOfRooms);
         CreateShop(listOfRooms);
 
         navMeshSurface.BuildNavMesh();
@@ -149,6 +149,7 @@ public class DungeonCreator : MonoBehaviour
                         Vector3 enemyPos = new Vector3(enemyPosX, 1, enemyPosY);
 
                         GameObject foe = Instantiate(enemyPrefab, enemyPos, Quaternion.identity, dungeonSegments[i].area.transform);
+                        foe.name = enemyPrefab.name;
                         Opponent opponent = foe.GetComponent<Opponent>();
                         opponent.spawnRoom = room;
 
@@ -166,7 +167,17 @@ public class DungeonCreator : MonoBehaviour
         }
     }
 
-    private void CreateNavPoint(List<Node> listOfRooms)
+    private void AddNavPoint(Node room, GameObject area, int x, int y)
+    {
+        Vector3 navPointPos = new Vector3(x, 0.5f, y);
+
+        GameObject navPoint = Instantiate(navPointPrefab, navPointPos, Quaternion.identity, area.transform);
+        navPoint.name = navPointPrefab.name;
+
+        room.navPointList.Add(navPoint.GetComponent<NavPoint>());
+    }
+
+    private void CreateNavPoints(List<Node> listOfRooms)
     {
         for (int i = 0; i < listOfRooms.Count; i++)
         {
@@ -176,41 +187,10 @@ public class DungeonCreator : MonoBehaviour
             {
                 GameObject area = dungeonSegments[i].area;
 
-                int navPointX = room.BottomLeftAreaCorner.x + 5;
-                int navPointY = room.BottomLeftAreaCorner.y + 5;
-                Vector3 navPointPos = new Vector3(
-                    navPointX,
-                    0.5f,
-                    navPointY);
-
-                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity, area.transform).GetComponent<NavPoint>());
-
-                navPointX = room.TopLeftAreaCorner.x + 5;
-                navPointY = room.TopLeftAreaCorner.y - 5;
-                navPointPos = new Vector3(
-                    navPointX,
-                    0.5f,
-                    navPointY);
-
-                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity, area.transform).GetComponent<NavPoint>());
-
-                navPointX = room.TopRightAreaCorner.x - 5;
-                navPointY = room.TopRightAreaCorner.y - 5;
-                navPointPos = new Vector3(
-                    navPointX,
-                    0.5f,
-                    navPointY);
-
-                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity, area.transform).GetComponent<NavPoint>());
-
-                navPointX = room.BottomRightAreaCorner.x - 5;
-                navPointY = room.BottomRightAreaCorner.y + 5;
-                navPointPos = new Vector3(
-                    navPointX,
-                    0.5f,
-                    navPointY);
-
-                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity, area.transform).GetComponent<NavPoint>());
+                AddNavPoint(room, area, room.BottomLeftAreaCorner.x + 5, room.BottomLeftAreaCorner.y + 5);
+                AddNavPoint(room, area, room.TopLeftAreaCorner.x + 5, room.TopLeftAreaCorner.y - 5);
+                AddNavPoint(room, area, room.TopRightAreaCorner.x - 5, room.TopRightAreaCorner.y - 5);
+                AddNavPoint(room, area, room.BottomRightAreaCorner.x - 5, room.BottomRightAreaCorner.y + 5);
             }
         }
     }
@@ -267,6 +247,7 @@ public class DungeonCreator : MonoBehaviour
                 if (UnityEngine.Random.Range(0f,1f) < shopProb)
                 {
                     GameObject shop = Instantiate(shopPrefab, shopPos, Quaternion.identity, dungeonSegments[i].area.transform);
+                    shop.name = shopPrefab.name;
 
                     // compute random inventory of shop
                     ItemContainer items = new();
@@ -310,7 +291,8 @@ public class DungeonCreator : MonoBehaviour
             (selectedRoom.BottomLeftAreaCorner.x + selectedRoom.BottomRightAreaCorner.x) / 2,
             0,
             (selectedRoom.BottomLeftAreaCorner.y + selectedRoom.TopLeftAreaCorner.y) / 2);
-        Instantiate(trapDoorPrefab, pos, Quaternion.identity, selectedAera.transform);
+        GameObject trapdoor = Instantiate(trapDoorPrefab, pos, Quaternion.identity, selectedAera.transform);
+        trapdoor.name = trapDoorPrefab.name;
     }
 
 
@@ -328,7 +310,8 @@ public class DungeonCreator : MonoBehaviour
 
                 if (UnityEngine.Random.Range(0f,1f) > lootProb)
                 {
-                    var chest = Instantiate(chestPrefab, chestPos, Quaternion.identity, dungeonSegments[i].area.transform);
+                    GameObject chest = Instantiate(chestPrefab, chestPos, Quaternion.identity, dungeonSegments[i].area.transform);
+                    chest.name = chestPrefab.name;
 
                     ItemSlot tmpSlot = new();
                     SetRandomDroppedItem(tmpSlot);
@@ -362,6 +345,7 @@ public class DungeonCreator : MonoBehaviour
         {
             GameObject pillar = Instantiate(pillarPrefab, position, Quaternion.identity, parent.transform);
             pillar.transform.localScale = new Vector3(1.125f, 1, 1.125f);
+            pillar.name = pillarPrefab.name;
         }
     }
 
@@ -435,6 +419,7 @@ public class DungeonCreator : MonoBehaviour
                             );
                             GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, segment.area.transform);
                             wall.transform.localScale = new Vector3(scale, 1, 1);
+                            wall.name = wallPrefab.name;
                         }
                         else
                         {
@@ -451,6 +436,7 @@ public class DungeonCreator : MonoBehaviour
                                 );
                                 GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, segment.area.transform);
                                 wall.transform.localScale = new Vector3(scale, 1, 1);
+                                wall.name = wallPrefab.name;
                                 wallPosX += scale * wallScaler / 2;
                             }
                         }
@@ -503,6 +489,7 @@ public class DungeonCreator : MonoBehaviour
                             );
                             GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.Euler(0, 90, 0), segment.area.transform);
                             wall.transform.localScale = new Vector3(scale, 1, 1);
+                            wall.name = wallPrefab.name;
                         }
                         else
                         {
@@ -520,6 +507,7 @@ public class DungeonCreator : MonoBehaviour
                                 );
                                 GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.Euler(0, 90, 0), segment.area.transform);
                                 wall.transform.localScale = new Vector3(scale, 1, 1);
+                                wall.name = wallPrefab.name;
                                 wallPosZ += scale * wallScaler / 2;
                             }
                         }
