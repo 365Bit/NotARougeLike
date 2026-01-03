@@ -611,6 +611,8 @@ MonoBehaviour:
   lootProb: 0.5
   shopProb: 0.1
   material: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  floorMaterial: {fileID: 2100000, guid: 6b52bc3eac09f1c40852e8eb63bf1df3, type: 2}
+  ceilingMaterial: {fileID: 2100000, guid: 1f8d7b02d10a8e84ea50b9849a47dcb8, type: 2}
   roomBottomCornerModifier: 0.125
   roomTopCornerMidifier: 0.9
   roomOffset: 1
