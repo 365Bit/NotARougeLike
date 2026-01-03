@@ -17,15 +17,27 @@ public class PlayerStats : MonoBehaviour
         Recompute();
     }
 
-    public void Update() { 
-        // TODO: only when necessary
-        Recompute();
-    }
-
     // 
     public float Compute(StatKey stat) {
-        // TODO: check inventory for items with stat modifiers
-        return def[stat].ComputeFrom(upgrades.levels);
+        float value = def[stat].ComputeFrom(upgrades.levels);
+
+        foreach (var slot in inventory.container.slots)
+        {
+            if (slot.storedItem == null) continue;
+            var buff = slot.storedItem.itemBuffs[stat];
+            if (buff == null) continue;
+
+            switch (buff.operation) {
+                case ScalingFormula.Operation.Addition:
+                    value += buff.value;
+                    break;
+                case ScalingFormula.Operation.Multiplication:
+                    value *= buff.value;
+                    break;
+            }
+        }
+
+        return value;
     }
 
     public static float ComputeInitial(StatKey stat, StatScalingDefinitions def, PlayerUpgradeState upgrades) {
