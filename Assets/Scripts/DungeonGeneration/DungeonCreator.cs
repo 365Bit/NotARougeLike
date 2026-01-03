@@ -244,12 +244,12 @@ public class DungeonCreator : MonoBehaviour
             // select random definition
             float random = UnityEngine.Random.Range(0f,1f);
             foreach (ItemDefinition def in itemDefinitions.definitions) {
-                random -= def.shopProbability;
-                if (random <= 0f) {
+                if (random <= def.shopProbability) {
                     slot.storedItem = def;
                     slot.count = 1;
                     break;
                 }
+                random -= def.shopProbability;
             }
         }
     }
@@ -260,12 +260,12 @@ public class DungeonCreator : MonoBehaviour
         // select random definition
         var random = UnityEngine.Random.Range(0f,1f);
         foreach (ItemDefinition def in itemDefinitions.definitions) {
-            if (random <= def.shopProbability) {
+            if (random <= def.dropProbability) {
                 slot.storedItem = def;
                 slot.count = 1;
                 break;
             }
-            random -= def.shopProbability;
+            random -= def.dropProbability;
         }
     }
 
