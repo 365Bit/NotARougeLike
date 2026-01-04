@@ -9,10 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3264794840061447751}
+  - component: {fileID: 8351641477545658752}
   - component: {fileID: 5196027272824433926}
   - component: {fileID: 8408705079164422734}
   - component: {fileID: -2637577086527989318}
-  - component: {fileID: 8351641477545658752}
+  - component: {fileID: 8785196659807477998}
+  - component: {fileID: 149643943944928172}
   - component: {fileID: 7895014659698534790}
   m_Layer: 0
   m_Name: Definitions
@@ -36,6 +38,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8351641477545658752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6761e8b1e93989789cb6412eaeb21b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Constants
+  itemSlots: 12
+  hotbarSlots: 4
+  initialGold: 5
+  initialXP: 0
+  initialAmmo: 16
 --- !u!114 &5196027272824433926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,15 +99,15 @@ MonoBehaviour:
     weight: 0
     maxPerInventorySlot: 10
   - name: BowAmmo
-    displayName: Bow Ammo
+    displayName: Arrow
     itemModel: {fileID: 6937730135751535858, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
     itemModelUI: {fileID: 6937730135751535858, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
     dropProbability: 0.39
     shopProbability: 0.31
     cost: 2
-    maxPerShopSlot: 20
+    maxPerShopSlot: 4
     weight: 0
-    maxPerInventorySlot: 32
+    maxPerInventorySlot: 4
 --- !u!114 &8408705079164422734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,125 +120,233 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ed6bc1b65f8b649f9e94a95e3dae9ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  definitions:
-  - key: 0
-    def:
-      baseValue: 3
-      operation: 1
-      scalingInBaseStat:
-      - stat: 5
-        value:
-        - 1
-        - 2
-        - 3
-        - 4
-  - key: 1
-    def:
-      baseValue: 2
-      operation: 1
-      scalingInBaseStat:
-      - stat: 5
-        value:
-        - 1
-        - 2
-        - 3
-        - 5
-      - stat: 3
-        value:
-        - 1
-        - 1.2
-        - 1.3
-        - 1.5
-  - key: 2
-    def:
-      baseValue: 0.4
-      operation: 1
-      scalingInBaseStat: []
-  - key: 3
-    def:
-      baseValue: 0.2
-      operation: 1
-      scalingInBaseStat: []
-  - key: 4
-    def:
-      baseValue: 0.1
-      operation: 1
-      scalingInBaseStat: []
-  - key: 5
-    def:
-      baseValue: 100
-      operation: 1
-      scalingInBaseStat: []
-  - key: 6
-    def:
-      baseValue: 3
-      operation: 1
-      scalingInBaseStat: []
-  - key: 7
-    def:
-      baseValue: 10
-      operation: 1
-      scalingInBaseStat: []
-  - key: 8
-    def:
-      baseValue: 5
-      operation: 1
-      scalingInBaseStat: []
-  - key: 9
-    def:
-      baseValue: 5
-      operation: 1
-      scalingInBaseStat: []
-  - key: 10
-    def:
-      baseValue: 2.5
-      operation: 1
-      scalingInBaseStat: []
-  - key: 11
-    def:
-      baseValue: 12
-      operation: 1
-      scalingInBaseStat: []
-  - key: 12
-    def:
-      baseValue: 100
-      operation: 1
-      scalingInBaseStat: []
-  - key: 13
-    def:
-      baseValue: 2
-      operation: 1
-      scalingInBaseStat: []
-  - key: 14
-    def:
-      baseValue: 1.5
-      operation: 1
-      scalingInBaseStat: []
-  - key: 15
-    def:
-      baseValue: 100
-      operation: 1
-      scalingInBaseStat: []
-  - key: 16
-    def:
-      baseValue: 5
-      operation: 1
-      scalingInBaseStat: []
-  - key: 17
-    def:
-      baseValue: 10
-      operation: 1
-      scalingInBaseStat: []
-  - key: 18
-    def:
-      baseValue: 20
-      operation: 1
-      scalingInBaseStat: []
-  - key: 19
-    def:
-      baseValue: 15
-      operation: 1
-      scalingInBaseStat: []
+  data:
+    definitions:
+    - key: FireRate
+      def:
+        baseValue: 3
+        operation: 1
+        scalingInBaseStat:
+        - stat: 5
+          value:
+            baseValue: 1
+            points: []
+            cyclic: 0
+    - key: HitRate
+      def:
+        baseValue: 1
+        operation: 1
+        scalingInBaseStat:
+        - stat: 5
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 3
+            cyclic: 0
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 1.5
+            cyclic: 0
+    - key: SwingDuration
+      def:
+        baseValue: 0.3
+        operation: 1
+        scalingInBaseStat: []
+    - key: StrikeDuration
+      def:
+        baseValue: 0.2
+        operation: 1
+        scalingInBaseStat: []
+    - key: ReturnDuration
+      def:
+        baseValue: 0.1
+        operation: 1
+        scalingInBaseStat: []
+    - key: MaxMana
+      def:
+        baseValue: 100
+        operation: 1
+        scalingInBaseStat: []
+    - key: ManaRegRate
+      def:
+        baseValue: 3
+        operation: 1
+        scalingInBaseStat: []
+    - key: RunSpeed
+      def:
+        baseValue: 10
+        operation: 1
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
+    - key: WalkSpeed
+      def:
+        baseValue: 5
+        operation: 1
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
+    - key: SneakSpeed
+      def:
+        baseValue: 5
+        operation: 1
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
+    - key: MaxSlideTime
+      def:
+        baseValue: 2.5
+        operation: 1
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
+    - key: SlideSpeed
+      def:
+        baseValue: 12
+        operation: 1
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
+    - key: MaxHealth
+      def:
+        baseValue: 100
+        operation: 1
+        scalingInBaseStat:
+        - stat: 0
+          value:
+            baseValue: 1
+            points: []
+            cyclic: 0
+    - key: HealthRegRate
+      def:
+        baseValue: 1
+        operation: 1
+        scalingInBaseStat:
+        - stat: 0
+          value:
+            baseValue: 1
+            points: []
+            cyclic: 0
+    - key: JumpHeight
+      def:
+        baseValue: 1.5
+        operation: 1
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points: []
+            cyclic: 0
+    - key: MaxStamina
+      def:
+        baseValue: 100
+        operation: 1
+        scalingInBaseStat: []
+    - key: StaminaRegRate
+      def:
+        baseValue: 5
+        operation: 1
+        scalingInBaseStat: []
+    - key: RunConsRate
+      def:
+        baseValue: 10
+        operation: 1
+        scalingInBaseStat: []
+    - key: SlideConsRate
+      def:
+        baseValue: 20
+        operation: 1
+        scalingInBaseStat: []
+    - key: JumpConsRate
+      def:
+        baseValue: 15
+        operation: 1
+        scalingInBaseStat: []
+    - key: StrikeDamage
+      def:
+        baseValue: 30
+        operation: 1
+        scalingInBaseStat:
+        - stat: 2
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
+    - key: ArrowDamage
+      def:
+        baseValue: 20
+        operation: 1
+        scalingInBaseStat:
+        - stat: 2
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 3
+            cyclic: 0
+    - key: ArrowSpeed
+      def:
+        baseValue: 80
+        operation: 1
+        scalingInBaseStat:
+        - stat: 2
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 3
+            cyclic: 0
 --- !u!114 &-2637577086527989318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,22 +359,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eeb92d0330b78018abc488012dcccc57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  cost:
-  - stat: 0
-    xpValues: 0a000000
-  - stat: 1
-    xpValues: 0a000000
-  - stat: 2
-    xpValues: 0a000000
-  - stat: 3
-    xpValues: 0a000000
-  - stat: 4
-    xpValues: 0a000000
-  - stat: 5
-    xpValues: 0a000000
-  - stat: 6
-    xpValues: 0a000000
---- !u!114 &8351641477545658752
+  data:
+    definitions:
+    - key: Health
+      def: 32000000320000004b0000004b000000640000006400000096000000c80000002c01000090010000
+    - key: Armour
+      def: 32000000320000004b0000004b000000640000006400000096000000c80000002c01000090010000
+    - key: Strength
+      def: 32000000320000004b0000004b000000640000006400000096000000c80000002c01000090010000
+    - key: Agility
+      def: 32000000320000004b0000004b000000640000006400000096000000c80000002c01000090010000
+    - key: Stamina
+      def: 32000000320000004b0000004b000000640000006400000096000000c80000002c01000090010000
+    - key: Dexterity
+      def: 32000000320000004b0000004b000000640000006400000096000000c80000002c01000090010000
+    - key: Perception
+      def: 32000000320000004b0000004b000000640000006400000096000000c80000002c01000090010000
+--- !u!114 &8785196659807477998
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -256,14 +384,210 @@ MonoBehaviour:
   m_GameObject: {fileID: 5066985577544289893}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b6761e8b1e93989789cb6412eaeb21b4, type: 3}
+  m_Script: {fileID: 11500000, guid: f09a77301f3090831b4a6e359ec3df8d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Constants
-  itemSlots: 12
-  hotbarSlots: 4
-  initialGold: 5
-  initialXP: 0
-  initialAmmo: 16
+  m_EditorClassIdentifier: '::'
+  data:
+    definitions:
+    - key: Size
+      def:
+        baseValue: 1
+        points:
+        - level: 0
+          value: 1
+        - level: 1
+          value: 2
+        - level: 2
+          value: 1
+        - level: 3
+          value: 6
+        cyclic: 1
+    - key: TrapCount
+      def:
+        baseValue: 1
+        points:
+        - level: 0
+          value: 0.1
+        - level: 1
+          value: 0.1
+        - level: 2
+          value: 0.5
+        - level: 3
+          value: 3
+        cyclic: 1
+    - key: EnemyCount
+      def:
+        baseValue: 1
+        points:
+        - level: 0
+          value: 1
+        - level: 1
+          value: 3
+        - level: 2
+          value: 0.5
+        - level: 3
+          value: 0.25
+        cyclic: 1
+    - key: EnemyLevel
+      def:
+        baseValue: 1
+        points:
+        - level: 0
+          value: 0
+        - level: 1
+          value: 1
+        - level: 8
+          value: 2
+        - level: 15
+          value: 3
+        cyclic: 0
+    - key: HasBoss
+      def:
+        baseValue: 1
+        points:
+        - level: 0
+          value: 1
+        - level: 1
+          value: 3
+        - level: 2
+          value: 0.5
+        - level: 3
+          value: 0.25
+        cyclic: 1
+    - key: AvailableXP
+      def:
+        baseValue: 50
+        points:
+        - level: 0
+          value: 1
+        - level: 100
+          value: 10
+        - level: 1000
+          value: 50
+        cyclic: 0
+    - key: AvailableGold
+      def:
+        baseValue: 10
+        points:
+        - level: 0
+          value: 1
+        - level: 100
+          value: 10
+        cyclic: 1
+    - key: AvailableAmmoPerEnemy
+      def:
+        baseValue: 5
+        points: []
+        cyclic: 1
+--- !u!114 &149643943944928172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066985577544289893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1db8b3e974017ce7b19bddf946c2e05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  classes:
+  - className: base opponent
+    spawnProbability: 0.1
+    prefab: {fileID: 8282398908945130151, guid: 2466d15c19041db4fba290b6fc587695, type: 3}
+    stats:
+      definitions:
+      - key: HitRate
+        def:
+          baseValue: 2
+          points:
+          - level: 0
+            value: 1
+          - level: 1
+            value: 2
+          cyclic: 0
+      - key: StunDuration
+        def:
+          baseValue: 0.6
+          points:
+          - level: 0
+            value: 1
+          - level: 0
+            value: 0.5
+          cyclic: 0
+      - key: SwingDuration
+        def:
+          baseValue: 0.5
+          points: []
+          cyclic: 0
+      - key: StrikeDuration
+        def:
+          baseValue: 0.3
+          points: []
+          cyclic: 0
+      - key: ReturnDuration
+        def:
+          baseValue: 0.2
+          points: []
+          cyclic: 0
+      - key: AttackRange
+        def:
+          baseValue: 3
+          points: []
+          cyclic: 0
+      - key: AttackDamage
+        def:
+          baseValue: 30
+          points:
+          - level: 0
+            value: 1
+          - level: 10
+            value: 2
+          cyclic: 0
+      - key: MaxHealth
+        def:
+          baseValue: 100
+          points:
+          - level: 0
+            value: 1
+          - level: 10
+            value: 5
+          cyclic: 0
+      - key: HealthRegRate
+        def:
+          baseValue: 5
+          points: []
+          cyclic: 0
+      - key: WanderInterval
+        def:
+          baseValue: 3
+          points: []
+          cyclic: 0
+      - key: WanderRadius
+        def:
+          baseValue: 5
+          points: []
+          cyclic: 0
+      - key: RotationSpeed
+        def:
+          baseValue: 90
+          points: []
+          cyclic: 0
+      - key: MovementSpeed
+        def:
+          baseValue: 3
+          points: []
+          cyclic: 0
+      - key: MemoryDuration
+        def:
+          baseValue: 5
+          points: []
+          cyclic: 0
+      - key: DetectionRange
+        def:
+          baseValue: 20
+          points: []
+          cyclic: 0
 --- !u!114 &7895014659698534790
 MonoBehaviour:
   m_ObjectHideFlags: 0
