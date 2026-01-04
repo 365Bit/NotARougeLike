@@ -33,7 +33,10 @@ public class PlayerStats : MonoBehaviour
         hitRate = Compute(StatKey.HitRate); 
         swingDuration = Compute(StatKey.SwingDuration); 
         strikeDuration = Compute(StatKey.StrikeDuration); 
+        strikeDamage = Compute(StatKey.StrikeDamage);
         returnDuration = Compute(StatKey.ReturnDuration); 
+        arrowDamage = Compute(StatKey.ArrowDamage);
+        arrowSpeed = Compute(StatKey.ArrowSpeed);
 
         maxMana = Compute(StatKey.MaxMana); 
         manaRegRate = Compute(StatKey.ManaRegRate); 
@@ -63,7 +66,10 @@ public class PlayerStats : MonoBehaviour
     public float hitRate { get; private set; }
     public float swingDuration { get; private set; }
     public float strikeDuration { get; private set; }
+    public float strikeDamage { get; private set; }
     public float returnDuration { get; private set; }
+    public float arrowDamage { get; private set; }
+    public float arrowSpeed { get; private set; }
 
     [Header("Mana")]
     public float maxMana { get; private set; }

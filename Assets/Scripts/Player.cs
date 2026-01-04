@@ -195,7 +195,7 @@ public class Player : MonoBehaviour
                         startRotation = Quaternion.Euler(strikeRotation);
                         endRotation = Quaternion.Euler(restRotation);
                         hitZone.gameObject.SetActive(true);
-                        hitZone.SetDamage(20.0f);
+                        hitZone.SetDamage(stats.strikeDamage);
                         break;
                     case HitState.Return:
                         hitState = HitState.Idle;
@@ -498,7 +498,7 @@ public class Player : MonoBehaviour
 
         Projectile instance = Instantiate(projectiles[0], position, rotation);
         instance.name = projectiles[0].name;
-        instance.SetDamage(10.0f);
+        instance.SetDamage(stats.arrowDamage);
 
         fireCooldown = 1.0f / stats.fireRate;
     }
