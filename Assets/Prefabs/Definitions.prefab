@@ -184,27 +184,72 @@ MonoBehaviour:
       def:
         baseValue: 10
         operation: 1
-        scalingInBaseStat: []
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
     - key: WalkSpeed
       def:
         baseValue: 5
         operation: 1
-        scalingInBaseStat: []
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
     - key: SneakSpeed
       def:
         baseValue: 5
         operation: 1
-        scalingInBaseStat: []
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
     - key: MaxSlideTime
       def:
         baseValue: 2.5
         operation: 1
-        scalingInBaseStat: []
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
     - key: SlideSpeed
       def:
         baseValue: 12
         operation: 1
-        scalingInBaseStat: []
+        scalingInBaseStat:
+        - stat: 3
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
     - key: MaxHealth
       def:
         baseValue: 100
@@ -286,7 +331,7 @@ MonoBehaviour:
             - level: 0
               value: 1
             - level: 10
-              value: 2
+              value: 3
             cyclic: 0
     - key: ArrowSpeed
       def:
@@ -300,7 +345,7 @@ MonoBehaviour:
             - level: 0
               value: 1
             - level: 10
-              value: 2
+              value: 3
             cyclic: 0
 --- !u!114 &-2637577086527989318
 MonoBehaviour:
@@ -377,7 +422,7 @@ MonoBehaviour:
         - level: 0
           value: 1
         - level: 1
-          value: 10
+          value: 3
         - level: 2
           value: 0.5
         - level: 3
@@ -411,42 +456,28 @@ MonoBehaviour:
         cyclic: 1
     - key: AvailableXP
       def:
-        baseValue: 1
+        baseValue: 50
         points:
         - level: 0
           value: 1
-        - level: 1
-          value: 3
-        - level: 2
-          value: 0.5
-        - level: 3
-          value: 0.25
-        cyclic: 1
+        - level: 100
+          value: 10
+        - level: 1000
+          value: 50
+        cyclic: 0
     - key: AvailableGold
       def:
-        baseValue: 1
+        baseValue: 10
         points:
         - level: 0
           value: 1
-        - level: 1
-          value: 3
-        - level: 2
-          value: 0.5
-        - level: 3
-          value: 0.25
+        - level: 100
+          value: 10
         cyclic: 1
     - key: AvailableAmmoPerEnemy
       def:
-        baseValue: 1
-        points:
-        - level: 0
-          value: 1
-        - level: 1
-          value: 3
-        - level: 2
-          value: 0.5
-        - level: 3
-          value: 0.25
+        baseValue: 5
+        points: []
         cyclic: 1
 --- !u!114 &149643943944928172
 MonoBehaviour:
