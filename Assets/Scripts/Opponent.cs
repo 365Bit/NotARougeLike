@@ -2,13 +2,14 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(NavMeshAgent)), RequireComponent(typeof(OpponentStats))]
 public class Opponent : MonoBehaviour
 {
     // Components
     private NavMeshAgent navMeshAgent;
     private Transform playerTransform;
     private Player player;
+    private OpponentStats stats;
 
     private float currentHealth;
     private float wanderTime;
@@ -18,18 +19,11 @@ public class Opponent : MonoBehaviour
     [Header("Combat")]
     private Animator animator;
     public HitZone hitZone;
-    public float hitRate;
+
+    private float hitCooldown;
     private float hitTime;
-    public float hitCooldown;
-    public float stunDuration;
     private float stunTimer;
-    //private Transform rightShoulderTransform;
-    public float swingDuration;
-    public float strikeDuration;
-    public float returnDuration;
-    public float attackRange;
-    public float detectionRange;
-    public float rotationSpeed;
+
     private Vector3 restRotation = new Vector3(0.0f, 0.0f, 0.0f);
     private Vector3 swingRotation = new Vector3(-130.0f, 0.0f, 0.0f);
     private Vector3 strikeRotation = new Vector3(-30.0f, 0.0f, 0.0f);
@@ -48,14 +42,6 @@ public class Opponent : MonoBehaviour
 
     public bool playerGotHit = false;
 
-    [Header("Health")]
-    public float maxHealth = 100.0f;
-    public float healthRegRate = 5.0f;
-
-    [Header("Movement")]
-    public float wanderInterval = 3.0f;
-    public float wanderRadius = 5.0f;
-
     public Node spawnRoom;
     private int nextNavPointID = 0;
     bool wandering = false;
@@ -65,7 +51,6 @@ public class Opponent : MonoBehaviour
     public float viewAngle;
     private LayerMask obstacleMask;
     private float memoryTimer;
-    public float memoryDuration;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -74,9 +59,11 @@ public class Opponent : MonoBehaviour
         playerTransform = GameObject.Find("Player").transform;
         //rightShoulderTransform = transform.Find("Opp Right Shoulder");
 
-        currentHealth = maxHealth;
+        stats = GetComponent<OpponentStats>();
+
+        currentHealth = stats.maxHealth;
         spawnPosition = transform.position;
-        wanderTime = wanderInterval;
+        wanderTime = stats.wanderInterval;
 
         hitState = HitState.Idle;
         hitCooldown = 0.0f;
@@ -86,8 +73,10 @@ public class Opponent : MonoBehaviour
         player = playerTransform.GetComponent<Player>();
 
         animator = GetComponentInChildren<Animator>();
-        animator.SetFloat("attackSpeed", hitRate);
+        animator.SetFloat("attackSpeed", stats.hitRate);
         obstacleMask = LayerMask.GetMask("Wall");
+
+        navMeshAgent.speed = stats.movementSpeed;
     }
 
     // Update is called once per frame
@@ -146,7 +135,7 @@ public class Opponent : MonoBehaviour
             {
                 Quaternion lookRotation = Quaternion.LookRotation(direction);
                 lastRotation = transform.rotation;
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * stats.rotationSpeed);
                 float signedAngularVelocity = Vector3.SignedAngle(
                     lastRotation * Vector3.forward,
                     transform.rotation * Vector3.forward,
@@ -168,7 +157,7 @@ public class Opponent : MonoBehaviour
 
             Vector3 playerOppDir = (transform.position - playerTransform.position).normalized;  
             Vector3 targetPosition;
-            if (currentHealth < maxHealth * 0.5f)
+            if (currentHealth < stats.maxHealth * 0.5f)
             {
                 targetPosition = playerTransform.position + playerOppDir * 7.5f;
             }
@@ -178,7 +167,7 @@ public class Opponent : MonoBehaviour
             }
             navMeshAgent.SetDestination(targetPosition);
 
-            if (distance <= attackRange && hitState == HitState.Idle && hitCooldown == 0.0f)
+            if (distance <= stats.attackRange && hitState == HitState.Idle && hitCooldown == 0.0f)
             {
                 Attack();
             }
@@ -194,8 +183,9 @@ public class Opponent : MonoBehaviour
         {
             hitTime += Time.deltaTime;
 
-            float duration = hitState == HitState.Swing ? swingDuration :
-                             hitState == HitState.Strike ? strikeDuration : returnDuration;
+            float duration = hitState == HitState.Swing ? stats.swingDuration :
+                             hitState == HitState.Strike ? stats.strikeDuration : stats.returnDuration;
+            duration /= stats.hitRate;
 
             float ratio = Mathf.Clamp(hitTime / duration, 0.0f, 1.0f);
 
@@ -224,7 +214,7 @@ public class Opponent : MonoBehaviour
                     case HitState.Return:
                         hitZone.gameObject.SetActive(false);
                         hitState = HitState.Idle;
-                        hitCooldown = 0.5f;
+                        hitCooldown = 1f / stats.hitRate;
                         playerGotHit = false;
 
                         break;
@@ -248,7 +238,7 @@ public class Opponent : MonoBehaviour
         // TODO
         navMeshAgent.isStopped = true;
 
-        hitZone.SetDamage(20.0f);
+        hitZone.SetDamage(stats.attackDamage);
         hitState = HitState.Swing;
         hitTime = 0.0f;
 
@@ -267,7 +257,7 @@ public class Opponent : MonoBehaviour
     {
         navMeshAgent.isStopped = true;
         animator.SetTrigger("gotHit");
-        stunTimer = stunDuration;
+        stunTimer = stats.stunDuration;
 
         currentHealth -= damage;
 
@@ -280,10 +270,10 @@ public class Opponent : MonoBehaviour
 
     void RegenerateHealth()
     {
-        if (currentHealth < maxHealth)
+        if (currentHealth < stats.maxHealth)
         {
-            float health = currentHealth + healthRegRate * Time.deltaTime;
-            currentHealth = Mathf.Min(health, maxHealth);
+            float health = currentHealth + stats.healthRegRate * Time.deltaTime;
+            currentHealth = Mathf.Min(health, stats.maxHealth);
         }
     }
 
@@ -300,9 +290,9 @@ public class Opponent : MonoBehaviour
 
         if (!wandering)
         {
-            //Vector3 randomDirection = Random.insideUnitSphere * wanderRadius;
+            //Vector3 randomDirection = Random.insideUnitSphere * stats.wanderRadius;
             //Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f),Random.Range(-1f, 1f)).normalized;
-            //Vector3 targetPos = spawnPosition + new Vector3(randomDirection.x, randomDirection.y, 0) * wanderRadius;
+            //Vector3 targetPos = spawnPosition + new Vector3(randomDirection.x, randomDirection.y, 0) * stats.wanderRadius;
             //randomDirection += spawnPosition;
 
             if(spawnRoom != null)
@@ -312,11 +302,11 @@ public class Opponent : MonoBehaviour
                 Vector3 targetPos = targetList[nextNavPointID].transform.position;
 
                 NavMeshHit navHit;
-                NavMesh.SamplePosition(targetPos, out navHit, wanderRadius, NavMesh.AllAreas);
+                NavMesh.SamplePosition(targetPos, out navHit, stats.wanderRadius, NavMesh.AllAreas);
 
                 navMeshAgent.SetDestination(navHit.position);
 
-                wanderTime = Random.Range(wanderInterval * 0.5f, wanderInterval * 2.0f);
+                wanderTime = Random.Range(stats.wanderInterval * 0.5f, stats.wanderInterval * 2.0f);
                 wandering = true;
                 nextNavPointID++;
                 nextNavPointID %= targetList.Count;
@@ -333,7 +323,7 @@ public class Opponent : MonoBehaviour
         Vector3 toPlayer = playerTransform.position - transform.position;
         float distanceToPlayer = toPlayer.magnitude;
 
-        if (distanceToPlayer > detectionRange) return false;
+        if (distanceToPlayer > stats.detectionRange) return false;
         else if (distanceToPlayer < 5.0f && !player.isSneaking()) return true;
 
         Vector3 forward = transform.forward;

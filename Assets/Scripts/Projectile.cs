@@ -121,4 +121,9 @@ public class Projectile : MonoBehaviour
     {
         this.damage = damage;
     }
+
+    public void SetSpeed(float speed)
+    {
+        this.speed = speed;
+    }
 }
