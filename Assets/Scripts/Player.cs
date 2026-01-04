@@ -499,6 +499,7 @@ public class Player : MonoBehaviour
         Projectile instance = Instantiate(projectiles[0], position, rotation);
         instance.name = projectiles[0].name;
         instance.SetDamage(stats.arrowDamage);
+        instance.SetSpeed(stats.arrowSpeed);
 
         fireCooldown = 1.0f / stats.fireRate;
     }
