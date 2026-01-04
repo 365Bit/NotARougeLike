@@ -260,6 +260,48 @@ MonoBehaviour:
         baseValue: 15
         operation: 1
         scalingInBaseStat: []
+    - key: StrikeDamage
+      def:
+        baseValue: 30
+        operation: 1
+        scalingInBaseStat:
+        - stat: 2
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
+    - key: ArrowDamage
+      def:
+        baseValue: 20
+        operation: 1
+        scalingInBaseStat:
+        - stat: 2
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
+    - key: ArrowSpeed
+      def:
+        baseValue: 80
+        operation: 1
+        scalingInBaseStat:
+        - stat: 2
+          value:
+            baseValue: 1
+            points:
+            - level: 0
+              value: 1
+            - level: 10
+              value: 2
+            cyclic: 0
 --- !u!114 &-2637577086527989318
 MonoBehaviour:
   m_ObjectHideFlags: 0
