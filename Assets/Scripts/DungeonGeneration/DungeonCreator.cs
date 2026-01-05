@@ -1,12 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.AI.Navigation;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+
+struct DungeonSegment
+{
+    public GameObject area;
+
+    public HashSet<Vector3Int> horizontalWallPositions;
+    public HashSet<Vector3Int> verticalWallPositions;
+}
 
 [RequireComponent(typeof(NavMeshSurface))]
 public class DungeonCreator : MonoBehaviour
 {
+    private GameObject dungeonLevel;
+    private List<DungeonSegment> dungeonSegments;
     private NavMeshSurface navMeshSurface;
 
     public int dungeonWidth, dungeonLength;
@@ -15,9 +25,10 @@ public class DungeonCreator : MonoBehaviour
     public int corridorWidth;
     public int enemyAmount;
     public float lootProb, shopProb;
+
     [Header("Materials")]
-    public Material material;
-    public Material floorMaterial, ceilingMaterial;
+    public Material floorMaterial;
+    public Material ceilingMaterial;
 
     [Range(0.0f, 0.3f)]
     public float roomBottomCornerModifier;
@@ -27,10 +38,9 @@ public class DungeonCreator : MonoBehaviour
     public int roomOffset;
 
     public GameObject wallPrefab, pillarPrefab, playerPrefab, chestPrefab, shopPrefab, trapDoorPrefab, navPointPrefab;
-    List<Vector3Int> possibleVerticalDoorPosition;
-    List<Vector3Int> possibleHorizontalDoorPosition;
-    List<Vector3Int> possibleHorizontalWallPosition;
-    List<Vector3Int> possibleVerticalWallPosition;
+
+    private Dictionary<Vector3Int, DungeonSegment> horizontalWallOwners;
+    private Dictionary<Vector3Int, DungeonSegment> verticalWallOwners;
 
     // definitions
     ItemDefinitions itemDefinitions;
@@ -44,7 +54,7 @@ public class DungeonCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GameObject defs = GameObject.Find("Definitions"); 
+        GameObject defs = GameObject.Find("Definitions");
         itemDefinitions = defs.GetComponent<ItemDefinitions>();
         dungeonPropertyDefinitions = defs.GetComponent<DungeonPropertyDefinitions>();
         opponentDefinitions = defs.GetComponent<OpponentDefinitions>();
@@ -61,6 +71,7 @@ public class DungeonCreator : MonoBehaviour
         int size = (int) properties[DungeonPropertyKey.Size];
 
         DestroyAllChildren();
+
         DugeonGenerator generator = new DugeonGenerator(size * dungeonWidth, size * dungeonLength);
         var listOfRooms = generator.CalculateDungeon((int)Math.Clamp(Math.Log(size), 1, 5) * maxIterations,
             roomWidthMin,
@@ -69,23 +80,44 @@ public class DungeonCreator : MonoBehaviour
             roomTopCornerMidifier,
             roomOffset,
             corridorWidth);
-        GameObject wallParent = new GameObject("WallParent");
-        wallParent.transform.parent = transform;
-        possibleHorizontalDoorPosition = new List<Vector3Int>();
-        possibleVerticalDoorPosition = new List<Vector3Int>();
-        possibleHorizontalWallPosition = new List<Vector3Int>();
-        possibleVerticalWallPosition = new List<Vector3Int>();
-        CreatePlayer(listOfRooms);
-        CreateTrapDoor(listOfRooms);
+
+        dungeonLevel = new GameObject("DungeonLevel");
+        dungeonLevel.transform.parent = transform;
+
+        dungeonSegments = new List<DungeonSegment>();
+
+        horizontalWallOwners = new Dictionary<Vector3Int, DungeonSegment>();
+        verticalWallOwners = new Dictionary<Vector3Int, DungeonSegment>();
+
         for (int i = 0; i < listOfRooms.Count; i++)
         {
-            CreateMesh(listOfRooms[i].BottomLeftAreaCorner, listOfRooms[i].TopRightAreaCorner, listOfRooms[i].Type);
+            Vector2Int bottomLeftAreaCorner = listOfRooms[i].BottomLeftAreaCorner;
+            Vector2Int topRightAreaCorner = listOfRooms[i].TopRightAreaCorner;
+            String type = listOfRooms[i].Type;
+
+            Vector2Int areaCenter = (bottomLeftAreaCorner + topRightAreaCorner) / 2;
+
+            DungeonSegment segment = new DungeonSegment();
+
+            segment.area = new GameObject(char.ToUpper(type[0]) + type.Substring(1) + " " + areaCenter);
+            segment.area.transform.parent = dungeonLevel.transform;
+            segment.area.transform.position = new Vector3(areaCenter.x, 0, areaCenter.y);
+
+            segment.horizontalWallPositions = new HashSet<Vector3Int>();
+            segment.verticalWallPositions = new HashSet<Vector3Int>();
+
+            dungeonSegments.Add(segment);
+
+            CreateMesh(bottomLeftAreaCorner, topRightAreaCorner, segment, type);
         }
-        CreateWalls(wallParent);
+
+        CreatePlayer(listOfRooms);
+        CreateTrapDoor(listOfRooms);
+        CreateWalls();
         CreatePillars(listOfRooms);
         CreateLoot(listOfRooms);
         CreateEnemy(listOfRooms);
-        CreateNavPoint(listOfRooms);
+        CreateNavPoints(listOfRooms);
         CreateShop(listOfRooms);
 
         navMeshSurface.BuildNavMesh();
@@ -94,14 +126,11 @@ public class DungeonCreator : MonoBehaviour
     private void CreatePlayer(List<Node> listOfRooms)
     {
         Node room = listOfRooms[UnityEngine.Random.Range(0, listOfRooms.Count)];
+
         int playerPosX = UnityEngine.Random.Range(room.BottomLeftAreaCorner.x + 2, room.BottomRightAreaCorner.x - 1);
         int playerPosY = UnityEngine.Random.Range(room.BottomLeftAreaCorner.y + 2, room.TopLeftAreaCorner.y - 1);
-            Vector3 playerPos = new Vector3(
-                playerPosX,
-                2,
-                playerPosY);
-        //playerPrefab.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
-        //GameObject player = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        Vector3 playerPos = new Vector3(playerPosX, 2, playerPosY);
+
         Player player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
         player.transform.SetPositionAndRotation(playerPos, Quaternion.identity);
         player.name = "Player";
@@ -131,83 +160,69 @@ public class DungeonCreator : MonoBehaviour
 
         bool isEnoughEnemies = false;
         int counter = 0;
+
         while (!isEnoughEnemies)
         {
-            foreach( var room in listOfRooms)
+            for (int i = 0; i < listOfRooms.Count; i++)
             {
+                Node room = listOfRooms[i];
+
                 if (room.Type == "room")
                 {
-                    if(UnityEngine.Random.Range(0f,1f) > 0.5)
+                    if (UnityEngine.Random.Range(0.0f, 1.0f) > 0.5f)
                     {
                         int opponentClass = SelectRandomOpponentClass();
 
                         int enemyPosX = UnityEngine.Random.Range(room.BottomLeftAreaCorner.x + 2, room.BottomRightAreaCorner.x - 1);
                         int enemyPosY = UnityEngine.Random.Range(room.BottomLeftAreaCorner.y + 2, room.TopLeftAreaCorner.y - 1);
-                        Vector3 enemyPos = new Vector3(
-                            enemyPosX,
-                            1,
-                            enemyPosY);
+                        Vector3 enemyPos = new Vector3(enemyPosX, 1, enemyPosY);
 
-                        GameObject foe = Instantiate(opponentDefinitions.classes[opponentClass].prefab, enemyPos, Quaternion.identity);
+                        GameObject foe = Instantiate(opponentDefinitions.classes[opponentClass].prefab, enemyPos, Quaternion.identity, dungeonSegments[i].area.transform);
+                        foe.name = opponentDefinitions.classes[opponentClass].prefab.name;
                         Opponent opponent = foe.GetComponent<Opponent>();
                         opponent.spawnRoom = room;
 
-                        OpponentStats stats = foe.GetComponent<OpponentStats>(); 
+                        OpponentStats stats = foe.GetComponent<OpponentStats>();
                         stats.ComputeFrom(opponentDefinitions.classes[opponentClass], (int)properties[DungeonPropertyKey.EnemyLevel]);
 
                         counter++;
                     }
+
                     if (counter >= actualEnemyAmount)
                     {
                         break;
                     }
                 }
             }
+
             isEnoughEnemies = counter >= actualEnemyAmount;
         }
     }
 
-    private void CreateNavPoint(List<Node> listOfRooms)
+    private void AddNavPoint(Node room, GameObject area, int x, int y)
     {
-        foreach( var room in listOfRooms)
+        Vector3 navPointPos = new Vector3(x, 0.5f, y);
+
+        GameObject navPoint = Instantiate(navPointPrefab, navPointPos, Quaternion.identity, area.transform);
+        navPoint.name = navPointPrefab.name;
+
+        room.navPointList.Add(navPoint.GetComponent<NavPoint>());
+    }
+
+    private void CreateNavPoints(List<Node> listOfRooms)
+    {
+        for (int i = 0; i < listOfRooms.Count; i++)
         {
+            Node room = listOfRooms[i];
+
             if (room.Type == "room")
             {
-                int navPointX = room.BottomLeftAreaCorner.x + 5;
-                int navPointY = room.BottomLeftAreaCorner.y + 5;
-                Vector3 navPointPos = new Vector3(
-                    navPointX,
-                    0.5f,
-                    navPointY);
+                GameObject area = dungeonSegments[i].area;
 
-                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
-
-                navPointX = room.TopLeftAreaCorner.x + 5;
-                navPointY = room.TopLeftAreaCorner.y - 5;
-                navPointPos = new Vector3(
-                    navPointX,
-                    0.5f,
-                    navPointY);
-
-                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
-
-                navPointX = room.TopRightAreaCorner.x - 5;
-                navPointY = room.TopRightAreaCorner.y - 5;
-                navPointPos = new Vector3(
-                    navPointX,
-                    0.5f,
-                    navPointY);
-
-                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
-
-                navPointX = room.BottomRightAreaCorner.x - 5;
-                navPointY = room.BottomRightAreaCorner.y + 5;
-                navPointPos = new Vector3(
-                    navPointX,
-                    0.5f,
-                    navPointY);
-
-                room.navPointList.Add(Instantiate(navPointPrefab, navPointPos, Quaternion.identity).GetComponent<NavPoint>());
+                AddNavPoint(room, area, room.BottomLeftAreaCorner.x + 5, room.BottomLeftAreaCorner.y + 5);
+                AddNavPoint(room, area, room.TopLeftAreaCorner.x + 5, room.TopLeftAreaCorner.y - 5);
+                AddNavPoint(room, area, room.TopRightAreaCorner.x - 5, room.TopRightAreaCorner.y - 5);
+                AddNavPoint(room, area, room.BottomRightAreaCorner.x - 5, room.BottomRightAreaCorner.y + 5);
             }
         }
     }
@@ -247,8 +262,10 @@ public class DungeonCreator : MonoBehaviour
 
     private void CreateShop(List<Node> listOfRooms)
     {
-        foreach( var room in listOfRooms)
+        for (int i = 0; i < listOfRooms.Count(); i++)
         {
+            Node room = listOfRooms[i];
+
             if (room.Type == "room")
             {
                 // use center of room
@@ -258,9 +275,11 @@ public class DungeonCreator : MonoBehaviour
                     shopX,
                     0f,
                     shopY);
-                if(UnityEngine.Random.Range(0f,1f) < shopProb)
+
+                if (UnityEngine.Random.Range(0f,1f) < shopProb)
                 {
-                    GameObject shop = Instantiate(shopPrefab, shopPos, Quaternion.identity);
+                    GameObject shop = Instantiate(shopPrefab, shopPos, Quaternion.identity, dungeonSegments[i].area.transform);
+                    shop.name = shopPrefab.name;
 
                     // compute random inventory of shop
                     ItemContainer items = new();
@@ -279,42 +298,52 @@ public class DungeonCreator : MonoBehaviour
 
         float maxDist = 0f;
         Node selectedRoom = null;
-        foreach (var room in listOfRooms) {
+        GameObject selectedAera = null;
+
+        for (int i = 0; i < listOfRooms.Count(); i++) {
+            Node room = listOfRooms[i];
+
             if (room.Type != "room") continue;
 
-            Vector3 currentPos = new Vector3(  (room.BottomLeftAreaCorner.x + room.BottomRightAreaCorner.x) / 2,
-                                        0,
-                                        (room.BottomLeftAreaCorner.y + room.TopLeftAreaCorner.y) / 2);
+            Vector3 currentPos = new Vector3(
+                (room.BottomLeftAreaCorner.x + room.BottomRightAreaCorner.x) / 2,
+                0,
+                (room.BottomLeftAreaCorner.y + room.TopLeftAreaCorner.y) / 2);
             float dist = (player.position - currentPos).magnitude;
+
             if (dist > maxDist) {
                 maxDist = dist;
+                selectedAera = dungeonSegments[i].area;
                 selectedRoom = room;
             }
         }
 
         // place in center of the selected room
-        Vector3 pos = new Vector3(  (selectedRoom.BottomLeftAreaCorner.x + selectedRoom.BottomRightAreaCorner.x) / 2,
-                                    0,
-                                    (selectedRoom.BottomLeftAreaCorner.y + selectedRoom.TopLeftAreaCorner.y) / 2);
-        Instantiate(trapDoorPrefab, pos, Quaternion.identity);
+        Vector3 pos = new Vector3(
+            (selectedRoom.BottomLeftAreaCorner.x + selectedRoom.BottomRightAreaCorner.x) / 2,
+            0,
+            (selectedRoom.BottomLeftAreaCorner.y + selectedRoom.TopLeftAreaCorner.y) / 2);
+        GameObject trapdoor = Instantiate(trapDoorPrefab, pos, Quaternion.identity, selectedAera.transform);
+        trapdoor.name = trapDoorPrefab.name;
     }
 
 
     private void CreateLoot(List<Node> listOfRooms)
     {
-        foreach( var room in listOfRooms)
+        for(int i = 0; i < listOfRooms.Count(); i++)
         {
+            Node room = listOfRooms[i];
+
             if (room.Type == "room")
             {
                 int chestX = UnityEngine.Random.Range(room.BottomLeftAreaCorner.x + 2, room.BottomRightAreaCorner.x - 1);
                 int chestY = UnityEngine.Random.Range(room.BottomLeftAreaCorner.y + 2, room.TopLeftAreaCorner.y - 1);
-                Vector3 chestPos = new Vector3(
-                    chestX,
-                    0.35f,
-                    chestY);
-                if(UnityEngine.Random.Range(0f,1f) > lootProb)
+                Vector3 chestPos = new Vector3(chestX, 0.35f, chestY);
+
+                if (UnityEngine.Random.Range(0f,1f) > lootProb)
                 {
-                    var chest = Instantiate(chestPrefab, chestPos, Quaternion.identity);
+                    GameObject chest = Instantiate(chestPrefab, chestPos, Quaternion.identity, dungeonSegments[i].area.transform);
+                    chest.name = chestPrefab.name;
 
                     ItemSlot tmpSlot = new();
                     SetRandomDroppedItem(tmpSlot);
@@ -326,182 +355,207 @@ public class DungeonCreator : MonoBehaviour
 
     private void CreatePillars(List<Node> listOfRooms)
     {
-        foreach (var room in listOfRooms)
+        for (int i = 0; i < listOfRooms.Count; i++)
         {
+            Node room = listOfRooms[i];
+            GameObject area = dungeonSegments[i].area;
+
             Vector3 bottomLeftAreaCorner = new Vector3(room.BottomLeftAreaCorner.x, 0, room.BottomLeftAreaCorner.y);
-            CreatePillar(bottomLeftAreaCorner);
+            CreatePillar(bottomLeftAreaCorner, area);
             Vector3 bottomRightAreaCorner = new Vector3(room.TopRightAreaCorner.x, 0, room.BottomLeftAreaCorner.y);
-            CreatePillar(bottomRightAreaCorner);
+            CreatePillar(bottomRightAreaCorner, area);
             Vector3 topLeftCorner = new Vector3(room.BottomLeftAreaCorner.x, 0, room.TopRightAreaCorner.y);
-            CreatePillar(topLeftCorner);
+            CreatePillar(topLeftCorner, area);
             Vector3 topRightCorner = new Vector3(room.TopRightAreaCorner.x, 0, room.TopRightAreaCorner.y);
-            CreatePillar(topRightCorner);
+            CreatePillar(topRightCorner, area);
         }
     }
 
-    private void CreatePillar(Vector3 pillarPos)
+    private void CreatePillar(Vector3 position, GameObject parent)
     {
-        if (pillarPos != Vector3.zero)
+        if (position != Vector3.zero)
         {
-            GameObject pillar = Instantiate(pillarPrefab, pillarPos, Quaternion.identity);
+            GameObject pillar = Instantiate(pillarPrefab, position, Quaternion.identity, parent.transform);
             pillar.transform.localScale = new Vector3(1.125f, 1, 1.125f);
+            pillar.name = pillarPrefab.name;
         }
     }
 
-    private void CreateWalls(GameObject wallParent)
+    private void CreateWalls()
     {
-        // To Cap the possibleWalls Lists
-        possibleHorizontalWallPosition.Add(possibleHorizontalWallPosition[0]);
-        possibleVerticalWallPosition.Add(possibleVerticalWallPosition[0]);
-        int wallLength;
-        float wallDetail;
-        float wallPosX = 0;
-        int wallPosY = 0;
-        float wallPosZ = 0;
-        int startX = -1;
-        int startZ = -1;
-        int temp = 0;
-        int wallScaler = 4;
-        foreach (var hWallPosition in possibleHorizontalWallPosition)
+        foreach (var segment in dungeonSegments)
         {
-            // Define starting point
-            if (startX == -1)
+            List<Vector3Int> horizontalWalls = segment.horizontalWallPositions.OrderBy(p => p.z).ThenBy(p => p.x).ToList();
+            List<Vector3Int> verticalWalls = segment.verticalWallPositions.OrderBy(p => p.x).ThenBy(p => p.z).ToList();
+
+            if (horizontalWalls.Count > 0)
             {
-                startX = hWallPosition.x;
-                wallPosZ = hWallPosition.z;
-                temp = hWallPosition.x;
+                horizontalWalls.Add(horizontalWalls[0]);
             }
-            else
+            if (verticalWalls.Count > 0)
+            { 
+                verticalWalls.Add(verticalWalls[0]);
+            }
+
+            int wallLength;
+            float wallDetail;
+
+            float wallPosX = 0;
+            int wallPosY = 0;
+            float wallPosZ = 0;
+
+            int startX = -1;
+            int startZ = -1;
+
+            int temp = 0;
+            int wallScaler = 4;
+
+            foreach (var hWallPosition in horizontalWalls)
             {
-                // check if coherent Wall, save end point as temp
-                if(hWallPosition.x == temp + 1)
+                // Define starting point
+                if (startX == -1)
                 {
-                    temp = hWallPosition.x;
-                }
-                // (temp - start) = total length of wall
-                else
-                {
-                    wallLength = temp - startX;
-                    int segmentCount = (wallLength < wallScaler) ? 1 : wallLength / wallScaler;
-                    float scale = 0;
-                    if(segmentCount == 1)
-                    {
-                        if(wallLength < 4)
-                        {
-                            int wallOffset = wallLength % wallScaler;
-                            scale = (float) wallOffset / wallScaler;
-                        }
-                        else
-                        {
-                            scale = (float) wallLength / wallScaler;
-                        }
-                        wallPosX =  startX + (float) (wallLength+1) / 2;
-                        Vector3 wallPos  = new Vector3(
-                            wallPosX,
-                            wallPosY,
-                            wallPosZ
-                        );
-                        GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, wallParent.transform);
-                        wall.transform.localScale = new Vector3(scale, 1, 1);
-                    }
-                    else
-                    {
-                        wallPosX = startX + 0.5f;
-                        scale = (float) wallLength / segmentCount / wallScaler;
-                        for (int i = 0; i < segmentCount; i++)
-                        {
-                            wallPosX += scale * wallScaler / 2;
-                            wallDetail = UnityEngine.Random.Range(-0.1f, 0.1f);
-                            Vector3 wallPos  = new Vector3(
-                                wallPosX,
-                                wallPosY,
-                                wallPosZ + wallDetail
-                            );
-                            GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, wallParent.transform);
-                            wall.transform.localScale = new Vector3(scale, 1, 1);
-                            wallPosX += scale * wallScaler / 2;
-                        }
-                    }
                     startX = hWallPosition.x;
                     wallPosZ = hWallPosition.z;
                     temp = hWallPosition.x;
                 }
-            }
-        }
-        foreach (var vWallPosition in possibleVerticalWallPosition)
-        {
-            // Define starting point
-            if (startZ == -1)
-            {
-                startZ = vWallPosition.z;
-                wallPosX = vWallPosition.x;
-                temp = vWallPosition.z;
-            }
-            else
-            {
-                // check if coherent Wall, save end point as temp
-                if(vWallPosition.z == temp + 1)
-                {
-                    temp = vWallPosition.z;
-                }
-                // (temp - start) = total length of wall
                 else
                 {
-                    wallLength = temp - startZ;
-                    int segmentCount = (wallLength < wallScaler) ? 1 : wallLength / wallScaler;
-                    float scale;
-
-                    if(segmentCount == 1)
+                    // check if coherent Wall, save end point as temp
+                    if (hWallPosition.x == temp + 1)
                     {
-                        wallLength += 1;
-                        if(wallLength < 4)
-                        {
-                            int wallOffset = wallLength % wallScaler;
-                            scale = (float) wallOffset / wallScaler;
-                        }
-                        else
-                        {
-                            scale = (float) wallLength / wallScaler;
-                        }
-                        wallPosZ = startZ + (float) (wallLength+1) / 2;
-                        Vector3 wallPos  = new Vector3(
-                            wallPosX,
-                            wallPosY,
-                            wallPosZ - 0.5f
-                        );
-                        GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.Euler(0, 90, 0), wallParent.transform);
-                        wall.transform.localScale = new Vector3(scale, 1, 1);
+                        temp = hWallPosition.x;
                     }
+                    // (temp - start) = total length of wall
                     else
                     {
-
-                        wallPosZ = startZ + 0.5f;
-                        scale = (float) wallLength / segmentCount / wallScaler;
-                        for (int i = 0; i < segmentCount; i++)
+                        wallLength = temp - startX;
+                        int segmentCount = (wallLength < wallScaler) ? 1 : wallLength / wallScaler;
+                        float scale = 0;
+                        if (segmentCount == 1)
                         {
-                            wallPosZ += scale * wallScaler / 2;
-                            wallDetail = UnityEngine.Random.Range(-0.1f, 0.1f);
-                            Vector3 wallPos  = new Vector3(
-                                wallPosX + wallDetail,
+                            if (wallLength < 4)
+                            {
+                                int wallOffset = wallLength % wallScaler;
+                                scale = (float)wallOffset / wallScaler;
+                            }
+                            else
+                            {
+                                scale = (float)wallLength / wallScaler;
+                            }
+                            wallPosX = startX + (float)(wallLength + 1) / 2;
+                            Vector3 wallPos = new Vector3(
+                                wallPosX,
                                 wallPosY,
                                 wallPosZ
                             );
-                            GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.Euler(0, 90, 0), wallParent.transform);
+                            GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, segment.area.transform);
                             wall.transform.localScale = new Vector3(scale, 1, 1);
-                            wallPosZ += scale * wallScaler / 2;
+                            wall.name = wallPrefab.name;
                         }
+                        else
+                        {
+                            wallPosX = startX + 0.5f;
+                            scale = (float)wallLength / segmentCount / wallScaler;
+                            for (int i = 0; i < segmentCount; i++)
+                            {
+                                wallPosX += scale * wallScaler / 2;
+                                wallDetail = UnityEngine.Random.Range(-0.1f, 0.1f);
+                                Vector3 wallPos = new Vector3(
+                                    wallPosX,
+                                    wallPosY,
+                                    wallPosZ + wallDetail
+                                );
+                                GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.identity, segment.area.transform);
+                                wall.transform.localScale = new Vector3(scale, 1, 1);
+                                wall.name = wallPrefab.name;
+                                wallPosX += scale * wallScaler / 2;
+                            }
+                        }
+                        startX = hWallPosition.x;
+                        wallPosZ = hWallPosition.z;
+                        temp = hWallPosition.x;
                     }
+                }
+            }
+            foreach (var vWallPosition in verticalWalls)
+            {
+                // Define starting point
+                if (startZ == -1)
+                {
                     startZ = vWallPosition.z;
                     wallPosX = vWallPosition.x;
                     temp = vWallPosition.z;
+                }
+                else
+                {
+                    // check if coherent Wall, save end point as temp
+                    if (vWallPosition.z == temp + 1)
+                    {
+                        temp = vWallPosition.z;
+                    }
+                    // (temp - start) = total length of wall
+                    else
+                    {
+                        wallLength = temp - startZ;
+                        int segmentCount = (wallLength < wallScaler) ? 1 : wallLength / wallScaler;
+                        float scale;
+
+                        if (segmentCount == 1)
+                        {
+                            wallLength += 1;
+                            if (wallLength < 4)
+                            {
+                                int wallOffset = wallLength % wallScaler;
+                                scale = (float)wallOffset / wallScaler;
+                            }
+                            else
+                            {
+                                scale = (float)wallLength / wallScaler;
+                            }
+                            wallPosZ = startZ + (float)(wallLength + 1) / 2;
+                            Vector3 wallPos = new Vector3(
+                                wallPosX,
+                                wallPosY,
+                                wallPosZ - 0.5f
+                            );
+                            GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.Euler(0, 90, 0), segment.area.transform);
+                            wall.transform.localScale = new Vector3(scale, 1, 1);
+                            wall.name = wallPrefab.name;
+                        }
+                        else
+                        {
+
+                            wallPosZ = startZ + 0.5f;
+                            scale = (float)wallLength / segmentCount / wallScaler;
+                            for (int i = 0; i < segmentCount; i++)
+                            {
+                                wallPosZ += scale * wallScaler / 2;
+                                wallDetail = UnityEngine.Random.Range(-0.1f, 0.1f);
+                                Vector3 wallPos = new Vector3(
+                                    wallPosX + wallDetail,
+                                    wallPosY,
+                                    wallPosZ
+                                );
+                                GameObject wall = Instantiate(wallPrefab, wallPos, Quaternion.Euler(0, 90, 0), segment.area.transform);
+                                wall.transform.localScale = new Vector3(scale, 1, 1);
+                                wall.name = wallPrefab.name;
+                                wallPosZ += scale * wallScaler / 2;
+                            }
+                        }
+                        startZ = vWallPosition.z;
+                        wallPosX = vWallPosition.x;
+                        temp = vWallPosition.z;
+                    }
                 }
             }
         }
     }
 
-    private void CreatePlane(String name, Material material, Vector2 position, Vector3[] vertices)
+    private void CreatePlane(String name, Material material, GameObject parent, Vector3[] vertices)
     {
-        GameObject plane = new GameObject(name + position);
+        GameObject plane = new GameObject(name);
+        plane.transform.parent = parent.transform;
 
         MeshFilter meshFilter = plane.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = plane.AddComponent<MeshRenderer>();
@@ -536,7 +590,7 @@ public class DungeonCreator : MonoBehaviour
         meshCollider.convex = false;
     }
 
-    private void CreateMesh(Vector2 bottomLeftCorner, Vector2 topRightCorner, String roomType)
+    private void CreateMesh(Vector2 bottomLeftCorner, Vector2 topRightCorner, DungeonSegment segment, String roomType)
     {
         Vector3 bottomLeftV = new Vector3(bottomLeftCorner.x, 0, bottomLeftCorner.y);
         Vector3 bottomRightV = new Vector3(topRightCorner.x, 0, bottomLeftCorner.y);
@@ -559,40 +613,55 @@ public class DungeonCreator : MonoBehaviour
             new Vector3(topRightV.x, 6, topRightV.z)
         };
 
-        CreatePlane("Floor", floorMaterial, bottomLeftCorner, floorVertices);
-        CreatePlane("Ceiling", ceilingMaterial, bottomLeftCorner, ceilingVertices);
+        CreatePlane("Floor", floorMaterial, segment.area, floorVertices);
+        CreatePlane("Ceiling", ceilingMaterial, segment.area, ceilingVertices);
 
         for (int row = (int)Math.Ceiling(bottomLeftV.x); row < (int)Math.Ceiling(bottomRightV.x); row++)
         {
-            var wallPosition = new Vector3(row, 0, bottomLeftV.z);
-            AddWallPositionToList(wallPosition, possibleHorizontalWallPosition, possibleHorizontalDoorPosition);
+            var position = new Vector3(row, 0, bottomLeftV.z);
+            AddWallPosition(position, true, segment);
         }
         for (int row = (int)Math.Ceiling(topLeftV.x); row < (int)Math.Ceiling(topRightCorner.x); row++)
         {
-            var wallPosition = new Vector3(row, 0, topRightV.z);
-            AddWallPositionToList(wallPosition, possibleHorizontalWallPosition, possibleHorizontalDoorPosition);
+            var position = new Vector3(row, 0, topRightV.z);
+            AddWallPosition(position, true, segment);
         }
         for (int col = (int)Math.Ceiling(bottomLeftV.z); col < (int)Math.Ceiling(topLeftV.z); col++)
         {
-            var wallPosition = new Vector3(bottomLeftV.x, 0, col);
-            AddWallPositionToList(wallPosition, possibleVerticalWallPosition, possibleVerticalDoorPosition);
+            var position = new Vector3(bottomLeftV.x, 0, col);
+            AddWallPosition(position, false, segment);
         }
         for (int col = (int)Math.Ceiling(bottomRightV.z); col < (int)Math.Ceiling(topRightV.z); col++)
         {
-            var wallPosition = new Vector3(bottomRightV.x, 0, col);
-            AddWallPositionToList(wallPosition, possibleVerticalWallPosition, possibleVerticalDoorPosition);
+            var position = new Vector3(bottomRightV.x, 0, col);
+            AddWallPosition(position, false, segment);
         }
     }
 
-    private void AddWallPositionToList(Vector3 wallPosition, List<Vector3Int> wallList, List<Vector3Int> doorList)
+    private void AddWallPosition(Vector3 position, bool horizontally, DungeonSegment segment)
     {
-        Vector3Int point = Vector3Int.CeilToInt(wallPosition);
-        if (wallList.Contains(point)){
-            wallList.Remove(point);
+        Vector3Int location = Vector3Int.CeilToInt(position);
+
+        var wallOwners = horizontally ? horizontalWallOwners : verticalWallOwners;
+        var wallPosition = horizontally ? segment.horizontalWallPositions : segment.verticalWallPositions;
+
+        if (wallOwners.TryGetValue(location, out DungeonSegment owningSegment))
+        {
+            if (horizontally)
+            {
+                owningSegment.horizontalWallPositions.Remove(location);
+            }
+            else
+            {
+                owningSegment.verticalWallPositions.Remove(location);
+            }
+
+            wallOwners.Remove(location);
         }
         else
         {
-            wallList.Add(point);
+            wallOwners.Add(location, segment);
+            wallPosition.Add(location);
         }
     }
 
