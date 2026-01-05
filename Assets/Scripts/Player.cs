@@ -118,10 +118,11 @@ public class Player : MonoBehaviour
         opponentGotHit = false;
 
         if (!RunData.Instance.Initialized) {
-            RunData.Instance.NewRun();
-        } else {
-            attackType = RunData.Instance.selectedAttack;
+            RunData.Instance.NewGame();
         }
+        GameSaver.load();
+
+        attackType = RunData.Instance.selectedAttack;
     }
 
     // Update is called once per frame
@@ -140,6 +141,10 @@ public class Player : MonoBehaviour
         else
         {
             motion.y = 0.0f;
+        }
+
+        if (transform.position.y < -10 && !isDead) {
+            Die();
         }
 
         if (fireCooldown > 0.0f)
@@ -166,6 +171,7 @@ public class Player : MonoBehaviour
 
             float duration = hitState == HitState.Swing ? stats.swingDuration :
                              hitState == HitState.Strike ? stats.strikeDuration : stats.returnDuration;
+            duration /= stats.hitRate;
 
             float ratio = Mathf.Clamp(hitTime / duration, 0.0f, 1.0f);
 
@@ -189,7 +195,7 @@ public class Player : MonoBehaviour
                         startRotation = Quaternion.Euler(strikeRotation);
                         endRotation = Quaternion.Euler(restRotation);
                         hitZone.gameObject.SetActive(true);
-                        hitZone.SetDamage(20.0f);
+                        hitZone.SetDamage(stats.strikeDamage);
                         break;
                     case HitState.Return:
                         hitState = HitState.Idle;
@@ -299,6 +305,9 @@ public class Player : MonoBehaviour
         isDead = true;
         characterController.enabled = false;
         UIManager.Instance.SwitchToDeathScreen();
+        RunData.Instance.NewRun();
+        GameSaver.save();
+
     }
 
     public void StartGame()
@@ -489,7 +498,8 @@ public class Player : MonoBehaviour
 
         Projectile instance = Instantiate(projectiles[0], position, rotation);
         instance.name = projectiles[0].name;
-        instance.SetDamage(10.0f);
+        instance.SetDamage(stats.arrowDamage);
+        instance.SetSpeed(stats.arrowSpeed);
 
         fireCooldown = 1.0f / stats.fireRate;
     }

@@ -53,7 +53,6 @@ public class RunData {
         // add initial items and currencies
         items.AddItem(defs.GetComponent<ItemDefinitions>()[3], constants.initialAmmo);
         currencies[Currency.Gold] = constants.initialGold;
-        currencies[Currency.XP] += constants.initialXP;
     }
 
     public void NewGame() {
@@ -83,7 +82,7 @@ public class RunData {
         // add initial items and currencies
         items.AddItem(defs.GetComponent<ItemDefinitions>()[3], constants.initialAmmo);
         currencies[Currency.Gold] = constants.initialGold;
-        currencies[Currency.XP] += constants.initialXP;
+        currencies[Currency.XP] = constants.initialXP;
     }
     
     public static RunData Instance = new();
