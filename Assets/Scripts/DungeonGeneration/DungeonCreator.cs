@@ -35,10 +35,17 @@ public class DungeonCreator : MonoBehaviour
     public float roomTopCornerMidifier;
     [Range(0, 2)]
     public int roomOffset;
+    
+    [Header("Torch Placement")]
+    public float pillarThickness;
+    [Range(0, 6)]
+    public float torchHeight;
+    [Range(1, 10)]
+    public float torchSpacing;
+    [Range(0, 2)]
+    public float torchWallOffset;
 
-    [Header("Prefabs")]
-    public GameObject wallPrefab;
-    public GameObject pillarPrefab, playerPrefab, chestPrefab, enemyPrefab, shopPrefab, trapDoorPrefab, navPointPrefab;
+    public GameObject wallPrefab, pillarPrefab, playerPrefab, chestPrefab, shopPrefab, torchPrefab, trapDoorPrefab, navPointPrefab;
 
     private Dictionary<Vector3Int, DungeonSegment> horizontalWallOwners;
     private Dictionary<Vector3Int, DungeonSegment> verticalWallOwners;
@@ -373,8 +380,9 @@ public class DungeonCreator : MonoBehaviour
     {
         if (position != Vector3.zero)
         {
+            Quaternion rotation = Quaternion.Euler(0.0f, UnityEngine.Random.Range(0, 4) * 90.0f, 0.0f);
+
             GameObject pillar = Instantiate(pillarPrefab, position, Quaternion.identity, parent.transform);
-            pillar.transform.localScale = new Vector3(1.125f, 1, 1.125f);
             pillar.name = pillarPrefab.name;
         }
     }
@@ -391,7 +399,7 @@ public class DungeonCreator : MonoBehaviour
                 horizontalWalls.Add(horizontalWalls[0]);
             }
             if (verticalWalls.Count > 0)
-            { 
+            {
                 verticalWalls.Add(verticalWalls[0]);
             }
 
@@ -470,6 +478,9 @@ public class DungeonCreator : MonoBehaviour
                                 wallPosX += scale * wallScaler / 2;
                             }
                         }
+
+                        PlaceTorches(new Vector3(startX, 0, wallPosZ), new Vector3(temp + 1, 0, wallPosZ), segment.area);
+
                         startX = hWallPosition.x;
                         wallPosZ = hWallPosition.z;
                         temp = hWallPosition.x;
@@ -541,6 +552,9 @@ public class DungeonCreator : MonoBehaviour
                                 wallPosZ += scale * wallScaler / 2;
                             }
                         }
+
+                        PlaceTorches(new Vector3(wallPosX, 0, startZ), new Vector3(wallPosX, 0, temp + 1), segment.area);
+
                         startZ = vWallPosition.z;
                         wallPosX = vWallPosition.x;
                         temp = vWallPosition.z;
@@ -671,6 +685,63 @@ public class DungeonCreator : MonoBehaviour
             {
                 DestroyImmediate(item.gameObject);
             }
+        }
+    }
+
+    private void PlaceTorches(Vector3 start, Vector3 end, GameObject parent)
+    {
+        float lenght = Vector3.Distance(start, end);
+        float visibleLength = lenght - 2.0f * pillarThickness;
+
+        float edgePadding = torchSpacing * 0.5f;
+
+        if (visibleLength < edgePadding)
+        {
+            return;
+        }
+
+        float usableLength = visibleLength - 2.0f * edgePadding;
+
+        Vector3 roomCenter = parent.transform.position;
+        Vector3 wallCenter = (start + end) * 0.5f;
+
+        Vector3 direction = (end - start).normalized;
+        Vector3 toRoomCenter = (roomCenter - wallCenter).normalized;
+
+        Vector3 normal = Vector3.Cross(Vector3.up, direction).normalized;
+
+        if (Vector3.Dot(normal, toRoomCenter) < 0.0f)
+        {
+            normal = -normal;
+        }
+
+        int torchCount = usableLength < 0 ? 1 : Mathf.FloorToInt(visibleLength / torchSpacing) + 1;
+
+        if (torchCount == 1)
+        {
+            Vector3 position = wallCenter;
+            position += normal * torchWallOffset;
+            position.y = torchHeight;
+
+            GameObject torch = Instantiate(torchPrefab, position, Quaternion.LookRotation(-normal), parent.transform);
+            torch.name = torchPrefab.name;
+
+            return;
+        }
+
+        float placementLength = (torchCount - 1) * torchSpacing;
+        float startOffset = pillarThickness + edgePadding + (usableLength - placementLength) * 0.5f;
+
+        for (int i = 0; i < torchCount; i++)
+        {
+            float offset = startOffset + i * torchSpacing;
+
+            Vector3 position = start + direction * offset;
+            position += normal * torchWallOffset;
+            position.y = torchHeight;
+
+            GameObject torch = Instantiate(torchPrefab, position, Quaternion.LookRotation(-normal), parent.transform);
+            torch.name = torchPrefab.name;
         }
     }
 }
