@@ -65,7 +65,7 @@ public class DungeonCreator : MonoBehaviour
         CreateTrapDoor(listOfRooms);
         for (int i = 0; i < listOfRooms.Count; i++)
         {
-            CreateMesh(listOfRooms[i].BottomLeftAreaCorner, listOfRooms[i].TopRightAreaCorner, listOfRooms[i].Type);
+            CreateMesh(listOfRooms[i].BottomLeftAreaCorner, listOfRooms[i].TopRightAreaCorner, listOfRooms[i].name, listOfRooms[i].Type);
         }
         CreateWalls(wallParent);
         CreatePillars(listOfRooms);
@@ -463,7 +463,7 @@ public class DungeonCreator : MonoBehaviour
         }
     }
 
-    private void CreateMesh(Vector2 bottomLeftCorner, Vector2 topRightCorner, String roomType)
+    private void CreateMesh(Vector2 bottomLeftCorner, Vector2 topRightCorner, String name, String type)
     {
         Vector3 bottomLeftV = new Vector3(bottomLeftCorner.x, 0, bottomLeftCorner.y);
         Vector3 bottomRightV = new Vector3(topRightCorner.x, 0, bottomLeftCorner.y);
@@ -498,7 +498,7 @@ public class DungeonCreator : MonoBehaviour
         mesh.uv = uvs;
         mesh.triangles = triangles;
 
-        GameObject dungeonFloor = new GameObject("Mesh" + bottomLeftCorner, typeof(MeshFilter), typeof(MeshRenderer));
+        GameObject dungeonFloor = new GameObject(type + name, typeof(MeshFilter), typeof(MeshRenderer));//"Mesh" + bottomLeftCorner
 
         dungeonFloor.transform.position = Vector3.zero;
         dungeonFloor.transform.localScale = Vector3.one;

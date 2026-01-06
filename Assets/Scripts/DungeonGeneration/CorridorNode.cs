@@ -7,6 +7,8 @@ public class CorridorNode : Node
 {
     private Node structure1;
     private Node structure2;
+    private String room1;
+    private String room2;
     private int corridorWidth;
     private int modifierDistanceFromWall=2;
 
@@ -56,10 +58,47 @@ public class CorridorNode : Node
         {
             int maxX = sortedLeftStructure[0].TopRightAreaCorner.x;
             sortedLeftStructure = sortedLeftStructure.Where(children => Math.Abs(maxX - children.TopRightAreaCorner.x) < 10).ToList();
-            int index = UnityEngine.Random.Range(0, sortedLeftStructure.Count);
-            leftStructure = sortedLeftStructure[index];
+            //int index = UnityEngine.Random.Range(0, sortedLeftStructure.Count);
+            //leftStructure = sortedLeftStructure[index];
         }
 
+        var sortedRightStructure = rightStructureChildren.OrderBy(child => child.TopRightAreaCorner.x).ToList();
+        if (sortedRightStructure.Count == 1)
+        {
+            leftStructure = sortedRightStructure[0];
+        }
+        else
+        {
+            int minX = sortedRightStructure[0].BottomLeftAreaCorner.x;
+            sortedRightStructure = sortedRightStructure.Where(children => Math.Abs(minX - children.BottomLeftAreaCorner.x) < 10).ToList();
+        }
+        float bestScale = 0;
+        float scale = 0;
+        Node rightResult = null;
+        Node leftResult = null;
+        foreach(var leftRoom in sortedLeftStructure)
+        {
+            foreach(var rightRoom in sortedRightStructure)
+            {
+                int topLeftBottomRight = Math.Abs(leftRoom.TopRightAreaCorner.y - rightRoom.BottomLeftAreaCorner.y);
+                int topRightBottomLeft = Math.Abs(rightRoom.TopLeftAreaCorner.y - leftRoom.BottomRightAreaCorner.y);
+                if (topLeftBottomRight <= topRightBottomLeft){
+                    scale = (float)topLeftBottomRight/topRightBottomLeft;
+                } 
+                else
+                {
+                    scale = (float)topRightBottomLeft/topLeftBottomRight;
+                }
+                if (scale > bestScale){
+                    bestScale = scale;
+                    rightResult = rightRoom;
+                    leftResult = leftRoom;
+                }
+            }
+        }
+        leftStructure = leftResult;
+        rightStructure = rightResult;
+        /*
         var possibleNeighboursInRightStructureList = rightStructureChildren.Where(
             child => GetValidYForNeighourLeftRight(
                 leftStructure.TopRightAreaCorner,
@@ -77,6 +116,7 @@ public class CorridorNode : Node
         {
             rightStructure = possibleNeighboursInRightStructureList[0];
         }
+        */
         int y = GetValidYForNeighourLeftRight(
             leftStructure.TopLeftAreaCorner, 
             leftStructure.BottomRightAreaCorner,
@@ -91,8 +131,10 @@ public class CorridorNode : Node
             rightStructure.TopLeftAreaCorner,
             rightStructure.BottomLeftAreaCorner);
         }
-        BottomLeftAreaCorner = new Vector2Int(leftStructure.BottomRightAreaCorner.x, y);
-        TopRightAreaCorner = new Vector2Int(rightStructure.TopLeftAreaCorner.x, y + this.corridorWidth);
+        room1 = leftStructure.name;
+        room2 = rightStructure.name;
+        BottomLeftAreaCorner = new Vector2Int(leftStructure.BottomRightAreaCorner.x, y - this.corridorWidth/2);
+        TopRightAreaCorner = new Vector2Int(rightStructure.TopLeftAreaCorner.x, y + this.corridorWidth/2);
     }
 
     private int GetValidYForNeighourLeftRight(Vector2Int leftNodeUp, Vector2Int leftNodeDown, Vector2Int rightNodeUp, Vector2Int rightNodeDown)
@@ -107,22 +149,22 @@ public class CorridorNode : Node
         if(rightNodeUp.y <= leftNodeUp.y && leftNodeDown.y <= rightNodeDown.y)
         {
             return StructureHelper.CalculateMiddlePoint(
-                rightNodeDown+new Vector2Int(0,modifierDistanceFromWall),
+                rightNodeDown + new Vector2Int(0,modifierDistanceFromWall),
                 rightNodeUp - new Vector2Int(0, modifierDistanceFromWall)
                 ).y;
         }
-        if(leftNodeUp.y >= rightNodeDown.y && leftNodeUp.y <= rightNodeUp.y)
+        if(leftNodeUp.y <= rightNodeUp.y && leftNodeUp.y >= rightNodeDown.y + this.corridorWidth + 2 * modifierDistanceFromWall) 
         {
             return StructureHelper.CalculateMiddlePoint(
-                rightNodeDown+new Vector2Int(0,modifierDistanceFromWall),
-                leftNodeUp-new Vector2Int(0,modifierDistanceFromWall)
+                rightNodeDown + new Vector2Int(0,modifierDistanceFromWall),
+                leftNodeUp - new Vector2Int(0,modifierDistanceFromWall)
                 ).y;
         }
-        if(leftNodeDown.y >= rightNodeDown.y && leftNodeDown.y <= rightNodeUp.y)
+        if(leftNodeDown.y >= rightNodeDown.y && rightNodeUp.y >= leftNodeDown.y + this.corridorWidth + 2 * modifierDistanceFromWall)
         {
             return StructureHelper.CalculateMiddlePoint(
-                leftNodeDown+new Vector2Int(0,modifierDistanceFromWall),
-                rightNodeUp-new Vector2Int(0,modifierDistanceFromWall)
+                leftNodeDown + new Vector2Int(0,modifierDistanceFromWall),
+                rightNodeUp - new Vector2Int(0,modifierDistanceFromWall)
                 ).y;
         }
         return- 1;
@@ -145,10 +187,43 @@ public class CorridorNode : Node
         {
             int maxY = sortedBottomStructure[0].TopLeftAreaCorner.y;
             sortedBottomStructure = sortedBottomStructure.Where(child => Mathf.Abs(maxY - child.TopLeftAreaCorner.y) < 10).ToList();
-            int index = UnityEngine.Random.Range(0, sortedBottomStructure.Count);
-            bottomStructure = sortedBottomStructure[index];
+            //int index = UnityEngine.Random.Range(0, sortedBottomStructure.Count);
+            //bottomStructure = sortedBottomStructure[index];
+        }
+        var sortedTopStructure = structureAboveChildren.OrderBy(child => child.BottomLeftAreaCorner.y).ToList();
+
+        if (sortedTopStructure.Count == 1)
+        {
+            topStructure = structureAboveChildren[0];
+        }
+        else
+        {
+            int minY = sortedTopStructure[0].BottomLeftAreaCorner.y;
+            sortedTopStructure = sortedTopStructure.Where(child => Mathf.Abs(minY - child.BottomLeftAreaCorner.y) < 10).ToList();
         }
 
+        float bestScale = 0;
+        float scale = 0;
+        Node bottomResult = null;
+        Node topResult = null;
+        foreach(var bottomRoom in sortedBottomStructure)
+        {
+            foreach(var topRoom in sortedTopStructure)
+            {
+                int topLeftBottomRight = Math.Abs(bottomRoom.TopRightAreaCorner.x - topRoom.BottomLeftAreaCorner.x);
+                int topRightBottomLeft = Math.Abs(topRoom.BottomRightAreaCorner.x - bottomRoom.TopLeftAreaCorner.x);
+                scale = topLeftBottomRight <= topRightBottomLeft ?
+                 (float)topLeftBottomRight/topRightBottomLeft :
+                  (float)topRightBottomLeft/topLeftBottomRight;
+                if (scale > bestScale){
+                    bestScale = scale;
+                    topResult = topRoom;
+                    bottomResult = bottomRoom;
+                }
+            }
+        }        bottomStructure = bottomResult;
+        topStructure = topResult;
+        /*
         var possibleNeighboursInTopStructure = structureAboveChildren.Where(
             child => GetValidXForNeighbourUpDown(
                 bottomStructure.TopLeftAreaCorner,
@@ -164,6 +239,7 @@ public class CorridorNode : Node
         {
             topStructure = possibleNeighboursInTopStructure[0];
         }
+        */
         int x = GetValidXForNeighbourUpDown(
                 bottomStructure.TopLeftAreaCorner,
                 bottomStructure.TopRightAreaCorner,
@@ -179,41 +255,51 @@ public class CorridorNode : Node
                 topStructure.BottomLeftAreaCorner,
                 topStructure.BottomRightAreaCorner);
         }
-        BottomLeftAreaCorner = new Vector2Int(x, bottomStructure.TopLeftAreaCorner.y);
-        TopRightAreaCorner = new Vector2Int(x + this.corridorWidth, topStructure.BottomLeftAreaCorner.y);
+        room1 = bottomStructure.name;
+        room2 = topStructure.name;
+        BottomLeftAreaCorner = new Vector2Int(x - corridorWidth/2, bottomStructure.TopLeftAreaCorner.y);
+        TopRightAreaCorner = new Vector2Int(x + corridorWidth/2, topStructure.BottomLeftAreaCorner.y);
     }
 
     private int GetValidXForNeighbourUpDown(Vector2Int bottomNodeLeft, 
         Vector2Int bottomNodeRight, Vector2Int topNodeLeft, Vector2Int topNodeRight)
     {
-        if(topNodeLeft.x < bottomNodeLeft.x && bottomNodeRight.x < topNodeRight.x)
+        /*if(topNodeLeft.x < bottomNodeLeft.x && bottomNodeRight.x < topNodeRight.x)
         {
             return StructureHelper.CalculateMiddlePoint(
                 bottomNodeLeft + new Vector2Int(modifierDistanceFromWall, 0),
-                bottomNodeRight - new Vector2Int(this.corridorWidth + modifierDistanceFromWall, 0)
+                bottomNodeRight - new Vector2Int(modifierDistanceFromWall, 0)
                 ).x;
-        }
+        }*/
         if(topNodeLeft.x >= bottomNodeLeft.x && bottomNodeRight.x >= topNodeRight.x)
         {
             return StructureHelper.CalculateMiddlePoint(
-                topNodeLeft+new Vector2Int(modifierDistanceFromWall,0),
-                topNodeRight - new Vector2Int(this.corridorWidth+modifierDistanceFromWall,0)
+                topNodeLeft + new Vector2Int(modifierDistanceFromWall,0),
+                topNodeRight - new Vector2Int(modifierDistanceFromWall,0)
                 ).x;
         }
-        if(bottomNodeLeft.x >= (topNodeLeft.x) && bottomNodeLeft.x <= topNodeRight.x)
+        if(bottomNodeLeft.x >= topNodeLeft.x && topNodeRight.x >= bottomNodeLeft.x + this.corridorWidth + 2*modifierDistanceFromWall) 
         {
-            return StructureHelper.CalculateMiddlePoint(
+            return bottomNodeRight.x <= topNodeRight.x ?
+                StructureHelper.CalculateMiddlePoint(
                 bottomNodeLeft + new Vector2Int(modifierDistanceFromWall,0),
-                topNodeRight - new Vector2Int(this.corridorWidth+modifierDistanceFromWall,0)
-
+                bottomNodeRight - new Vector2Int(modifierDistanceFromWall,0)
+                ).x :
+                StructureHelper.CalculateMiddlePoint(
+                bottomNodeLeft + new Vector2Int(modifierDistanceFromWall,0),
+                topNodeRight - new Vector2Int(modifierDistanceFromWall,0)
                 ).x;
         }
-        if(bottomNodeRight.x <= topNodeRight.x && bottomNodeRight.x >= topNodeLeft.x)
+        if(bottomNodeRight.x <= topNodeRight.x && bottomNodeRight.x >= topNodeLeft.x + this.corridorWidth + 2*modifierDistanceFromWall)
         {
-            return StructureHelper.CalculateMiddlePoint(
+            return topNodeLeft.x <= bottomNodeLeft.x ?
+                StructureHelper.CalculateMiddlePoint(
+                bottomNodeLeft + new Vector2Int(modifierDistanceFromWall, 0),
+                bottomNodeRight - new Vector2Int(modifierDistanceFromWall, 0)
+                ).x : 
+                StructureHelper.CalculateMiddlePoint(
                 topNodeLeft + new Vector2Int(modifierDistanceFromWall, 0),
-                bottomNodeRight - new Vector2Int(this.corridorWidth + modifierDistanceFromWall, 0)
-
+                bottomNodeRight - new Vector2Int(modifierDistanceFromWall, 0)
                 ).x;
         }
         return -1;
@@ -246,5 +332,14 @@ public class CorridorNode : Node
     {
         return Mathf.Atan2(middlePointStructure2Temp.y - middlePointStructure1Temp.y,
             middlePointStructure2Temp.x - middlePointStructure1Temp.x)*Mathf.Rad2Deg;
+    }
+
+    public String get_structre1()
+    {
+        return room1;
+    }
+    public String get_structre2()
+    {
+        return room2;
     }
 }

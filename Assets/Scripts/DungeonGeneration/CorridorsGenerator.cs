@@ -17,6 +17,7 @@ public class CorridorsGenerator
             }
             CorridorNode corridor = new CorridorNode(node.ChildrenNodeList[0], node.ChildrenNodeList[1], corridorWidth);
             corridor.Type = "corridor";
+            corridor.name = corridor.get_structre1() + " to " + corridor.get_structre2();
             corridorList.Add(corridor);
         }
         return corridorList;
