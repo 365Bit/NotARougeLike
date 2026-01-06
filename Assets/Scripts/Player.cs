@@ -352,6 +352,8 @@ public class Player : MonoBehaviour
     {
         isDead = false;
         characterController.enabled = true;
+        OnInventoryChanged();
+        OnStatUpgrade();
     }
 
     public float GetHealth()
@@ -399,10 +401,12 @@ public class Player : MonoBehaviour
             inventory.currency[Currency.Gold] -= slot.item.cost;
             inventory.container.AddItem(slot.item, slot.count);
             slot.shop.RemoveItem(slot.Index);
+            OnInventoryChanged();
             return true;
         } else if (transform.gameObject.TryGetComponent<DroppedItem>(out DroppedItem item)) {
             inventory.container.AddItem(item.item, item.count);
             item.Disable();
+            OnInventoryChanged();
             return true;
         } else if (transform.gameObject.TryGetComponent<TrapDoor>(out TrapDoor door)){
             door.Interact();
@@ -410,6 +414,16 @@ public class Player : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void OnInventoryChanged()
+    {
+        stats.Recompute();
+    }
+
+    public void OnStatUpgrade()
+    {
+        stats.Recompute();
     }
 
     public void Interact()
