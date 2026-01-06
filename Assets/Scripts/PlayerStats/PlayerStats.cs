@@ -10,7 +10,7 @@ public class PlayerStats : MonoBehaviour
     private PlayerUpgrades upgrades;
     private Inventory inventory;
 
-    public void Start() {
+    public void Awake() {
         def = GameObject.Find("Definitions").GetComponent<StatScalingDefinitions>();
         upgrades = GetComponent<PlayerUpgrades>();
         inventory = GetComponent<Inventory>();
