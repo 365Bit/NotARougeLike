@@ -14,7 +14,6 @@ public class PlayerStats : MonoBehaviour
         def = GameObject.Find("Definitions").GetComponent<StatScalingDefinitions>();
         upgrades = GetComponent<PlayerUpgrades>();
         inventory = GetComponent<Inventory>();
-        Recompute();
     }
 
     // 
