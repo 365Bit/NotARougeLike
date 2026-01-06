@@ -14,6 +14,7 @@ public class ItemDefinition {
 
     [Header("Rendering")]
     public string displayName;
+    public string description;
     // prefab for displaying item in scene (e.g. shop, loot drops)
     public GameObject itemModel;
     // prefab for displaying item in ui (e.g. hotbar)
