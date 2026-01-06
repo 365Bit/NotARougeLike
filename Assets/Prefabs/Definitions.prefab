@@ -123,7 +123,7 @@ MonoBehaviour:
     dropProbability: 0.031
     shopProbability: 0.23
     cost: 100
-    maxPerShopSlot: 4
+    maxPerShopSlot: 1
     weight: 0
     maxPerInventorySlot: 1
     itemBuffs:
@@ -131,15 +131,15 @@ MonoBehaviour:
       - key: WalkSpeed
         def:
           operation: 1
-          value: 2
+          value: 1.2
       - key: RunSpeed
         def:
           operation: 1
-          value: 3
+          value: 1.5
       - key: SneakSpeed
         def:
           operation: 1
-          value: 2
+          value: 1.5
 --- !u!114 &8408705079164422734
 MonoBehaviour:
   m_ObjectHideFlags: 0
