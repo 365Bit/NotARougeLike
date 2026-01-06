@@ -70,6 +70,7 @@ MonoBehaviour:
   definitions:
   - name: health_fruit
     displayName: Health Fruit
+    description: Restores health when eaten
     itemModel: {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
     itemModelUI: {fileID: 5994598806465713049, guid: 4aed6631bfdec9c9fb8bc0e542fa7be5, type: 3}
     dropProbability: 0.157
@@ -82,6 +83,7 @@ MonoBehaviour:
       definitions: []
   - name: stamina_fruit
     displayName: Stamina Fruit
+    description: Restores stamina when eaten
     itemModel: {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
     itemModelUI: {fileID: 1662156151352070245, guid: 78b72048a27746fa39395f10735ff60d, type: 3}
     dropProbability: 0.301
@@ -94,6 +96,7 @@ MonoBehaviour:
       definitions: []
   - name: mana_fruit
     displayName: Mana Fruit
+    description: Restores mana when eaten
     itemModel: {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
     itemModelUI: {fileID: 8399732216031229202, guid: e9625c90e3b36bfbf829a333b7333109, type: 3}
     dropProbability: 0.126
@@ -106,6 +109,7 @@ MonoBehaviour:
       definitions: []
   - name: BowAmmo
     displayName: Arrow
+    description: 
     itemModel: {fileID: 6937730135751535858, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
     itemModelUI: {fileID: 6937730135751535858, guid: 4bc641c7358486c479b67cdc7d794936, type: 3}
     dropProbability: 0.18
@@ -118,6 +122,7 @@ MonoBehaviour:
       definitions: []
   - name: swiftness_rune
     displayName: Rune of Swiftness
+    description: Makes its owner faster
     itemModel: {fileID: 5994598806465713049, guid: cb2cc647910d12c0db740d8ff661c926, type: 3}
     itemModelUI: {fileID: 5994598806465713049, guid: cb2cc647910d12c0db740d8ff661c926, type: 3}
     dropProbability: 0.031
