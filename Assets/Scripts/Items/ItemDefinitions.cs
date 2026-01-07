@@ -11,6 +11,7 @@ public enum Currency {
 public class ItemDefinition {
     [Header("General")]
     public string name;
+    public ItemType type;
 
     [Header("Rendering")]
     public string displayName;
@@ -82,3 +83,13 @@ public class ItemDefinitions : MonoBehaviour
         }
     }
 }
+
+[Flags]
+public enum ItemType {
+    Default = 0,
+    Consumable = 1,
+    Ammunition = 2,
+    Buff = 4
+}
+
+
