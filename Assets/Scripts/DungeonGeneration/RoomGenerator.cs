@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class RoomGenerator
@@ -17,6 +18,7 @@ public class RoomGenerator
     public List<RoomNode> GenerateRoomsInGivenSpaces(List<Node> roomSpaces, float roomBottomCornerModifier, float roomTopCornerMidifier, int roomOffset)
     {
         List<RoomNode> listToReturn = new List<RoomNode>();
+        int node_id = 1; 
         foreach (var space in roomSpaces)
         {
             Vector2Int newBottomLeftPoint = StructureHelper.GenerateBottomLeftCornerBetween(
@@ -29,8 +31,9 @@ public class RoomGenerator
             space.BottomRightAreaCorner = new Vector2Int(newTopRightPoint.x, newBottomLeftPoint.y);
             space.TopLeftAreaCorner = new Vector2Int(newBottomLeftPoint.x, newTopRightPoint.y);
             space.Type = "room";
+            space.name = node_id.ToString();
+            node_id++;
             listToReturn.Add((RoomNode)space);
-                
         }
         return listToReturn;
     }

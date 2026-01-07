@@ -13,6 +13,7 @@ public abstract class Node
     public Vector2Int TopRightAreaCorner { get; set; }
     public Vector2Int TopLeftAreaCorner { get; set; }
     public String Type { get; set; }
+    public String name;
 
     public Node Parent { get; set; }
     public int TreeLayerIndex { get; set; }
