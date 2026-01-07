@@ -58,6 +58,10 @@ public class Player : MonoBehaviour
     private float slideCooldown;
     private float slideTime;
 
+    private Transform interactionTarget;
+    private float interactionTimer = 0f;
+    private float interactionTargetDuration = 0.2f;
+
     [Header("Camera")]
     public float normalFOV = 60.0f;
     public float aimFOV = 30.0f;
@@ -244,12 +248,19 @@ public class Player : MonoBehaviour
         bool idle = motion.x >= -0.1f && motion.x <= 0.1f && motion.y >= -0.1f && motion.y <= 0.1f && motion.z >= -0.1f && motion.z <= 0.1f;
         constitution.RegenerateStamina(idle);
 
-        // give interaction hint
+        // give interaction hint that stays for a fixed amount of time
+        interactionTimer -= Time.deltaTime;
+
+        if (interactionTimer <= 0f) {
+            interactionTarget = null;
+            crosshair.Reset();
+        }
+
         if (RaycastInteractible(out RaycastHit hit)) {
             if (hit.transform.gameObject.TryGetComponent<InteractionHint>(out InteractionHint hint)) {
+                interactionTarget = hit.transform;
+                interactionTimer = interactionTargetDuration;
                 crosshair.SetInteractionText(hint.Text);
-            } else {
-                crosshair.Reset();
             }
         }
     }
@@ -370,14 +381,17 @@ public class Player : MonoBehaviour
             door.Interact();
             return true;
         }
+
         return false;
     }
 
     public void Interact()
     {
-        if (RaycastInteractible(out RaycastHit hit)) {
-            InteractWith(hit.transform);
+        if (interactionTarget != null) {
+            InteractWith(interactionTarget);
+            interactionTarget = null;
         }
+        crosshair.Reset();
     }
 
     public bool isGrounded()
