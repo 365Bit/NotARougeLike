@@ -25,6 +25,7 @@ public class DungeonCreator : MonoBehaviour
     public int corridorWidth;
     public int enemyAmount;
     public float lootProb, shopProb;
+
     [Header("Materials")]
     public Material floorMaterial;
     public Material ceilingMaterial;
@@ -62,7 +63,7 @@ public class DungeonCreator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GameObject defs = GameObject.Find("Definitions"); 
+        GameObject defs = GameObject.Find("Definitions");
         itemDefinitions = defs.GetComponent<ItemDefinitions>();
         dungeonPropertyDefinitions = defs.GetComponent<DungeonPropertyDefinitions>();
         opponentDefinitions = defs.GetComponent<OpponentDefinitions>();
@@ -79,6 +80,7 @@ public class DungeonCreator : MonoBehaviour
         int size = (int) properties[DungeonPropertyKey.Size];
 
         DestroyAllChildren();
+
         DugeonGenerator generator = new DugeonGenerator(size * dungeonWidth, size * dungeonLength);
         var listOfRooms = generator.CalculateDungeon((int)Math.Clamp(Math.Log(size), 1, 5) * maxIterations,
             roomWidthMin,
@@ -134,8 +136,8 @@ public class DungeonCreator : MonoBehaviour
     {
         Node room = listOfRooms[UnityEngine.Random.Range(0, listOfRooms.Count)];
 
-        int playerPosX = UnityEngine.Random.Range(room.BottomLeftAreaCorner.x + 2, room.BottomRightAreaCorner.x - 1);
-        int playerPosY = UnityEngine.Random.Range(room.BottomLeftAreaCorner.y + 2, room.TopLeftAreaCorner.y - 1);
+        int playerPosX = UnityEngine.Random.Range(room.BottomLeftAreaCorner.x + 2, room.TopRightAreaCorner.x - 1);
+        int playerPosY = UnityEngine.Random.Range(room.BottomLeftAreaCorner.y + 2, room.TopRightAreaCorner.y - 1);
         Vector3 playerPos = new Vector3(playerPosX, 2, playerPosY);
 
         Player player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
@@ -184,16 +186,17 @@ public class DungeonCreator : MonoBehaviour
                         int enemyPosY = UnityEngine.Random.Range(room.BottomLeftAreaCorner.y + 2, room.TopLeftAreaCorner.y - 1);
                         Vector3 enemyPos = new Vector3(enemyPosX, 1, enemyPosY);
 
-                        GameObject foe = Instantiate(opponentDefinitions.classes[opponentClass].prefab, enemyPos, Quaternion.identity);
+                        GameObject foe = Instantiate(opponentDefinitions.classes[opponentClass].prefab, enemyPos, Quaternion.identity, dungeonSegments[i].area.transform);
                         foe.name = opponentDefinitions.classes[opponentClass].prefab.name;
                         Opponent opponent = foe.GetComponent<Opponent>();
                         opponent.spawnRoom = room;
 
-                        OpponentStats stats = foe.GetComponent<OpponentStats>(); 
+                        OpponentStats stats = foe.GetComponent<OpponentStats>();
                         stats.ComputeFrom(opponentDefinitions.classes[opponentClass], (int)properties[DungeonPropertyKey.EnemyLevel]);
 
                         counter++;
                     }
+
                     if (counter >= actualEnemyAmount)
                     {
                         break;
@@ -201,7 +204,7 @@ public class DungeonCreator : MonoBehaviour
                 }
             }
 
-            isEnoughEnemies = counter >= enemyAmount;
+            isEnoughEnemies = counter >= actualEnemyAmount;
         }
     }
 

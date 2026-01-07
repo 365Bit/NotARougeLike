@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: 36f44eed5d0c7664bbc2f652081e94a4
+guid: fb58374ec0f14584ba4592460a0c0205
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Quiver
+    second: {fileID: 2100000, guid: 5e8365d3e212ab24a9f7df6ca659b58a, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

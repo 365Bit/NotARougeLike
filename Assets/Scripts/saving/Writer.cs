@@ -148,6 +148,7 @@ class Writer : IDisposable
 
 
 
+
     public void Dispose()
     {
         if (disposed)

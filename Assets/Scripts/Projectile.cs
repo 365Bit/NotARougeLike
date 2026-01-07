@@ -39,8 +39,8 @@ public class Projectile : MonoBehaviour
         lastPosition = transform.position;
 
         // move one frame ahead already
-        transform.rotation = Quaternion.LookRotation(travelDirection);
         travelDirection = rigidBody.linearVelocity.normalized;
+        transform.rotation = Quaternion.LookRotation(travelDirection);
         transform.position += travelDirection * Time.deltaTime;
 
         // Destroy the projectile after its lifetime expires
@@ -102,18 +102,6 @@ public class Projectile : MonoBehaviour
             droppedInstance = Instantiate(droppedItemPrefab, hit.point - transform.TransformVector(tipPosition * depthFactor), transform.GetChild(0).rotation);
             droppedInstance.GetComponent<DroppedItem>().SetItem(bowAmmo, 1);
             droppedInstance.name = bowAmmo.name;
-        }
-
-        if (droppedInstance != null) {
-            if (hitObject.TryGetComponent<AttachedObjects>(out AttachedObjects a)) {
-                a.Attach(droppedInstance.transform);
-            } else {
-                // if no AttachedObjects component, stick to objects that are not rigidbodies
-                var rb = droppedInstance.GetComponent<Rigidbody>();
-                rb.isKinematic = !hitObject.TryGetComponent<Rigidbody>(out Rigidbody _);
-            }
-
-            Destroy(this.gameObject);
         }
 
         if (droppedInstance != null) {
