@@ -159,7 +159,3 @@ class SaveAble : Attribute
 {
     
 }
-
-class SaveAble : Attribute
-{
-}
