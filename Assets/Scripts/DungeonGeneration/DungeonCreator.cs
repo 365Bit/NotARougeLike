@@ -184,7 +184,7 @@ public class DungeonCreator : MonoBehaviour
                         Vector3 enemyPos = new Vector3(enemyPosX, 1, enemyPosY);
 
                         GameObject foe = Instantiate(opponentDefinitions.classes[opponentClass].prefab, enemyPos, Quaternion.identity);
-                        foe.name = enemyPrefab.name;
+                        foe.name = opponentDefinitions.classes[opponentClass].prefab.name;
                         Opponent opponent = foe.GetComponent<Opponent>();
                         opponent.spawnRoom = room;
 
