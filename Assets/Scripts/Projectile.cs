@@ -39,8 +39,8 @@ public class Projectile : MonoBehaviour
         lastPosition = transform.position;
 
         // move one frame ahead already
-        transform.rotation = Quaternion.LookRotation(travelDirection);
         travelDirection = rigidBody.linearVelocity.normalized;
+        transform.rotation = Quaternion.LookRotation(travelDirection);
         transform.position += travelDirection * Time.deltaTime;
 
         // Destroy the projectile after its lifetime expires
