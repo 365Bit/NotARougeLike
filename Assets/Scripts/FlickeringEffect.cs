@@ -20,13 +20,11 @@ public class FlickeringEffect : MonoBehaviour
     private float[] baseIntensity;
 
     // internal state
-    private WindReceiver windReceiver = null;
     private float time = 0f;
     private float factor = 1f;
 
     void Start()
     {
-        TryGetComponent<WindReceiver>(out windReceiver);
         // store base intensities
         baseIntensity = new float[targets.Length];
         for (int i = 0; i < targets.Length; i++)
