@@ -11,6 +11,9 @@ public class Opponent : MonoBehaviour
     private Player player;
     private OpponentStats stats;
 
+    private string className;
+    private OpponentType opponentType;
+
     private float currentHealth;
     private float wanderTime;
 
@@ -27,6 +30,13 @@ public class Opponent : MonoBehaviour
     private Vector3 restRotation = new Vector3(0.0f, 0.0f, 0.0f);
     private Vector3 swingRotation = new Vector3(-130.0f, 0.0f, 0.0f);
     private Vector3 strikeRotation = new Vector3(-30.0f, 0.0f, 0.0f);
+
+    enum OpponentType
+    {
+        SkeletonMelee,
+        SkeletonRange
+    }
+
     enum HitState
     {
         Idle,
@@ -60,6 +70,21 @@ public class Opponent : MonoBehaviour
         //rightShoulderTransform = transform.Find("Opp Right Shoulder");
 
         stats = GetComponent<OpponentStats>();
+
+        className = stats.className;
+
+        switch(className)
+        {
+            case "MeleeSkeleton":
+                opponentType = OpponentType.SkeletonMelee;
+                break;
+            case "RangedSkeleton":
+                opponentType = OpponentType.SkeletonRange;
+                break;
+            default:
+                Debug.LogError("Unknown Opponent Class Name: " + className);
+                break;
+        }
 
         currentHealth = stats.maxHealth;
         spawnPosition = transform.position;
@@ -131,41 +156,35 @@ public class Opponent : MonoBehaviour
             Vector3 direction = (playerTransform.position - transform.position).normalized;
             direction.y = 0.0f;
 
-            if (direction != Vector3.zero)
+            if (/*direction != Vector3.zero*/ true)
             {
                 Quaternion lookRotation = Quaternion.LookRotation(direction);
                 lastRotation = transform.rotation;
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * stats.rotationSpeed);
-                float signedAngularVelocity = Vector3.SignedAngle(
-                    lastRotation * Vector3.forward,
-                    transform.rotation * Vector3.forward,
-                    Vector3.up
-                ) / Time.deltaTime;
-                //Debug.Log("Signed Angular Velocity: " + signedAngularVelocity);
-                if (Mathf.Abs(signedAngularVelocity) > 170f)
-                {
-                    animator.SetTrigger("TurnAround180");
-                } else if (signedAngularVelocity > 45f) 
-                {
-                    animator.SetTrigger("TurnRight90");
-                } else if (signedAngularVelocity < -45f) 
-                { 
-                    animator.SetTrigger("TurnLeft90");
-                }
+                //float signedAngularVelocity = Vector3.SignedAngle(
+                //    lastRotation * Vector3.forward,
+                //    transform.rotation * Vector3.forward,
+                //    Vector3.up
+                //) / Time.deltaTime;
+                ////Debug.Log("Signed Angular Velocity: " + signedAngularVelocity);
+                //if (Mathf.Abs(signedAngularVelocity) > 170f)
+                //{
+                //    animator.SetTrigger("TurnAround180");
+                //}
+                //else if (signedAngularVelocity > 45f)
+                //{
+                //    animator.SetTrigger("TurnRight90");
+                //}
+                //else if (signedAngularVelocity < -45f)
+                //{
+                //    animator.SetTrigger("TurnLeft90");
+                //}
             }
 
+            Vector3 playerOppDir = (transform.position - playerTransform.position).normalized;
+            float distanceModifier = currentHealth < stats.maxHealth * 0.5f ? 7.5f : 2.5f;
 
-            Vector3 playerOppDir = (transform.position - playerTransform.position).normalized;  
-            Vector3 targetPosition;
-            if (currentHealth < stats.maxHealth * 0.5f)
-            {
-                targetPosition = playerTransform.position + playerOppDir * 7.5f;
-            }
-            else
-            {
-                targetPosition = playerTransform.position + playerOppDir * 2.5f;
-            }
-            navMeshAgent.SetDestination(targetPosition);
+            navMeshAgent.SetDestination(playerTransform.position + playerOppDir * distanceModifier);
 
             if (distance <= stats.attackRange && hitState == HitState.Idle && hitCooldown == 0.0f)
             {
