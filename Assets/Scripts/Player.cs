@@ -1,4 +1,6 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(CharacterController)), RequireComponent(typeof(PlayerStats)), DisallowMultipleComponent]
 public class Player : MonoBehaviour
@@ -8,6 +10,7 @@ public class Player : MonoBehaviour
     private CharacterController characterController;
     private InteractionArea interactArea;
     private Camera playerCamera;
+    private Rigidbody rb;
 
     private Transform leftShoulderTransform;
     private Transform rightShoulderTransform;
@@ -39,6 +42,7 @@ public class Player : MonoBehaviour
 
     private Vector3 motion;
     private Vector3 scale;
+    private float SprintAnimSpeed;
 
     private float currentFOV;
 
@@ -68,6 +72,8 @@ public class Player : MonoBehaviour
     public float zoomSpeed = 10.0f;
 
     [Header("Combat")]
+    Vector3 localVelocity;
+    Animator animator;
     public Projectile[] projectiles;
     public Weapon weapon;
     public PlayerHitZone hitZone;
@@ -97,9 +103,11 @@ public class Player : MonoBehaviour
         playerCamera = mainCamera.GetComponent<Camera>();
         cameraTransform = mainCamera.GetComponent<Transform>();
         characterController = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody>();
+        animator = GetComponentInChildren<Animator>();
 
-        leftShoulderTransform = GameObject.Find("Left Shoulder").GetComponent<Transform>();
-        rightShoulderTransform = GameObject.Find("Right Shoulder").GetComponent<Transform>();
+        //leftShoulderTransform = GameObject.Find("Left Shoulder").GetComponent<Transform>();
+        //rightShoulderTransform = GameObject.Find("Right Shoulder").GetComponent<Transform>();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -107,6 +115,7 @@ public class Player : MonoBehaviour
     {
         attackType = AttackType.Shoot;
         hitState = HitState.Idle;
+        weapon.gameObject.SetActive(false);
 
         fireCooldown = 0.0f;
         hitCooldown = 0.0f;
@@ -117,7 +126,7 @@ public class Player : MonoBehaviour
 
         defaultYScale = transform.localScale.y;
 
-        weapon.gameObject.SetActive(false);
+        //weapon.gameObject.SetActive(false);
         hitZone.gameObject.SetActive(false);
         opponentGotHit = false;
 
@@ -127,6 +136,10 @@ public class Player : MonoBehaviour
         GameSaver.load();
 
         attackType = RunData.Instance.selectedAttack;
+        if(attackType == AttackType.Hit)
+        {
+            weapon.gameObject.SetActive(true);
+        }
     }
 
     // Update is called once per frame
@@ -135,19 +148,30 @@ public class Player : MonoBehaviour
         grounded = characterController.isGrounded;
         scale = transform.localScale;
 
+
         scale.y = slide ? defaultYScale * 0.5f : sneak ? defaultYScale * 0.75f : defaultYScale;
         transform.localScale = scale;
+        SprintAnimSpeed = run ? 2f : 1f;
+        animator.SetFloat("SprintAnimSpeed", SprintAnimSpeed);
+
+        localVelocity = transform.InverseTransformDirection(rb.linearVelocity);
+
+        float moveX = localVelocity.x;
+        float moveZ = localVelocity.z;
+        animator.SetFloat("MoveX", moveX, 0.1f, Time.deltaTime);
+        animator.SetFloat("MoveZ", moveZ, 0.1f, Time.deltaTime);
 
         if (!grounded)
         {
+            animator.SetBool("Jumping", true);
             motion.y += gravity * Time.deltaTime;
-        }
-        else
+        } else
         {
-            motion.y = 0.0f;
+            animator.SetBool("Jumping", false);
         }
 
-        if (transform.position.y < -10 && !isDead) {
+        if (transform.position.y < -10 && !isDead)
+        {
             Die();
         }
 
@@ -179,13 +203,14 @@ public class Player : MonoBehaviour
 
             float ratio = Mathf.Clamp(hitTime / duration, 0.0f, 1.0f);
 
-            rightShoulderTransform.localRotation = Quaternion.Slerp(startRotation, endRotation, ratio);
+            //rightShoulderTransform.localRotation = Quaternion.Slerp(startRotation, endRotation, ratio);
 
             if (ratio >= 1.0f)
             {
                 switch (hitState)
                 {
                     case HitState.Swing:
+                        animator.SetTrigger("Swing");
                         hitState = HitState.Strike;
                         hitTime = 0.0f;
 
@@ -205,7 +230,7 @@ public class Player : MonoBehaviour
                         hitState = HitState.Idle;
                         hitCooldown = 1.0f / stats.hitRate;
 
-                        weapon.gameObject.SetActive(false);
+                        //weapon.gameObject.SetActive(false);
                         hitZone.gameObject.SetActive(false);
                         opponentGotHit = false;
                         break;
@@ -301,10 +326,12 @@ public class Player : MonoBehaviour
         if (attackType == AttackType.Hit)
         {
             attackType = AttackType.Shoot;
+            weapon.gameObject.SetActive(false);
         }
         else
         {
             attackType = AttackType.Hit;
+            weapon.gameObject.SetActive(true);
         }
 
         RunData.Instance.selectedAttack = attackType;
@@ -349,13 +376,13 @@ public class Player : MonoBehaviour
             return;
         }
 
-        weapon.gameObject.SetActive(true);
+        //weapon.gameObject.SetActive(true);
         weapon.SetDamage(20.0f);
 
         hitState = HitState.Swing;
         hitTime = 0.0f;
 
-        startRotation = rightShoulderTransform.localRotation;
+        //startRotation = rightShoulderTransform.localRotation;
         endRotation = Quaternion.Euler(swingRotation);
     }
 
@@ -418,6 +445,7 @@ public class Player : MonoBehaviour
     {
         if (grounded && constitution.Stamina >= stats.jumpConsRate)
         {
+            animator.SetBool("Jumping", true);
             constitution.Stamina -= stats.jumpConsRate;
             motion.y = Mathf.Sqrt(stats.jumpHeight * -2f * gravity);
         }
@@ -434,6 +462,7 @@ public class Player : MonoBehaviour
         {
             constitution.Stamina -= stats.runConsRate * Time.deltaTime;
             speed = stats.runSpeed;
+
         }
         else if (sneak)
         {
@@ -457,17 +486,17 @@ public class Player : MonoBehaviour
 
             float wave = Mathf.Sin(Time.time * frequency) * amplitude;
 
-            leftShoulderTransform.localRotation = Quaternion.Slerp(leftShoulderTransform.localRotation,
-                Quaternion.Euler(wave, 0.0f, 0.0f), ratio);
-            rightShoulderTransform.localRotation = Quaternion.Slerp(rightShoulderTransform.localRotation,
-                Quaternion.Euler(-wave, 0.0f, 0.0f), ratio);
+            //leftShoulderTransform.localRotation = Quaternion.Slerp(leftShoulderTransform.localRotation,
+            //    Quaternion.Euler(wave, 0.0f, 0.0f), ratio);
+            //rightShoulderTransform.localRotation = Quaternion.Slerp(rightShoulderTransform.localRotation,
+            //    Quaternion.Euler(-wave, 0.0f, 0.0f), ratio);
         }
         else
         {
-            leftShoulderTransform.localRotation = Quaternion.Slerp(leftShoulderTransform.localRotation,
-                Quaternion.Euler(0.0f, 0.0f, 0.0f), ratio);
-            rightShoulderTransform.localRotation = Quaternion.Slerp(rightShoulderTransform.localRotation,
-                Quaternion.Euler(0.0f, 0.0f, 0.0f), ratio);
+            //leftShoulderTransform.localRotation = Quaternion.Slerp(leftShoulderTransform.localRotation,
+            //    Quaternion.Euler(0.0f, 0.0f, 0.0f), ratio);
+            //rightShoulderTransform.localRotation = Quaternion.Slerp(rightShoulderTransform.localRotation,
+            //    Quaternion.Euler(0.0f, 0.0f, 0.0f), ratio);
         }
     }
 
