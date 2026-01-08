@@ -41,7 +41,7 @@ public class DungeonCreator : MonoBehaviour
     public float pillarThickness;
     [Range(0, 6)]
     public float torchHeight;
-    [Range(1, 10)]
+    [Range(1, 20)]
     public float torchSpacing;
     [Range(0, 2)]
     public float torchWallOffset;
