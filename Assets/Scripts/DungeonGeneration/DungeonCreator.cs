@@ -76,8 +76,14 @@ public class DungeonCreator : MonoBehaviour
     public void CreateDungeon()
     {
         level = RunData.Instance.level;
+        if (level < 0) { 
+            Debug.LogWarning("rundata has not been initialized yet, assuming level = 0");
+            level = 0; 
+        }
+
         properties = dungeonPropertyDefinitions.ComputeFrom(level);
         int size = (int) properties[DungeonPropertyKey.Size];
+        Debug.Log("Generating dungeon with parameters: " + properties.ToString());
 
         DestroyAllChildren();
 
