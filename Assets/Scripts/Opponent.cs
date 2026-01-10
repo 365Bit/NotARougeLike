@@ -27,10 +27,6 @@ public class Opponent : MonoBehaviour
     private float hitTime;
     private float stunTimer;
 
-    private Vector3 restRotation = new Vector3(0.0f, 0.0f, 0.0f);
-    private Vector3 swingRotation = new Vector3(-130.0f, 0.0f, 0.0f);
-    private Vector3 strikeRotation = new Vector3(-30.0f, 0.0f, 0.0f);
-
     enum OpponentType
     {
         SkeletonMelee,
@@ -47,20 +43,22 @@ public class Opponent : MonoBehaviour
 
     private HitState hitState;
 
-    private Quaternion startRotation;
-    private Quaternion endRotation;
-
     public bool playerGotHit = false;
 
     public Node spawnRoom;
     private int nextNavPointID = 0;
-    bool wandering = false;
+    private bool hit, stunned, wandering = false;
 
-    Vector3 localVelocity;
-    private Quaternion lastRotation;
+    private Vector3 localDirection;
+    private Vector3 localVelocity;
+
+    private Quaternion lookRotation;
+    private Vector3Int spawnRoomCenter;
     public float viewAngle;
     private LayerMask obstacleMask;
     private float memoryTimer;
+
+    private List<NavPoint> targetList;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -73,7 +71,7 @@ public class Opponent : MonoBehaviour
 
         className = stats.className;
 
-        switch(className)
+        switch (className)
         {
             case "MeleeSkeleton":
                 opponentType = OpponentType.SkeletonMelee;
@@ -88,6 +86,15 @@ public class Opponent : MonoBehaviour
 
         currentHealth = stats.maxHealth;
         spawnPosition = transform.position;
+
+        if (spawnRoom != null)
+        {
+            Vector2Int roomCenter = (spawnRoom.BottomLeftAreaCorner + spawnRoom.TopRightAreaCorner) / 2;
+            spawnRoomCenter = new Vector3Int(roomCenter.x, 0, roomCenter.y);
+
+            targetList = spawnRoom.navPointList;
+        }
+
         wanderTime = stats.wanderInterval;
 
         hitState = HitState.Idle;
@@ -107,8 +114,52 @@ public class Opponent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(animator.GetBool("isDead"))
+        if (animator.GetBool("isDead"))
         {
+            return;
+        }
+
+        if (hit)
+        {
+            // Stop movement temporarily and face the direction of the hit
+            navMeshAgent.updateRotation = false;
+
+            localDirection.y = 0.0f;
+
+            animator.SetFloat("MoveX", 0.0f, 0.25f, Time.deltaTime);
+            animator.SetFloat("MoveZ", 0.0f, 0.25f, Time.deltaTime);
+
+            lookRotation = Quaternion.LookRotation(localDirection);
+
+            if (transform.rotation != lookRotation)
+            {
+                transform.rotation = Quaternion.RotateTowards(
+                    transform.rotation,
+                    lookRotation,
+                    Time.deltaTime * stats.rotationSpeed
+                );
+
+                return;
+            }
+            
+            if (!stunned && transform.rotation == lookRotation)
+            {
+                hit = false;
+                stunned = true;
+                stunTimer = stats.stunDuration * 2.0f;
+            }
+        }
+
+        if (stunned)
+        {
+            stunTimer -= Time.deltaTime;
+
+            if (stunTimer < 0.0f)
+            {
+                stunTimer = 0.0f;
+                stunned = false;
+            }
+
             return;
         }
 
@@ -119,17 +170,7 @@ public class Opponent : MonoBehaviour
         animator.SetFloat("MoveX", moveX, 0.25f, Time.deltaTime);
         animator.SetFloat("MoveZ", moveZ, 0.25f, Time.deltaTime);
 
-        if (stunTimer > 0.0f)
-        {
-            stunTimer -= Time.deltaTime;
-            if(stunTimer < 0.0f)
-            {
-                stunTimer = 0.0f;
-            }
-            return;
-        }
-
-        if(stunTimer == 0.0f) 
+        if (stunTimer == 0.0f)
         {
             navMeshAgent.isStopped = false;
         }
@@ -153,33 +194,17 @@ public class Opponent : MonoBehaviour
         if (CanSeePlayer() && !player.isDead)
         {
             navMeshAgent.updateRotation = false;
-            Vector3 direction = (playerTransform.position - transform.position).normalized;
-            direction.y = 0.0f;
 
-            if (/*direction != Vector3.zero*/ true)
-            {
-                Quaternion lookRotation = Quaternion.LookRotation(direction);
-                lastRotation = transform.rotation;
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, lookRotation, Time.deltaTime * stats.rotationSpeed);
-                //float signedAngularVelocity = Vector3.SignedAngle(
-                //    lastRotation * Vector3.forward,
-                //    transform.rotation * Vector3.forward,
-                //    Vector3.up
-                //) / Time.deltaTime;
-                ////Debug.Log("Signed Angular Velocity: " + signedAngularVelocity);
-                //if (Mathf.Abs(signedAngularVelocity) > 170f)
-                //{
-                //    animator.SetTrigger("TurnAround180");
-                //}
-                //else if (signedAngularVelocity > 45f)
-                //{
-                //    animator.SetTrigger("TurnRight90");
-                //}
-                //else if (signedAngularVelocity < -45f)
-                //{
-                //    animator.SetTrigger("TurnLeft90");
-                //}
-            }
+            localDirection = (playerTransform.position - transform.position).normalized;
+            localDirection.y = 0.0f;
+
+            lookRotation = Quaternion.LookRotation(localDirection);
+
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                lookRotation,
+                Time.deltaTime * stats.rotationSpeed
+             );
 
             Vector3 playerOppDir = (transform.position - playerTransform.position).normalized;
             float distanceModifier = currentHealth < stats.maxHealth * 0.5f ? 7.5f : 2.5f;
@@ -208,8 +233,6 @@ public class Opponent : MonoBehaviour
 
             float ratio = Mathf.Clamp(hitTime / duration, 0.0f, 1.0f);
 
-            //rightShoulderTransform.localRotation = Quaternion.Slerp(startRotation, endRotation, ratio);
-
             if (ratio >= 1.0f)
             {
                 switch (hitState)
@@ -219,16 +242,12 @@ public class Opponent : MonoBehaviour
                         hitState = HitState.Strike;
                         hitTime = 0.0f;
 
-                        startRotation = Quaternion.Euler(swingRotation);
-                        endRotation = Quaternion.Euler(strikeRotation);
                         break;
                     case HitState.Strike:
                         hitZone.gameObject.SetActive(true);
                         hitState = HitState.Return;
                         hitTime = 0.0f;
 
-                        startRotation = Quaternion.Euler(strikeRotation);
-                        endRotation = Quaternion.Euler(restRotation);
                         break;
                     case HitState.Return:
                         hitZone.gameObject.SetActive(false);
@@ -260,9 +279,6 @@ public class Opponent : MonoBehaviour
         hitZone.SetDamage(stats.attackDamage);
         hitState = HitState.Swing;
         hitTime = 0.0f;
-
-        //startRotation = rightShoulderTransform.localRotation;
-        endRotation = Quaternion.Euler(swingRotation);
     }
 
     void Die()
@@ -272,11 +288,22 @@ public class Opponent : MonoBehaviour
         Destroy(gameObject, 2.0f);
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, Vector3? direction = null)
     {
+        bool hasDirection = direction.HasValue;
+
         navMeshAgent.isStopped = true;
         animator.SetTrigger("gotHit");
-        stunTimer = stats.stunDuration;
+
+        if (hasDirection)
+        {
+            localDirection = direction.Value;
+        }
+        else
+        {
+            stunTimer = stats.stunDuration;
+            stunned = true;
+        }
 
         currentHealth -= damage;
 
@@ -285,6 +312,8 @@ public class Opponent : MonoBehaviour
             currentHealth = 0.0f;
             Die();
         }
+
+        hit = true;
     }
 
     void RegenerateHealth()
@@ -304,37 +333,41 @@ public class Opponent : MonoBehaviour
         if (navMeshAgent.remainingDistance < 1)
         {
             wanderTime -= Time.deltaTime;
-            if(wanderTime <= 0.0f) wandering = false;
+
+            // Look towards the center of the spawn room
+            localDirection = spawnRoomCenter - transform.position;
+            localDirection.y = 0.0f;
+
+            lookRotation = Quaternion.LookRotation(localDirection);
+
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                lookRotation,
+                Time.deltaTime * stats.rotationSpeed
+            );
+
+            if (wanderTime <= 0.0f) wandering = false;
         }
 
         if (!wandering)
         {
-            //Vector3 randomDirection = Random.insideUnitSphere * stats.wanderRadius;
-            //Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f),Random.Range(-1f, 1f)).normalized;
-            //Vector3 targetPos = spawnPosition + new Vector3(randomDirection.x, randomDirection.y, 0) * stats.wanderRadius;
-            //randomDirection += spawnPosition;
+            Vector3 targetPos = targetList[nextNavPointID].transform.position;
 
-            if(spawnRoom != null)
-            {
-                List<NavPoint> targetList = spawnRoom.navPointList;
+            NavMeshHit navHit;
+            NavMesh.SamplePosition(targetPos, out navHit, stats.wanderRadius, NavMesh.AllAreas);
 
-                Vector3 targetPos = targetList[nextNavPointID].transform.position;
+            navMeshAgent.SetDestination(navHit.position);
 
-                NavMeshHit navHit;
-                NavMesh.SamplePosition(targetPos, out navHit, stats.wanderRadius, NavMesh.AllAreas);
+            wanderTime = Random.Range(stats.wanderInterval * 0.5f, stats.wanderInterval * 2.0f);
+            wandering = true;
 
-                navMeshAgent.SetDestination(navHit.position);
-
-                wanderTime = Random.Range(stats.wanderInterval * 0.5f, stats.wanderInterval * 2.0f);
-                wandering = true;
-                nextNavPointID++;
-                nextNavPointID %= targetList.Count;
-            }
+            nextNavPointID++;
+            nextNavPointID %= targetList.Count;
         }
     }
     bool CanSeePlayer()
     {
-        if(stunTimer > 0.0f)
+        if (stunned)
         {
             return true;
         }
