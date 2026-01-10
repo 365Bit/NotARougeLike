@@ -14,7 +14,8 @@ public class PlayerHitZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        string name = other.gameObject.name;
+        GameObject otherObject = other.gameObject;
+        string name = otherObject.name;
 
         if (name == "Player")
         {
@@ -24,14 +25,14 @@ public class PlayerHitZone : MonoBehaviour
 
         Debug.Log("Zone hit: " + name);
 
-        if (other.gameObject.TryGetComponent<DestroyableObject>(out DestroyableObject destroyableObject)) {
+        if (otherObject.TryGetComponent<DestroyableObject>(out DestroyableObject destroyableObject))
+        {
             Debug.Log("Zone dealing " + damage + " damage to " + other.gameObject.name);
             destroyableObject.TakeDamage(damage);
         }
 
-        if (name.Contains("Opponent"))
+        if (otherObject.TryGetComponent<Opponent>(out Opponent opponent))
         {
-            Opponent opponent = other.gameObject.GetComponent<Opponent>();
             Debug.Log("Zone dealing " + damage + " damage to " + name);
             if (!player.GetOpponentGotHit())
             {
