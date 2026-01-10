@@ -272,12 +272,16 @@ PrefabInstance:
       value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 149643943944928172, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
+      propertyPath: classes.Array.data[0].stats.definitions.Array.data[1].def.points.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 149643943944928172, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
       propertyPath: classes.Array.data[1].stats.definitions.Array.data[0].def.points.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 149643943944928172, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
       propertyPath: classes.Array.data[1].stats.definitions.Array.data[1].def.points.Array.size
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 149643943944928172, guid: 61894679d4d1cdc45bf55da6b032d215, type: 3}
       propertyPath: classes.Array.data[1].stats.definitions.Array.data[6].def.points.Array.size
