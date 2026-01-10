@@ -134,6 +134,22 @@ public class ScalingFormula {
         }
         return result;
     }
+
+    public float ComputeWithOverride(PlayerUpgradeState upgradeLevels, BaseStatKey baseStat, int overrideLevel) {
+        float result = baseValue;
+        if (scalingInBaseStat != null) {
+            foreach (Operand s in scalingInBaseStat) {
+                int level = (s.stat != baseStat) ? upgradeLevels[s.stat] : overrideLevel;
+                float value = s.value.ComputeFrom(level);
+                if (operation == Operation.Multiplication) {
+                    result *= value;
+                } else {
+                    result += value;
+                }
+            }
+        }
+        return result;
+    }
 }
 
 // base stats that can be upgraded
