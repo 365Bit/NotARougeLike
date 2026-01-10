@@ -13,7 +13,8 @@ public class HitZone : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        string name = other.gameObject.name;
+        GameObject otherObject = other.gameObject;
+        string name = otherObject.name;
 
         if (name == "Opponent")
         {
@@ -23,21 +24,8 @@ public class HitZone : MonoBehaviour
 
         Debug.Log("Zone hit: " + name);
 
-        if (name.Contains("chest"))
+        if (otherObject.TryGetComponent<Player>(out Player player))
         {
-            Transform parent = other.gameObject.transform.parent;
-            DestroyableObject destroyableObject = parent.GetComponent<DestroyableObject>();
-
-            if (destroyableObject != null)
-            {
-                Debug.Log("Zone dealing " + damage + " damage to " + parent.name);
-                destroyableObject.TakeDamage(damage);
-            }
-        }
-
-        if (name.Contains("Player"))
-        {
-            Player player = other.gameObject.GetComponent<Player>();
             Debug.Log("Zone dealing " + damage + " damage to " + name);
             if (!opponent.playerGotHit)
             {
