@@ -110,38 +110,6 @@ public class Player : MonoBehaviour
         //rightShoulderTransform = GameObject.Find("Right Shoulder").GetComponent<Transform>();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        attackType = AttackType.Shoot;
-        hitState = HitState.Idle;
-        weapon.gameObject.SetActive(false);
-
-        fireCooldown = 0.0f;
-        hitCooldown = 0.0f;
-        hitTime = 0.0f;
-
-        slideCooldown = 0.0f;
-        slideTime = 0.0f;
-
-        defaultYScale = transform.localScale.y;
-
-        //weapon.gameObject.SetActive(false);
-        hitZone.gameObject.SetActive(false);
-        opponentGotHit = false;
-
-        if (!RunData.Instance.Initialized) {
-            RunData.Instance.NewGame();
-        }
-        GameSaver.load();
-
-        attackType = RunData.Instance.selectedAttack;
-        if(attackType == AttackType.Hit)
-        {
-            weapon.gameObject.SetActive(true);
-        }
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -350,6 +318,29 @@ public class Player : MonoBehaviour
 
     public void StartGame()
     {
+        attackType = AttackType.Shoot;
+        hitState = HitState.Idle;
+        weapon.gameObject.SetActive(false);
+
+        fireCooldown = 0.0f;
+        hitCooldown = 0.0f;
+        hitTime = 0.0f;
+
+        slideCooldown = 0.0f;
+        slideTime = 0.0f;
+
+        defaultYScale = transform.localScale.y;
+
+        //weapon.gameObject.SetActive(false);
+        hitZone.gameObject.SetActive(false);
+        opponentGotHit = false;
+
+        attackType = RunData.Instance.selectedAttack;
+        if(attackType == AttackType.Hit)
+        {
+            weapon.gameObject.SetActive(true);
+        }
+
         isDead = false;
         characterController.enabled = true;
     }

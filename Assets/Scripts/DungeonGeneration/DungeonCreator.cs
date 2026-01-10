@@ -60,8 +60,7 @@ public class DungeonCreator : MonoBehaviour
     int level;
     DungeonProperties properties;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         GameObject defs = GameObject.Find("Definitions");
         itemDefinitions = defs.GetComponent<ItemDefinitions>();
@@ -69,15 +68,19 @@ public class DungeonCreator : MonoBehaviour
         opponentDefinitions = defs.GetComponent<OpponentDefinitions>();
 
         navMeshSurface = GetComponent<NavMeshSurface>();
-
-        CreateDungeon();
     }
 
     public void CreateDungeon()
     {
         level = RunData.Instance.level;
+        if (level < 0) { 
+            Debug.LogWarning("rundata has not been initialized yet, assuming level = 0");
+            level = 0; 
+        }
+
         properties = dungeonPropertyDefinitions.ComputeFrom(level);
         int size = (int) properties[DungeonPropertyKey.Size];
+        Debug.Log("Generating dungeon with parameters: " + properties.ToString());
 
         DestroyAllChildren();
 
