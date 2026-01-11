@@ -70,6 +70,8 @@ public class Projectile : MonoBehaviour
     {
         GameObject hitObject = hit.transform.gameObject;
         string name = hitObject.name;
+        string tag = hitObject.tag;
+
         Debug.Log("Projectile hit: " + name);
 
         GameObject droppedInstance = null;
@@ -87,7 +89,7 @@ public class Projectile : MonoBehaviour
         }
 
         // arrow can stick to opponent, so its position has be computed appropriately
-        if (name.Contains("Opponent"))
+        if (tag.Equals("Opponent"))
         {
             Vector3 diffToOrthPlane = hit.transform.position - hit.point;
             diffToOrthPlane.y = 0f;
