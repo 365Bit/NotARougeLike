@@ -75,7 +75,7 @@ public class Player : MonoBehaviour
     Vector3 localVelocity;
     Animator animator;
     public Projectile[] projectiles;
-    public Weapon weapon;
+    public GameObject bow, sword;
     public PlayerHitZone hitZone;
 
     [Header("Interaction")]
@@ -198,7 +198,6 @@ public class Player : MonoBehaviour
                         hitState = HitState.Idle;
                         hitCooldown = 1.0f / stats.hitRate;
 
-                        //weapon.gameObject.SetActive(false);
                         hitZone.gameObject.SetActive(false);
                         opponentGotHit = false;
                         break;
@@ -294,12 +293,12 @@ public class Player : MonoBehaviour
         if (attackType == AttackType.Hit)
         {
             attackType = AttackType.Shoot;
-            weapon.gameObject.SetActive(false);
+            sword.SetActive(false);
         }
         else
         {
             attackType = AttackType.Hit;
-            weapon.gameObject.SetActive(true);
+            sword.SetActive(true);
         }
 
         RunData.Instance.selectedAttack = attackType;
@@ -320,7 +319,7 @@ public class Player : MonoBehaviour
     {
         attackType = AttackType.Shoot;
         hitState = HitState.Idle;
-        weapon.gameObject.SetActive(false);
+        sword.SetActive(false);
 
         fireCooldown = 0.0f;
         hitCooldown = 0.0f;
@@ -331,14 +330,13 @@ public class Player : MonoBehaviour
 
         defaultYScale = transform.localScale.y;
 
-        //weapon.gameObject.SetActive(false);
         hitZone.gameObject.SetActive(false);
         opponentGotHit = false;
 
         attackType = RunData.Instance.selectedAttack;
         if(attackType == AttackType.Hit)
         {
-            weapon.gameObject.SetActive(true);
+            sword.SetActive(true);
         }
 
         isDead = false;
@@ -366,9 +364,6 @@ public class Player : MonoBehaviour
         {
             return;
         }
-
-        //weapon.gameObject.SetActive(true);
-        weapon.SetDamage(20.0f);
 
         hitState = HitState.Swing;
         hitTime = 0.0f;
