@@ -21,7 +21,7 @@ public class Opponent : MonoBehaviour
 
     [Header("Combat")]
     private Animator animator;
-    public HitZone hitZone;
+    public OpponentHitZone hitZone;
 
     private float hitCooldown;
     private float hitTime;
@@ -349,7 +349,7 @@ public class Opponent : MonoBehaviour
             if (wanderTime <= 0.0f) wandering = false;
         }
 
-        if (!wandering)
+        if (!wandering && targetList != null)
         {
             Vector3 targetPos = targetList[nextNavPointID].transform.position;
 

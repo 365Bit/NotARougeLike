@@ -1,48 +1,32 @@
 using System.ComponentModel;
 using UnityEngine;
 
-public class PlayerHitZone : MonoBehaviour
+public class PlayerHitZone : HitZone<Player>
 {
-    private float damage;
-    private Player player;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    protected override void DealDamage(GameObject other)
     {
-        player = GetComponentInParent<Player>();
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        GameObject otherObject = other.gameObject;
-        string name = otherObject.name;
-
-        if (name == "Player")
-        {
-            // Ignore self triggers
-            return;
-        }
-
-        Debug.Log("Zone hit: " + name);
-
-        if (otherObject.TryGetComponent<DestroyableObject>(out DestroyableObject destroyableObject))
+        if (other.TryGetComponent<DestroyableObject>(out DestroyableObject destroyableObject))
         {
             Debug.Log("Zone dealing " + damage + " damage to " + other.gameObject.name);
             destroyableObject.TakeDamage(damage);
         }
 
-        if (otherObject.TryGetComponent<Opponent>(out Opponent opponent))
+        if (other.TryGetComponent<Opponent>(out Opponent opponent))
         {
             Debug.Log("Zone dealing " + damage + " damage to " + name);
-            if (!player.GetOpponentGotHit())
+            if (!owner.GetOpponentGotHit())
             {
                 opponent.TakeDamage(damage);
-                player.SetOpponentGotHit(true);
+                owner.SetOpponentGotHit(true);
             }
         }
     }
-    public void SetDamage(float damage)
+
+    protected override bool IsSelf(GameObject other)
     {
-        this.damage = damage;
+        string name = other.name;
+        string tag = other.tag;
+
+        return name == "Player" || tag == "Player";
     }
 }

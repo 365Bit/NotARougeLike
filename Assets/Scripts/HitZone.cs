@@ -1,39 +1,32 @@
 using UnityEngine;
 
-public class HitZone : MonoBehaviour
+public abstract class HitZone<Owner> : MonoBehaviour
+    where Owner : MonoBehaviour
 {
-    private float damage;
-    private Opponent opponent;
+    protected float damage;
+    protected Owner owner;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    protected virtual void Awake()
     {
-        opponent = GetComponentInParent<Opponent>();
+        owner = GetComponentInParent<Owner>();
     }
-
-    private void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         GameObject otherObject = other.gameObject;
-        string name = otherObject.name;
 
-        if (name == "Opponent")
+        if (IsSelf(otherObject))
         {
             // Ignore self triggers
             return;
         }
+        
+        Debug.Log($"{GetType().Name} hit: {otherObject.name}");
 
-        Debug.Log("Zone hit: " + name);
-
-        if (otherObject.TryGetComponent<Player>(out Player player))
-        {
-            Debug.Log("Zone dealing " + damage + " damage to " + name);
-            if (!opponent.playerGotHit)
-            {
-                player.TakeDamage(damage);
-                opponent.playerGotHit = true;
-            }
-        }
+        DealDamage(otherObject);
     }
+
+    protected abstract void DealDamage(GameObject other);
+    protected abstract bool IsSelf(GameObject other);
 
     public void SetDamage(float damage)
     {
